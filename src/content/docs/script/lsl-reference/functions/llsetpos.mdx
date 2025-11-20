@@ -1,0 +1,78 @@
+---
+title: llSetPos
+description: >-
+  If the object is not physical, this function sets the position of the prim.
+
+  If the script is in a child prim, Position is treated as root relative and the
+  link-set is adjusted.
+
+  If the prim is the root prim, the entire object is moved (up to 10m) to
+  Position in region coordinates.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetPos" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- **Root prims (or single prim objects)**
+  - **Attached:** `pos` is a local coordinate relative to the attach point.
+  - **Not attached:** `pos` is a region coordinate.
+- **Child prims (non-root prims):** `pos` is a local coordinate relative to the root prim.
+
+## Caveats
+
+- This function has a movement cap of 10m and a time delay of 0.2 seconds per call. Consider using `llSetRegionPos` and/or `llSetLinkPrimitiveParamsFast` instead.
+- Because of the intermixing of local and regional coordinates with this function, when a prim's position is wanted it is best to use `llGetLocalPos`.
+- This function does not work in the root prim of physical objects. Use a physical function like `llMoveToTarget` instead.
+- If you have explicitly set your object as "static obstacle" for pathfinding, the function will fail with the error in the debug channel: "Unable to set prim position or scale: object contributes to the navmesh."
+
+## Examples
+
+### Move Object Up
+
+```lsl
+// Move the object up 1m when someone touches it
+default {
+    touch_start(integer i) {
+        llSetPos(llGetPos() + <0,0,1>);
+    }
+}
+```
+
+### Movement Workaround for Small Movements
+
+```lsl
+// To bypass the small movement bug
+// Created by Madpeter Zond
+// Notes: it does not check if the movement would go out of limit range for linked prims
+llSetLocalPos(vector offset)
+{
+    vector save = offset;
+    if(offset.x < 0.0) offset.x -= 1;
+    else offset.x += 1;
+    if(offset.y < 0.0) offset.y -= 1;
+    else offset.y += 1;
+    if(offset.z < 0.0) offset.z -= 1;
+    else offset.z += 1;
+    llSetPos(offset);
+    llSetPos(save);
+}
+```
+
+## Notes
+
+Multiple movement commands can be chained together with `llSetPrimitiveParams` and `PRIM_POSITION`. The advantage of doing this is that the script only sleeps once per function call instead of once per movement.
+
+## See Also
+
+- [llSetRegionPos](../llsetregionpos/)
+- [llGetLocalPos](../llgetlocalpos/)
+- [llGetRootPosition](../llgetrootposition/)
+- [llGetPos](../llgetpos/)
+
+<WikiAttribution />

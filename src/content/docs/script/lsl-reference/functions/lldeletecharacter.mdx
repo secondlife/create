@@ -1,0 +1,70 @@
+---
+title: llDeleteCharacter
+description: >-
+  Convert link-set from AI/Physics character to Physics object.
+
+  Convert the current link-set back to a standard object, removing all
+  path-finding properties.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDeleteCharacter" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+create_character()
+{
+  // Clear any previous character behaviors
+  llDeleteCharacter();
+
+  // default speed is 20
+  llCreateCharacter([CHARACTER_DESIRED_SPEED, 10.0]);
+  llWanderWithin(llGetPos(), <10.0, 10.0, 2.0>, []);
+}
+
+default
+{
+  on_rez(integer start_param)
+  {
+    llResetScript();
+  }
+
+  state_entry()
+  {
+    create_character();
+  }
+
+  touch_start(integer num_detected)
+  {
+    // Clear any previous character behaviors
+    llDeleteCharacter();
+  }
+}
+```
+
+## Notes
+
+- Use this function to convert a character back to a standard physics object
+- Commonly called before re-creating a character with different properties
+- All pathfinding behaviors will be removed from the object
+
+## See Also
+
+- [llCreateCharacter](../llcreatecharacter/)
+- [llUpdateCharacter](../llupdatecharacter/)
+- [llWanderWithin](../llwanderwithin/)
+- [llNavigateTo](../llnavigateto/)
+- [llPatrolPoints](../llpatrolpoints/)
+- [llEvade](../llevade/)
+- [llFleeFrom](../llfleefrom/)
+- [llPursue](../llpursue/)
+- [llExecCharacterCmd](../llexeccharactercmd/)
+- [llGetClosestNavPoint](../llgetclosestnavpoint/)
+- path_update event
+
+<WikiAttribution />

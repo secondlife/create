@@ -1,0 +1,124 @@
+---
+title: llRequestAgentData
+description: >-
+  Requests data about AvatarID. When data is available the dataserver event will
+  be raised.
+
+  This function requests data about an avatar. If and when the information is
+  collected, the dataserver event is triggered with the key returned from this
+  function passed in the requested parameter. See the agent data constants
+  (DATA_*) for details about valid values of data and what each will return in
+  the dataserver event.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRequestAgentData" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Getting Avatar Name (DATA_NAME)
+
+```lsl
+key owner_key;
+key owner_name_query;
+string owner_name;
+
+default
+{
+    state_entry()
+    {
+        owner_key = llGetOwner();
+        owner_name_query = llRequestAgentData(owner_key, DATA_NAME);
+    }
+    dataserver(key queryid, string data)
+    {
+        if ( owner_name_query == queryid )
+        {
+            owner_name = data;
+            llSay(0, "The owner of this script is called : " + owner_name );
+        }
+    }
+}
+```
+
+### Checking Online Status (DATA_ONLINE)
+
+This example demonstrates a server-friendly approach to checking avatar online status. It only requests data when avatars are present in the region to minimize server load.
+
+```lsl
+key owner;
+float repeat = 120.0; // 60 - 120 sec. Recommended, faster than 60 seconds and LL will kick your XXX.
+
+key status_request;
+Status()
+{
+    integer agent_count = llGetRegionAgentCount();
+    if(agent_count > 0) // skip the request if nobody is in the region
+    {
+        status_request = llRequestAgentData(owner, DATA_ONLINE);
+    }
+}
+
+default
+{
+    state_entry()
+    {
+        owner = llGetOwner();
+        llSetTimerEvent(repeat);
+        Status();
+    }
+
+    timer()
+    {
+        Status();
+    }
+
+    dataserver(key queryid, string data)
+    {
+        if(queryid == status_request)
+        {
+            // requested data contains the string "0" or "1" for DATA_ONLINE
+            // i convert it to an integer and use the boolean as index
+
+            //list index = [   0,       1,     2(0+2), 3(1+2)  ]
+            list status = ["OFFLINE","ONLINE",<1,0,0>,<0,1,0>];
+
+            string text = llList2String(status,(integer)data);    // boolean/index = 0   or 1
+            vector color = llList2Vector(status,(integer)data+2); // boolean/index = 0+2 or 1+2
+
+            llSetText(text, color, 1.0);
+        }
+    }
+
+    on_rez(integer Dae)
+    {
+        llResetScript();
+    }
+}
+```
+
+## Caveats
+
+- DATA_BORN is not UTC. It is Pacific Time based.
+- If the requested data does not exist, or if the key given is not for an agent, the `dataserver` event will **not** be raised. This is important when handling query responses.
+
+## Tips
+
+If you merely wish to show avatar name information in the viewer window, it may be more straightforward to output a direct link instead:
+
+```lsl
+llSay(0, "secondlife:///app/agent/" + (string)id + "/about");
+```
+
+This avoids the need for a DATA_NAME dataserver event entirely.
+
+## See Also
+
+- [llGetAgentInfo](/script/reference/lsl/functions/llgetAgentInfo/) - Get detailed agent information
+- [dataserver](/script/reference/lsl/events/dataserver/) - Event triggered when requested data is available
+
+<WikiAttribution />

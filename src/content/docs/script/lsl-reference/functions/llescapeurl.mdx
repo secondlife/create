@@ -1,0 +1,76 @@
+---
+title: llEscapeURL
+description: >-
+  Returns an escaped/encoded version of url, replacing spaces with %20 etc.
+
+  Returns the string that is the URL-escaped version of URL (replacing spaces
+  with %20, etc.).
+
+                  This function returns the UTF-8 encoded escape codes for selected characters.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llEscapeURL" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+string str = "http://wiki.secondlife.com/wiki/LSL Portal";
+
+default
+{
+    state_entry()
+    {
+        llOwnerSay("Plain string:\n\t" + str);
+        // output: "http://wiki.secondlife.com/wiki/LSL Portal"
+
+        llOwnerSay("Escaped string:\n\t" + llEscapeURL(str));
+        // output: "http%3A%2F%2Fwiki%2Esecondlife%2Ecom%2Fwiki%2FLSL%20Portal"
+
+        llOwnerSay("Escaped string unescaped again:\n\t" + llUnescapeURL( llEscapeURL(str) ));
+        // output: "http://wiki.secondlife.com/wiki/LSL Portal"
+
+        // because escaping and unescaping are exact opposite
+        // and unescaping an escaped string returns the original
+
+
+        //  For readability's sake it would make more sense to do:
+        llOwnerSay("For readability's sake:\n\t" + "http://wiki.secondlife.com/wiki/" + llEscapeURL("LSL Portal"));
+        // output: "http://wiki.secondlife.com/wiki/LSL%20Portal"
+    }
+}
+```
+
+## Caveats
+
+This function is not appropriate for escaping a URL all at once, because the `:` after the protocol and all of the `/` characters delimiting the various parts will be escaped. Instead, build the URL in parts, escaping parts of the path and query string arguments as needed.
+
+For example, to properly encode a query parameter value:
+
+```lsl
+// Good: Only escape the part that needs escaping
+string base_url = "http://example.com/api?param=";
+string param_value = "hello world";
+string full_url = base_url + llEscapeURL(param_value);
+// Result: "http://example.com/api?param=hello%20world"
+
+// Bad: Don't escape the entire URL at once
+string bad_url = llEscapeURL("http://example.com/api?param=hello world");
+// Result: "http%3A%2F%2Fexample%2Ecom%2Fapi%3Fparam%3Dhello%20world"
+```
+
+## Notes
+
+- The function escapes all characters except `[a-zA-Z0-9]` to `%xx` where `xx` is the hexadecimal value in UTF-8 byte form
+- If a character requires more than one byte in UTF-8 form, multiple `%xx` sequences are returned chained together
+- The SL viewer pretty prints URLs when converting them to clickable links in chat and dialogs. To confirm a URL was escaped correctly, right-click and copy it, then paste into the chat bar to inspect; or wrap with `<nolink>` tags; or examine your chat log file; or display with a function like `llSetText`
+
+## See Also
+
+- [llUnescapeURL](/script/reference/lsl/functions/llunescapeurl/)
+
+<WikiAttribution />

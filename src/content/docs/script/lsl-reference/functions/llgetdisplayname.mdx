@@ -1,0 +1,66 @@
+---
+title: llGetDisplayName
+description: >-
+  Returns the display name of an avatar, if the avatar is connected to the
+  current region, or if the name has been cached.  Otherwise, returns an empty
+  string. Use llRequestDisplayName if the avatar may be absent from the region.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetDisplayName" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Security
+
+It is a **terrible** idea to tie any security measures to display names; they are not unique and can easily be changed.
+
+### Data Execution
+
+Display names can contain quotes and some punctuation. While this is *not* a problem for LSL, remember to **escape** strings being passed to command line scripts, SQL queries, etc.
+
+See: [XKCD: Exploits of a Mom](http://xkcd.com/327/)
+
+## Caveats
+
+- To get around the "avatar must be present" limitation, you can use the `llRequestDisplayName` function and the `dataserver` event to obtain the avatar's display name from a key (this is slower).
+- There is no opposite function (`llDisplayName2Key`) available since display names are non-unique.
+- Either of `???` or empty string `""` is returned if the region is unable to return display names. This can happen even if display names are enabled on the region, especially the first time a given key is checked. At least one retry may be advisable. Do not rely on this function to verify avatar presence.
+- It is possible for `Loading...` to be returned if called before the region has had a chance to resolve the agent's display name.
+  - Do *not* retry failed attempts indefinitely in a loop. In a few cases, a display name or username will not be returned for as long as the avatar is in the region.
+- If you merely wish to show the agent display name in the viewer window, it may be more straightforward to use Viewer URI Name Space, for example:
+
+```lsl
+llSay(0, "secondlife:///app/agent/" + (string)id + "/displayname");
+```
+
+## Examples
+
+```lsl
+// Best viewed in Chat History (ctrl-h)
+default
+{
+    collision_start(integer a) //Announce who collided
+    {
+        llSay(0, "llGetDisplayName: " + llGetDisplayName(llDetectedKey(0)) +
+                 "\nllDetectedName: " + llDetectedName(0));
+    }
+    touch_start(integer a)
+    {
+        llSay(0, "llGetDisplayName: " + llGetDisplayName(llDetectedKey(0)) +
+                 "\nllDetectedName: " + llDetectedName(0));
+    }
+}
+```
+
+## See Also
+
+- [llRequestDisplayName](../llrequestdisplayname/)
+- [llGetUsername](../llgetusername/)
+- [llRequestUsername](../llrequestusername/)
+
+<WikiAttribution />

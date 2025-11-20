@@ -1,0 +1,86 @@
+---
+title: llSetRegionPos
+description: >-
+  Attempts to move the object so that the root prim is within 0.1m of Position.
+
+  Returns an integer boolean, TRUE if the object is successfully placed within
+  0.1 m of Position, FALSE otherwise.
+
+  Position may be any location within the region or up to 10m across a region
+  border.
+
+  If the position is below ground, it will be set to the ground level at that
+  x,y location.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetRegionPos" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The object with the script will move the root prim position to the given location. The position is any position within the region. If the position is below ground, it will be set to the ground level at that X,Y spot. The function has no delay or throttle.
+
+**Returns TRUE if:**
+- The object is successfully placed within 0.1 m of position.
+
+**Returns FALSE (and does not move) if:**
+- Position is more than 10m off region or above 4096m
+  - The x & y components of position must be in the range -10.0 to 266.0
+  - The z component must be in the range 0.0 to 4096
+- The object is dynamic (has physics enabled)
+- The object can not move to position due to parcel/region restrictions (object entry rules, prim limits, bans, etc.)
+- The object is an avatar attachment
+
+**Returns FALSE but moves the object if:**
+- The z position is below the ground
+
+## Examples
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        vector currentPosition = llGetPos();
+
+        // check whether the object has successfully been moved
+        // to the center of the sim at the same height
+        integer hasMoved = llSetRegionPos(<128.0, 128.0, currentPosition.z>);
+
+        if (hasMoved)
+        {
+            llOwnerSay("My new position is now:\n"
+                + "http://maps.secondlife.com/secondlife/" + llEscapeURL(llGetRegionName())
+                + "/128/128/" + (string)llRound(currentPosition.z) + "/");
+        }
+        else if ( currentPosition.z < llGround(ZERO_VECTOR) )
+        {
+            llOwnerSay("My new position is now:\n"
+                + "http://maps.secondlife.com/secondlife/" + llEscapeURL(llGetRegionName())
+                + "/128/128/" + (string)llCeil(llGround(ZERO_VECTOR)) + "/");
+        }
+        else
+            llOwnerSay("Move was not possible!");
+    }
+}
+```
+
+## Notes
+
+- This function is intended to replace WarpPos
+- Only if TRUE is returned does the object move, if FALSE is returned, the object does not change position
+- The function has no delay or throttle
+
+## See Also
+
+- [llGetLocalPos](../llgetlocalpos/)
+- [llGetRootPosition](../llgetrootposition/)
+- [llGetPos](../llgetpos/)
+- [llSetPos](../llsetpos/)
+- [llEdgeOfWorld](../lledgeofworld/)
+
+<WikiAttribution />

@@ -1,0 +1,83 @@
+---
+title: llRotTargetRemove
+description: |-
+  Removes rotational target number.
+  Remove rotational target indicated by the handle.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRotTargetRemove" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The following example demonstrates using `llRotTargetRemove` to cancel a rotation target when it has been reached:
+
+```lsl
+vector standrot = <0.0, 0.0, 0.0>;
+vector fliprot = <45.0, 0.0, 0.0>;
+
+// Simple two-state rotation target detection and rotation
+// Detects when an object reaches a target rotation and applies changes
+
+integer rottarget;
+
+default
+{
+    state_entry()
+    {
+        rottarget = llRotTarget(llEuler2Rot(fliprot * DEG_TO_RAD), 0.1);
+        llSetPrimitiveParams([PRIM_ROTATION, llEuler2Rot(standrot * DEG_TO_RAD)]);
+    }
+
+    not_at_rot_target()
+    {
+        llRotTargetRemove(rottarget);
+        llOwnerSay("not there");
+    }
+
+    touch_start(integer total_number)
+    {
+        state rotatestate;
+    }
+}
+
+state rotatestate
+{
+    state_entry()
+    {
+        rottarget = llRotTarget(llEuler2Rot(fliprot * DEG_TO_RAD), 0.1);
+        llSetPrimitiveParams([PRIM_ROTATION, llEuler2Rot(fliprot * DEG_TO_RAD)]);
+    }
+
+    at_rot_target(integer tnum, rotation targetrot, rotation ourrot)
+    {
+        llRotTargetRemove(rottarget);
+        llOwnerSay("there");
+    }
+
+    touch_start(integer touched)
+    {
+        state default;
+    }
+}
+```
+
+## Notes
+
+- Use this function to unregister a rotation target when you no longer need to monitor for rotation changes
+- The `handle` parameter is the integer returned by `llRotTarget` when the target was registered
+- Once removed, the target will no longer trigger `at_rot_target` or `not_at_rot_target` events
+
+## See Also
+
+- [llRotTarget](../llrottarget/)
+- [llTarget](../lltarget/)
+- [llTargetRemove](../lltargetremove/)
+- `at_rot_target` - Event triggered when object reaches target rotation
+- `not_at_rot_target` - Event triggered when object is not at target rotation
+
+<WikiAttribution />

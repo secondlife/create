@@ -1,0 +1,58 @@
+---
+title: llComputeHash
+description: Returns hex-encoded Hash string of Message using digest Algorithm.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llComputeHash" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Compute hash digests using different algorithms:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llOwnerSay("Ready");
+    }
+
+    touch_start(integer touch_count)
+    {
+        string message = "your-test-message-here";
+
+        list algorithms = ["md5", "md5_sha1", "sha1", "sha224", "sha256", "sha384", "sha512" ];
+
+        integer num_algorithms = llGetListLength(algorithms);
+        llOwnerSay("message='" + message + "'");
+
+        integer i = 0;
+        for (i = 0; i < num_algorithms; ++i)
+        {
+            string algorithm = llList2String(algorithms, i);
+            string hash = llComputeHash(message, algorithm);
+            llOwnerSay(algorithm + " : " + hash);
+        }
+    }
+}
+```
+
+## Notes
+
+Supported hash algorithms are: `md5`, `md5_sha1`, `sha1`, `sha224`, `sha256`, `sha384`, and `sha512`.
+
+## See Also
+
+- [llSignRSA](../llsignrsa/)
+- [llVerifyRSA](../llverifyrsa/)
+- [llHMAC](../llhmac/)
+- [llSHA1String](../llsha1string/)
+- [llSHA256String](../llsha256string/)
+- [llMD5String](../llmd5string/)
+
+<WikiAttribution />

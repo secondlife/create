@@ -1,0 +1,45 @@
+---
+title: llDialog
+description: |-
+  Shows a dialog box on the avatar's screen with the message.
+
+                      Up to 12 strings in the list form buttons.
+
+                      If a button is clicked, the name is chatted on Channel.
+  Opens a "notify box" in the given avatars screen displaying the message.
+
+                  Up to twelve buttons can be specified in a list of strings. When the user clicks a button, the name of the button is said on the specified channel.
+
+                  Channels work just like llSay(), so channel 0 can be heard by everyone.
+
+                  The chat originates at the object's position, not the avatar's position, even though it is said as the avatar (uses avatar's UUID and Name etc.).
+
+                  Examples:
+
+                  llDialog(who, "Are you a boy or a girl?", [ "Boy", "Girl" ], -4913);
+
+                  llDialog(who, "This shows only an OK button.", [], -192);
+
+                  llDialog(who, "This chats so you can 'hear' it.", ["Hooray"], 0);
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llDialog" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.Dialog()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llDialog](/script/reference/lsl/functions/llDialog/)
+
+

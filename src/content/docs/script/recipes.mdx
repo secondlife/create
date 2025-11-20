@@ -1,0 +1,164 @@
+---
+title: Script Recipes
+description: Practical examples and common patterns for Second Life scripting
+---
+
+import { Card, CardGrid, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Looking for working code examples? This collection of recipes shows you how to accomplish common scripting tasks in Second Life. Each recipe includes examples in both LSL and SLua.
+
+## How to Use These Recipes
+
+Each recipe demonstrates a complete, working solution to a specific problem. You can:
+
+- Copy and paste the code directly into your scripts
+- Modify the examples to fit your specific needs
+- Learn patterns and techniques to apply elsewhere
+- Compare LSL and SLua approaches side-by-side
+
+## Recipe Categories
+
+<CardGrid>
+  <Card title="Basic Interactions" icon="star">
+    Touch detection, hover text, chat commands, and simple responses
+  </Card>
+
+  <Card title="Movement & Physics" icon="rocket">
+    Moving objects, following avatars, doors, vehicles, and physics simulation
+  </Card>
+
+  <Card title="Visual Effects" icon="sun">
+    Particles, glow, transparency, color changes, and texture animation
+  </Card>
+
+  <Card title="Communication" icon="comment">
+    Chat, instant messages, HTTP requests, and data exchange between scripts
+  </Card>
+
+  <Card title="Timers & Scheduling" icon="moon">
+    Repeating actions, countdowns, scheduling, and time-based triggers
+  </Card>
+
+  <Card title="Data Storage" icon="document">
+    Saving data, notecards, databases, and persistent state
+  </Card>
+
+  <Card title="Avatar Interaction" icon="user">
+    Detecting avatars, permissions, animations, and attachments
+  </Card>
+
+  <Card title="Advanced Patterns" icon="puzzle">
+    State machines, async operations, error handling, and optimization
+  </Card>
+</CardGrid>
+
+## Featured Recipes
+
+### Hello World
+The simplest script - say hello when touched.
+
+<Tabs>
+  <TabItem label="LSL">
+  ```lsl
+  default {
+      touch_start(integer total_number) {
+          llSay(0, "Hello, Avatar!");
+      }
+  }
+  ```
+  </TabItem>
+  <TabItem label="SLua">
+  ```luau
+  LLEvents:on("touch_start", function(event: TouchEvent)
+      print("Hello, Avatar!")
+  end)
+  ```
+  </TabItem>
+</Tabs>
+
+### Color Changer
+Change an object's color when touched, cycling through the rainbow.
+
+<Tabs>
+  <TabItem label="LSL">
+  ```lsl
+  integer colorIndex = 0;
+  list colors = [
+      <1.0, 0.0, 0.0>,  // Red
+      <1.0, 0.5, 0.0>,  // Orange
+      <1.0, 1.0, 0.0>,  // Yellow
+      <0.0, 1.0, 0.0>,  // Green
+      <0.0, 0.0, 1.0>,  // Blue
+      <0.5, 0.0, 1.0>   // Purple
+  ];
+
+  default {
+      touch_start(integer total_number) {
+          llSetColor(llList2Vector(colors, colorIndex), ALL_SIDES);
+          colorIndex = (colorIndex + 1) % llGetListLength(colors);
+      }
+  }
+  ```
+  </TabItem>
+  <TabItem label="SLua">
+  ```luau
+  local colorIndex: number = 1
+  local colors: {vector} = {
+      vector(1.0, 0.0, 0.0),  -- Red
+      vector(1.0, 0.5, 0.0),  -- Orange
+      vector(1.0, 1.0, 0.0),  -- Yellow
+      vector(0.0, 1.0, 0.0),  -- Green
+      vector(0.0, 0.0, 1.0),  -- Blue
+      vector(0.5, 0.0, 1.0),  -- Purple
+  }
+
+  LLEvents:on("touch_start", function(event: TouchEvent)
+      llSetColor(colors[colorIndex], ALL_SIDES)
+      colorIndex = (colorIndex % #colors) + 1
+  end)
+  ```
+  </TabItem>
+</Tabs>
+
+### Simple Timer
+Do something every 5 seconds.
+
+<Tabs>
+  <TabItem label="LSL">
+  ```lsl
+  default {
+      state_entry() {
+          llSetTimerEvent(5.0);
+      }
+
+      timer() {
+          llOwnerSay("5 seconds have passed!");
+      }
+  }
+  ```
+  </TabItem>
+  <TabItem label="SLua">
+  ```luau
+  LLTimers:every(5, function()
+      print("5 seconds have passed!")
+  end)
+  ```
+  </TabItem>
+</Tabs>
+
+## Browse All Recipes
+
+Ready to explore more? Check out the complete recipe collection organized by category:
+
+- **[Basic Interactions](/script/recipes/interactions/)** - Touch, chat, and simple responses
+- **[Movement & Physics](/script/recipes/movement/)** - Moving and animating objects
+- **[Visual Effects](/script/recipes/effects/)** - Particles, colors, and animations
+- **[Communication](/script/recipes/communication/)** - Chat, HTTP, and messaging
+- **[Timers & Scheduling](/script/recipes/timers/)** - Time-based actions
+- **[Data Storage](/script/recipes/storage/)** - Saving and loading data
+- **[Avatar Interaction](/script/recipes/avatars/)** - Working with avatars
+- **[Advanced Patterns](/script/recipes/advanced/)** - Complex techniques
+
+## Contributing
+
+Have a useful recipe to share? We welcome contributions! Check out the [contribution guidelines](https://github.com/secondlife/create) to add your own recipes.

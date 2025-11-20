@@ -1,0 +1,70 @@
+---
+title: llMapDestination
+description: >-
+  Opens world map for avatar who touched it or is wearing the script, centred on
+  RegionName with Position highlighted. Only works for scripts attached to
+  avatar, or during touch events.
+
+  Direction currently has no effect.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llMapDestination" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+string simName = "Help Island Public";
+vector tpDest = <128.0, 128.0, 24.0>;
+vector lookAt = ZERO_VECTOR;
+
+default
+{
+    state_entry()
+    {
+        // set white, opaque floattext with teleport destination
+        llSetText("click to teleport\nto '" + simName + "'", <1.0, 1.0, 1.0>, (float)TRUE);
+    }
+
+    touch_start(integer num_detected)
+    {
+        key id = llDetectedKey(0);
+
+        string oldSlurlPrefix = "http://slurl.com/secondlife/";
+        string newSlurlPrefix = "http://maps.secondlife.com/secondlife/";
+        string slurlSuffix = llEscapeURL(simName)
+            + "/" + (string)llRound(tpDest.x)
+            + "/" + (string)llRound(tpDest.y)
+            + "/" + (string)llRound(tpDest.z);
+
+        llInstantMessage(id, oldSlurlPrefix + slurlSuffix);
+        llInstantMessage(id, newSlurlPrefix + slurlSuffix);
+
+        llMapDestination(simName, tpDest, lookAt);
+    }
+}
+```
+
+## Caveats
+
+- If the region name is omitted (empty string) or invalid, the map will open centered on the object, but the position will not be highlighted. Since this function requests the client to perform a task, there is no way for the script to know if it has failed.
+- The `Direction` (look_at) parameter currently does nothing.
+- If called from non-touch events, it only works for the script owner.
+- If called from a touch event with multiple touches in the event queue (`num_touched > 1`), it may only work for the first or last touch.
+- If called inside an attachment, it only works for the owner.
+
+## Notes
+
+- The position parameter will work with region coordinates not inside the specified region (like those returned by `llRequestInventoryData`).
+- This function only works for scripts attached to an avatar or during touch events.
+
+## See Also
+
+- [llMapBeacon](../llmapbeacon/)
+- [llRequestInventoryData](../llrequestinventorydata/)
+
+<WikiAttribution />

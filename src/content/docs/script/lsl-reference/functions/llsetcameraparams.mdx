@@ -1,0 +1,91 @@
+---
+title: llSetCameraParams
+description: >-
+  Sets multiple camera parameters at once. List format is [ rule-1, data-1,
+  rule-2, data-2 . . . rule-n, data-n ].
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetCameraParams" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Camera control is currently only supported for attachments and objects on which you are sitting. An attempt otherwise will result in an error being shouted on DEBUG_CHANNEL.
+- Scripted camera parameters are overridden for agents who are in Free Camera mode (Alt + Click). **No error is returned if this is the case**; however when the agent returns to regular camera mode, their camera will go to the scripted camera position.
+- When CAMERA_FOCUS is not defined, it is advised that CAMERA_FOCUS_THRESHOLD is set to 0.0 - this is because when left at its default value, it may prevent the camera from focusing on the correct point, instead focusing just to the side of the intended point.
+- A CAMERA_FOCUS_OFFSET of ZERO_VECTOR will always look at the same position as returned by llGetPos() for the avatar
+  - When seated, this is also the position of "Avatar Center" when hover height is 0
+  - When standing, this has a shape-dependent z-offset from "Avatar Center"
+- Cannot be used to control the camera in Mouselook.
+
+## Examples
+
+### Region Relative Coordinates
+
+This example sets the camera in region relative coordinates with both focus and position locked:
+
+```lsl
+lookAtMe(integer perms)
+{
+    if (perms & PERMISSION_CONTROL_CAMERA)
+    {
+        vector camPos = llGetPos() + (relCamP * llGetRot() * turnOnChair);
+        vector camFocus = llGetPos();
+        llClearCameraParams(); // reset camera to default
+        llSetCameraParams([
+            CAMERA_ACTIVE, 1, // 1 is active, 0 is inactive
+            CAMERA_FOCUS, camFocus, // region relative position
+            CAMERA_FOCUS_LOCKED, TRUE, // (TRUE or FALSE)
+            CAMERA_POSITION, camPos, // region relative position
+            CAMERA_POSITION_LOCKED, TRUE // (TRUE or FALSE)
+        ]);
+    }
+}
+```
+
+Note that Focus and Position are both locked. This example makes the camera look at `camFocus` from `camPos`.
+
+### Camera Follow Avatar
+
+This example makes the camera follow a pilot on a vehicle. Note that Focus and Position are NOT locked and not even set:
+
+```lsl
+lookAtMe(integer perms)
+{
+    if (perms & PERMISSION_CONTROL_CAMERA)
+    {
+        llClearCameraParams(); // reset camera to default
+        llSetCameraParams([
+            CAMERA_ACTIVE, 1, // 1 is active, 0 is inactive
+            CAMERA_BEHINDNESS_ANGLE, 30.0, // (0 to 180) degrees
+            CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
+            CAMERA_DISTANCE, 10.0, // (0.5 to 10) meters
+            //CAMERA_FOCUS, <0,0,5>, // region relative position
+            CAMERA_FOCUS_LAG, 0.05, // (0 to 3) seconds
+            CAMERA_FOCUS_LOCKED, FALSE, // (TRUE or FALSE)
+            CAMERA_FOCUS_THRESHOLD, 0.0, // (0 to 4) meters
+            CAMERA_PITCH, 10.0, // (-45 to 80) degrees
+            //CAMERA_POSITION, <0,0,0>, // region relative position
+            CAMERA_POSITION_LAG, 0.0, // (0 to 3) seconds
+            CAMERA_POSITION_LOCKED, FALSE, // (TRUE or FALSE)
+            CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
+            CAMERA_FOCUS_OFFSET, <2.0, 0.0, 0.0> // <-10,-10,-10> to <10,10,10> meters
+        ]);
+    }
+}
+```
+
+## See Also
+
+- [llClearCameraParams](../llclearcameraparams/)
+- [llGetCameraPos](../llgetcamerapos/)
+- [llGetCameraRot](../llgetcamerarot/)
+- [llSetLinkCamera](../llsetlinkcamera/)
+- [llSetCameraEyeOffset](../llsetcameraeyeoffset/)
+- [llSetCameraAtOffset](../llsetcameraatoffset/)
+
+<WikiAttribution />

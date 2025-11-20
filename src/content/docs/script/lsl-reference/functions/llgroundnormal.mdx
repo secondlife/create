@@ -1,0 +1,37 @@
+---
+title: llGroundNormal
+description: |-
+  Returns the ground normal below the object position + offset.
+  Returns the ground contour at the object's position + Offset.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGroundNormal" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function is defined as:
+
+```lsl
+vector llGroundNormal(vector offset)
+{
+    vector slope = llGroundSlope(offset);
+    return <slope.x, slope.y, 1.0>;
+}
+```
+
+## Notes
+
+There is sometimes confusion between a [Surface Normal](https://en.wikipedia.org/wiki/Normal_%28geometry%29) (the direction from the surface) and a [Normalized Vector](https://en.wikipedia.org/wiki/Unit_vector) (a vector with a magnitude of 1.0, also called a Unit Vector). This function does **not** return a unit vector. Surface normals may encode additional information in the magnitude of the vector. If you need a Unit Vector, simply use `llVecNorm`.
+
+## See Also
+
+- [llGround](../llground/)
+- [llGroundContour](../llgroundcontour/)
+- [llGroundSlope](../llgroundslope/)
+
+<WikiAttribution />

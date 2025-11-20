@@ -1,0 +1,44 @@
+---
+title: llLinksetDataListKeys
+description: Returns a list of all keys in the linkset datastore.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLinksetDataListKeys" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This example lists all the keys in a linkset. Note that only 1024 characters will be displayed due to limitations of `llSay`.
+
+```lsl
+// Retrieving too many entries from LinksetData can trigger a stack or heap error if the number of entries exceeds the available memory.  Use with caution.
+
+default
+{
+    state_entry()
+    {
+        llSay(0, llDumpList2String(llLinksetDataListKeys(0, 0), "\n"));
+    }
+}
+```
+
+## Notes
+
+Retrieving too many entries from LinksetData can trigger a stack or heap error if the number of entries exceeds the available memory. Use with caution when retrieving large datasets.
+
+## See Also
+
+- [llLinksetDataAvailable](../lllinksetdataavailable/)
+- [llLinksetDataCountKeys](../lllinksetdatacountkeys/)
+- [llLinksetDataDelete](../lllinksetdatadelete/)
+- [llLinksetDataDeleteFound](../lllinksetdatadeletefound/)
+- [llLinksetDataFindKeys](../lllinksetdatafindkeys/)
+- [llLinksetDataRead](../lllinksetdataread/)
+- [llLinksetDataReset](../lllinksetdatareset/)
+- [llLinksetDataWrite](../lllinksetdatawrite/)
+
+<WikiAttribution />

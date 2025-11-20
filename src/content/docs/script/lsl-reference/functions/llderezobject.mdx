@@ -1,0 +1,45 @@
+---
+title: llDerezObject
+description: >-
+  Derezzes an object previously rezzed by a script in this region. Returns TRUE
+  on success or FALSE if the object could not be derezzed.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDerezObject" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Deletes, or marks temporary, an object that was previously rezzed by this script. The object's root prim must have been previously rezzed from a script within this object. If the object is successfully deleted, this function returns TRUE; if it fails for any reason, it returns FALSE.
+
+## Derez Options
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| DEREZ_DIE | 0 | Immediately delete the object. |
+| DEREZ_MAKE_TEMP | 1 | Mark the object as temporary so that the simulator will remove the object at a later time. |
+| DEREZ_TO_INVENTORY | 2 | Returns the targeted object to derezzer's inventory and saves its current state. |
+
+## Caveats
+
+- The targeted object's rezzer must be the same as the object hosting this script
+- The target must not be an attachment
+- The target must be copyable
+- The target's owner must be the same as the script's owner
+- When marking an object as temporary, the object must not contribute to the navmesh
+- When using DEREZ_TO_INVENTORY:
+  - The derezzer must not be an attachment
+  - The derezzer must be modifiable
+  - The object in the derezzer's inventory must still exist
+  - The object in the derezzer's inventory must not be a coalesced object
+
+## See Also
+
+- [llRezObject](../llrezobject/)
+- [llRezAtRoot](../llrezatroot/)
+
+<WikiAttribution />

@@ -1,0 +1,162 @@
+---
+title: llSetClickAction
+description: Sets the action performed when a prim is clicked upon.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetClickAction" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- When set in the root of an object, the chosen `CLICK_ACTION_*` will apply to children even if they have their own `llSetClickAction()` set. However, if the `CLICK_ACTION_*` is set in the root but not in children (including no touch event scripts), the effect is not visible but is still used. To see the correct cursor, the `CLICK_ACTION_*` flags must match in both children and root.
+- If `llSetClickAction()` is set to `CLICK_ACTION_PAY`, you must have a `money` event, or it will revert to `CLICK_ACTION_NONE`.
+- While this function works on attached objects, the configured click action is ignored by the viewer (with exceptions). The viewer always behaves as though an attached object has `CLICK_ACTION_TOUCH` set. The only exception is `CLICK_ACTION_DISABLED`, which disables the cursor changing from the standard pointer to the touch pointer.
+- `llSetClickAction()` must be called before an avatar clicks on an object. Calling it while an avatar is clicking (click and holding) will cause this function to silently fail. You can set the click action after an avatar touches an object, but there may be delay before the avatar's viewer updates due to network latency.
+
+## Examples
+
+### Make sitting easier
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetClickAction(CLICK_ACTION_SIT);
+        llRemoveInventory(llGetScriptName());
+    }
+}
+```
+
+### Make unpacking for next owner easier
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetClickAction(CLICK_ACTION_OPEN);
+        llRemoveInventory(llGetScriptName());
+    }
+}
+```
+
+### Make buying for customers easier
+
+```lsl
+// Remember you'll have to set a price
+// in the general tab of the edit window
+// for your object before using this script
+
+default
+{
+    state_entry()
+    {
+        llSetClickAction(CLICK_ACTION_BUY);
+        llRemoveInventory(llGetScriptName());
+    }
+}
+```
+
+### Simple tip jar
+
+```lsl
+// Simple tipjar
+
+default
+{
+    state_entry()
+    {
+        llSetClickAction(CLICK_ACTION_PAY);
+
+        // Enable edit field to put own amount, all quick-pay-buttons hidden
+        llSetPayPrice(PAY_DEFAULT, [PAY_HIDE, PAY_HIDE, PAY_HIDE, PAY_HIDE]);
+    }
+
+    money(key id, integer amount)
+    {
+        string name = llKey2Name(id);
+
+        llInstantMessage(id, "Thank you for the tip, " + name + "!");
+    }
+}
+```
+
+### Sit only with permission
+
+```lsl
+// Sit only with permission
+
+list gAvWhitelist = ["953d10f1-44ce-462a-8bc1-f634333ee031", "599dce91-a2b8-48c5-b96d-54965433022b"];
+
+default
+{
+    state_entry()
+    {
+        llSitTarget(<0.0, 0.0, 0.5>, ZERO_ROTATION);
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK)
+        {
+            list Properties = llGetObjectDetails(llGetKey(), [OBJECT_CLICK_ACTION]);
+            integer Click = llList2Integer(Properties, 0);
+            key Av = llAvatarOnSitTarget();
+            if ((Av != NULL_KEY) && (!Click))
+            {
+                llSay(0, "Please click first for permission to sit.");
+                llUnSit(Av);
+            }
+        }
+    }
+    touch_start(integer total_number)
+    {
+        list Properties = llGetObjectDetails(llGetKey(), [OBJECT_CLICK_ACTION]);
+        integer Click = llList2Integer(Properties, 0);
+        if (!Click && (~llListFindList(gAvWhitelist, [(string)llDetectedKey(0)])))
+        {
+            llSetClickAction(CLICK_ACTION_SIT);
+            llSetTimerEvent(10.0);
+            llSay(0, "Please take a seat.");
+        }
+        else
+        {
+            llSetClickAction(CLICK_ACTION_TOUCH);
+            if (llAvatarOnSitTarget() != NULL_KEY)
+            {
+                llSay(0, "Good bye!");
+            }
+            else
+            {
+                llSay(0, "Sorry. You are not allowed to sit here.");
+            }
+            llUnSit(llDetectedKey(0));
+        }
+    }
+
+    timer()
+    {
+        llSetTimerEvent(0.0);
+        llSetClickAction(CLICK_ACTION_TOUCH);
+    }
+}
+```
+
+## Notes
+
+- When using `CLICK_ACTION_SIT`, an avatar who clicks the object, sits down, and then clicks the object again will fire a `touch` event with the second click.
+- The cursor image changes when hovering over the prim to reflect the action.
+
+## See Also
+
+- [llPassTouches](../llpasstouches/)
+- touch_start event
+- touch event
+- touch_end event
+
+<WikiAttribution />

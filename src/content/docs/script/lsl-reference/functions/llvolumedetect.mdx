@@ -1,0 +1,73 @@
+---
+title: llVolumeDetect
+description: >-
+  If DetectEnabled = TRUE, object becomes phantom but triggers collision_start
+  and collision_end events when other objects start and stop interpenetrating.
+
+  If another object (including avatars) interpenetrates it, it will get a
+  collision_start event.
+
+  When an object stops interpenetrating, a collision_end event is generated.
+  While the other is inter-penetrating, collision events are NOT generated.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llVolumeDetect" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llVolumeDetect(TRUE); // Starts llVolumeDetect
+    }
+    collision_start(integer total_number)
+    {
+        llSay(0, "Detected!"); // Tells you when something penetrates the prim
+    }
+}
+```
+
+## How VolumeDetect Works
+
+VolumeDetect works much like Phantom, but unlike Phantom, VolumeDetect objects trigger `collision_start` and `collision_end` events when interpenetrating. Collision events will trigger in any script in the object.
+
+### Differences Between VolumeDetect and Phantom
+
+**VolumeDetect:**
+- When physical they fall through the ground with the risk of going off-world
+- Collision events are not triggered
+- Triggers `collision_start` and `collision_end` events when objects interpenetrate
+
+**Phantom:**
+- When physical they collide with the ground but will not pass through (normal physical object behavior)
+- Land collision events are queued
+- Supports `land_collision_start`, `land_collision`, and `land_collision_end` events
+
+## Caveats
+
+- It can only be applied to the root prim (which will make the entire object VolumeDetect)
+- If the volume detecting object is *not* physical, it can only detect physical objects and avatars. If the object *is* physical, it can detect its collisions with static and keyframed motion objects as well
+
+### Attachments
+
+**Note:** Attachments are not included in the avatar's bounding box. Collision events received by attachments are collisions the avatar is having with the world, not collisions the attachment is having. Nothing actually can collide with an attachment.
+
+- It is meaningless to enable VolumeDetect on attachments. Attachments cannot collide with anything
+- Attachments do not receive collision events for avatar collisions with VolumeDetect objects
+- Attachments do receive collision events for avatar collisions with non-VolumeDetect, non-phantom objects
+
+## See Also
+
+- [llPassCollisions](../llpasscollisions/)
+- collision_start
+- collision
+- collision_end
+
+<WikiAttribution />

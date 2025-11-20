@@ -1,0 +1,91 @@
+---
+title: llSetAlpha
+description: >-
+  Sets the alpha (opacity) of Face.
+
+  Sets the alpha (opacity) value for Face. If Face is ALL_SIDES, sets the alpha
+  for all faces. The alpha value is interpreted as an opacity percentage (1.0 is
+  fully opaque, and 0.2 is mostly transparent). This function will clamp alpha
+  values less than 0.1 to 0.1 and greater than 1.0 to 1.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetAlpha" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+In practical terms, "alpha" means "transparency" or "visibility".
+
+To be clear, llSetAlpha will only affect the prim that the script is in. It will not affect any linked prims. To set the alpha state for those, use llSetLinkAlpha.
+
+## Caveats
+
+- llSetAlpha will have no visible effect on faces with a PBR material. To work on faces both with and without a PBR material, use one of these snippets:
+
+### Making Objects Invisible
+
+```lsl
+llSetAlpha(0.0, ALL_SIDES);
+llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_GLTF_BASE_COLOR, ALL_SIDES, "", "", "", "", "", 0.0, PRIM_GLTF_ALPHA_MODE_MASK, 1.0, ""]);
+```
+
+### Making Objects Visible
+
+```lsl
+llSetAlpha(1.0, ALL_SIDES);
+llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_GLTF_BASE_COLOR, ALL_SIDES, "", "", "", "", "", "", "", "", ""]);
+```
+
+## Examples
+
+```lsl
+float cloakSpeed = 0.1;
+
+default
+{
+    touch_end(integer total_number)
+    {
+        float alpha = 1.0;
+        while(alpha > 0.0)
+        {
+            alpha -= 0.1;
+            llSetAlpha(alpha, ALL_SIDES);
+            llSleep(cloakSpeed);
+        }
+        state cloaked;
+    }
+}
+
+state cloaked
+{
+    touch_end(integer total_number)
+    {
+        float alpha;
+        while (alpha < 1.0)
+        {
+            alpha += 0.1;
+            llSetAlpha(alpha, ALL_SIDES);
+            llSleep(cloakSpeed);
+        }
+        state default;
+    }
+}
+```
+
+This example demonstrates a cloaking effect that gradually fades an object in and out when touched.
+
+## See Also
+
+- [llGetAlpha](../llgetalpha/)
+- [llGetColor](../llgetcolor/)
+- [llSetColor](../llsetcolor/)
+- [llSetLinkColor](../llsetlinkcolor/)
+- [llSetLinkAlpha](../llsetlinkalpha/)
+- PRIM_COLOR - The equivalent parameter for llSetPrimitiveParams
+- PRIM_GLTF_BASE_COLOR - The equivalent PBR parameter for llSetPrimitiveParams
+
+<WikiAttribution />

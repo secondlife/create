@@ -1,0 +1,36 @@
+---
+title: llGetCreator
+description: |-
+  Returns a key for the creator of the prim.
+  Returns the key of the object's original creator. Similar to llGetOwner.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetCreator" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        key owner = llGetOwner();
+        key creatorThisPrim = llGetCreator();
+
+        llSay(0, "The creator of this prim has the key '"+(string)creatorThisPrim + "'.");
+        llSay(0, "My owner has the key '" + (string)owner + "'.");
+    }
+}
+```
+
+## See Also
+
+- [llGetInventoryCreator](../llgetinventorycreator/)
+- [llGetOwner](../llgetowner/)
+
+<WikiAttribution />

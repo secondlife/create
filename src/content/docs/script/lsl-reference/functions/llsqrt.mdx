@@ -1,0 +1,44 @@
+---
+title: llSqrt
+description: |-
+  Returns the square root of Value.
+  Triggers a math runtime error for imaginary results (if Value < 0.0).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSqrt" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+  state_entry()
+  {
+    float num1 = llFrand(100.0);
+
+    llOwnerSay("The square root of " + (string)num1 + " is " + (string)llSqrt(num1));
+  }
+}
+```
+
+## Caveats
+
+- Crashes the script if passed a negative number.
+
+## Notes
+
+- If you need the square root of two, you can use the constant `SQRT2`.
+- Other roots can be computed by `llPow(val, 1.0/root)`.
+
+## See Also
+
+- [llLog](../lllog/)
+- [llLog10](../lllog10/)
+- [llPow](../llpow/)
+
+<WikiAttribution />

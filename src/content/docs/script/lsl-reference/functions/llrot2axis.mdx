@@ -1,0 +1,51 @@
+---
+title: llRot2Axis
+description: |-
+  Returns the rotation axis represented by Rotation.
+  Returns the axis represented by the Rotation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRot2Axis" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function extracts the rotation axis (the vector around which rotation occurs) from a rotation value. The axis is normalized and represents the direction of the rotation.
+
+## Implementation Examples
+
+Here are two equivalent implementations of `llRot2Axis`:
+
+```lsl
+vector llRot2Axis(rotation a) {
+    if(a.s < 0)
+        return -llVecNorm(<a.x, a.y, a.z>);
+    return llVecNorm(<a.x, a.y, a.z>)
+}
+```
+
+Or more concisely:
+
+```lsl
+vector llRot2Axis(rotation a) {
+    return llVecNorm(<a.x, a.y, a.z>) * (1 | -(a.s < 0));
+}
+```
+
+The key insight is that the x, y, z components of a rotation represent the axis, and the function normalizes this vector. The scalar component `s` determines the sign of the result.
+
+## See Also
+
+- [llRot2Angle] - Get the angle of rotation (use together with llRot2Axis to decompose a rotation)
+- [llAxisAngle2Rot] - Create a rotation from axis and angle (inverse operation)
+- [llAxes2Rot] - Create a rotation from forward, left, and up vectors
+- [llRot2Left] - Get the left vector from a rotation
+- [llRot2Fwd] - Get the forward vector from a rotation
+- [llRot2Up] - Get the up vector from a rotation
+- [Slerp] - Spherical linear interpolation of rotations
+
+<WikiAttribution />

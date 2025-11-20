@@ -1,0 +1,50 @@
+---
+title: llReturnObjectsByOwner
+description: >-
+  Return objects based upon their owner and a scope of parcel, parcel owner, or
+  region.
+
+  Requires the PERMISSION_RETURN_OBJECTS permission and that the script owner
+  owns the parcel the returned objects are in, or is an estate manager or region
+  owner.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llReturnObjectsByOwner" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The `Scope` parameter uses the following flags to determine which objects to return:
+
+| Flag | Description |
+|------|-------------|
+| `OBJECT_RETURN_PARCEL` | Return all objects on the same parcel as the script which are owned by `owner`. The script must be owned by an estate manager or over a parcel owned by the owner of the script. |
+| `OBJECT_RETURN_PARCEL_OWNER` | Return all objects owned by `owner` which are over parcels owned by the owner of the script. |
+| `OBJECT_RETURN_REGION` | Return all objects in the region owned by `owner`. The script must be owned by the estate owner or an estate manager. |
+
+## Caveats
+
+- Parcel owner, estate owner and estate managers cannot have their objects returned by this method
+- Objects which are owned by the group the land is set to will not be returned by this method
+- Objects owned by other groups will be returned to their previous owner if the object is transferable; if not transferable they are deleted
+- For group-owned land you may want to explicitly code a group owner's key into the script as there is no way to determine if a user is a group owner
+
+## Throttling
+
+This function is throttled at max parcel land impact capacity region-wide per hour.
+
+## Return Value
+
+Returns the number of objects successfully returned to their owners, or an `ERR_*` error flag (negative values indicate errors).
+
+## See Also
+
+- [llReturnObjectsByID](../llreturnobjectsbyid/)
+- [llGetParcelPrimOwners](../llgetparcelprimowners/)
+- [llDie](../lldie/)
+
+<WikiAttribution />

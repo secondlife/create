@@ -1,0 +1,310 @@
+---
+title: llDialog
+description: |-
+  Shows a dialog box on the avatar's screen with the message.
+
+                      Up to 12 strings in the list form buttons.
+
+                      If a button is clicked, the name is chatted on Channel.
+  Opens a "notify box" in the given avatars screen displaying the message.
+
+                  Up to twelve buttons can be specified in a list of strings. When the user clicks a button, the name of the button is said on the specified channel.
+
+                  Channels work just like llSay(), so channel 0 can be heard by everyone.
+
+                  The chat originates at the object's position, not the avatar's position, even though it is said as the avatar (uses avatar's UUID and Name etc.).
+
+                  Examples:
+
+                  llDialog(who, "Are you a boy or a girl?", [ "Boy", "Girl" ], -4913);
+
+                  llDialog(who, "This shows only an OK button.", [], -192);
+
+                  llDialog(who, "This chats so you can 'hear' it.", ["Hooray"], 0);
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDialog" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- This function only opens a dialog box. The script must then register a listener on the same channel using `llListen()` and have a `listen` event handler to receive the response.
+- There is no way by script to kill a dialog box.
+- There is no way for the script to detect if the user clicked the "Ignore" button (no chat is generated as a result of pressing this button).
+- There is no way to distinguish the input from a dialog box and regular chat made by the same user. It is important to expect that the response may not be one of the buttons.
+- The listener will have access to the response sim-wide only if it is in the same script that created the dialog. If the listener is in a different script/object, the distance between the root prim of the listening object and the dialog generating prim becomes a factor. If this distance is greater than 20 meters when a button is pressed, the response will not be heard.
+  - This limitation affects attachments too if the wearer moves more than 20 meters from where the listener is located.
+- By default, only one dialog can be displayed per object in the Second Life Viewer. This can be overridden by the ScriptDialogLimitations debug setting in the Viewer.
+
+### Message Limits
+
+- The message must be fewer than 512 bytes in length and be not empty. If it is empty, `llDialog` will shout an error on the debug channel. If you want to create an empty message, use a line feed: `llDialog(avatar_key," \n",button_list,dialog_channel);`
+- The client only displays 20 lines of message at a time, not counting the top line containing the owner and name of the object. If there are more than 20 lines, the dialog displays a scroll bar.
+
+### Button Limits
+
+- If the buttons list is empty, it will default to `["OK"]`
+- Buttons named "Client_Side_Mute" or "Client_Side_Ignore" will be interpreted by the viewer as if the user clicked the special "Mute" or "Ignore" buttons.
+- An error will be shouted on the debug channel if:
+  - There are more than 12 buttons
+  - Any list item is not a string
+  - Any list item string length (measured in bytes, using UTF-8 encoding) is zero or greater than 24
+- The client will not display all the characters of a button if the text is wider than the text space of the button. Expect around 10 characters to display, even though up to 24 can be defined. The full button definition (up to 24 chars) will be spoken into the chat channel.
+- If the script generates button labels from outside sources like inventory or object names, avoid the special string `"!!llTextBox!!"`. This text, used as any button label, will cause `llDialog` to behave as `llTextBox` instead.
+
+## Examples
+
+### Basic Dialog Menu
+
+This simple example displays a dialog menu for the owner when the script starts:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        integer dialog_channel = PUBLIC_CHANNEL;
+
+        llDialog(llGetOwner(), "This is a message", ["A", "B", "C", "D"], dialog_channel);
+
+        llListen(dialog_channel, "", llGetOwner(), "");
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        llOwnerSay("Heard: " + message);
+    }
+}
+```
+
+### Dialog with Timeout
+
+This example shows how to offer a menu to a user interacting with an object, with a timeout if the user doesn't respond:
+
+```lsl
+integer gListener; // Identity of the listener
+
+default
+{
+    touch_start(integer total_number)
+    {
+        // Kill off any outstanding listener
+        llListenRemove(gListener);
+
+        key user = llDetectedKey(0);
+
+        // Set up listener before issuing the dialog
+        gListener = llListen(-99, "", user, "");
+
+        llDialog(user, "\nDo you wish for this prim to die?", ["Yes", "No"], -99);
+
+        // Start a one-minute timer
+        llSetTimerEvent(60.0);
+    }
+
+    listen(integer chan, string name, key id, string msg)
+    {
+        if (msg == "Yes")
+            llDie();
+
+        // Make the timer fire immediately for clean-up
+        llSetTimerEvent(0.1);
+    }
+
+    timer()
+    {
+        llListenRemove(gListener);
+        llSetTimerEvent(0);
+    }
+}
+```
+
+### Multi-Level Menu System
+
+This example demonstrates building a menu system with multiple levels and navigation:
+
+```lsl
+string mainMenuDialog = "\nWhich settings would you like to access?\nClick \"Close\" to close the menu.\n\nYou are here:\nMainmenu";
+list mainMenuButtons = ["sub 01", "sub 02", "Close"];
+
+string subMenu_01_Dialog = "\nClick \"Close\" to close the menu.\nClick \"-Main-\" to return to the main menu.\n\nYou are here:\nMainmenu > sub 01";
+list subMenu_01_Buttons = ["action 01a", "action 01b", "Close", "-Main-"];
+
+string subMenu_02_Dialog = "\nClick \"Close\" to close the menu.\nClick \"-Main-\" to return to the main menu.\n\nYou are here:\nMainmenu > sub 02";
+list subMenu_02_Buttons = ["action 02a", "action 02b", "Close", "-Main-"];
+
+integer dialogChannel;
+integer dialogHandle;
+
+open_menu(key inputKey, string inputString, list inputList)
+{
+    dialogChannel = (integer)llFrand(DEBUG_CHANNEL)*-1;
+    dialogHandle = llListen(dialogChannel, "", inputKey, "");
+    llDialog(inputKey, inputString, inputList, dialogChannel);
+    llSetTimerEvent(30.0);
+}
+
+close_menu()
+{
+    llSetTimerEvent(0.0);
+    llListenRemove(dialogHandle);
+}
+
+default
+{
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
+
+    touch_start(integer total_number)
+    {
+        key id = llDetectedKey(0);
+        close_menu();
+        open_menu(id, mainMenuDialog, mainMenuButtons);
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        if(channel != dialogChannel)
+            return;
+
+        close_menu();
+
+        if(message == "-Main-")
+            open_menu(id, mainMenuDialog, mainMenuButtons);
+        else if(message == "sub 01")
+            open_menu(id, subMenu_01_Dialog, subMenu_01_Buttons);
+        else if(message == "sub 02")
+            open_menu(id, subMenu_02_Dialog, subMenu_02_Buttons);
+        else if (message == "action 01a")
+        {
+            // Do something
+            open_menu(id, subMenu_01_Dialog, subMenu_01_Buttons);
+        }
+        else if (message == "action 01b")
+        {
+            // Do something else
+        }
+        else if (message == "action 02a")
+        {
+            // Do something
+            open_menu(id, subMenu_02_Dialog, subMenu_02_Buttons);
+        }
+        else if (message == "action 02b")
+        {
+            // Do something else
+            open_menu(id, subMenu_02_Dialog, subMenu_02_Buttons);
+        }
+    }
+
+    timer()
+    {
+        close_menu();
+    }
+}
+```
+
+## Tips
+
+### Choosing a Channel
+
+It is a good idea to use a very negative channel (never more negative than -2,147,483,648). For example:
+
+```lsl
+// Create random channel within range [-1000000000,-2000000000]
+integer channel = (integer)(llFrand(-1000000000.0) - 1000000000.0);
+
+llDialog(llDetectedKey(0), "Please choose one of the below options:",
+    ["Yes", "No", "0", "1"], channel);
+```
+
+Negative channels are popular for script communications because the standard SL client was unable to chat directly on them for many years. However, since late 2016, both third-party and the Linden Lab viewer can use negative channels from the chat bar.
+
+### Generating a Unique Channel
+
+You can generate a reasonably unique chat channel based on your object's key:
+
+```lsl
+integer channel() {
+    return (integer)("0x"+llGetSubString((string)llGetKey(),-8,-1));
+}
+
+integer dialog_channel = channel();
+```
+
+Note: Since this function uses public information to generate the channel number, it is not secret. The preceding code can produce both positive and negative channels. For guaranteed negative channels, use:
+
+```lsl
+gChannel = 0x80000000 | (integer)("0x"+(string)llGetKey());
+// or
+privchan = ((integer)("0x"+llGetSubString((string)llGetKey(),-8,-1)) & 0x3FFFFFFF) ^ 0xBFFFFFFF;
+```
+
+### Button Ordering
+
+Buttons are displayed in a 3x4 grid. To display buttons in a more intuitive numbered order (1-12 left to right, top to bottom), you can reorder them:
+
+```lsl
+list order_buttons(list buttons)
+{
+    return llList2List(buttons, -3, -1) + llList2List(buttons, -6, -4)
+         + llList2List(buttons, -9, -7) + llList2List(buttons, -12, -10);
+}
+```
+
+### Button Text Truncation Helper
+
+To ensure button labels don't exceed the 24-byte UTF-8 limit:
+
+```lsl
+string buttonLabel(string label) {
+    string encoded = llStringToBase64(label);
+    if (llStringLength(encoded) <= 32) {
+        return label;
+    }
+    integer end = 31;
+    string tailEnc = llGetSubString(encoded, 28, 33);
+    integer tail = llBase64ToInteger(tailEnc);
+    while ((tail & 0xc0) == 0x80) {
+        if (end % 4 == 1) {
+            end -= 2;
+        } else {
+            end--;
+        }
+        tail = tail >> 8;
+    }
+    return llBase64ToString(llGetSubString(encoded, 0, end));
+}
+```
+
+### Dialog Appearance
+
+- The message text can be formatted using "\n" (newline) and "\t" (tab).
+- URLs in the text will appear as clickable links. Some viewer application URLs receive special formatting.
+- You cannot influence font face, size, or weight.
+- You cannot change the size or color of the dialog itself.
+- The average number of characters per line is about 35 in ASCII.
+
+### Best Practices
+
+- Always close open listeners when they are no longer needed. This reduces lag and improves the Second Life experience.
+- There are no built-in submenus or pagination. If you want different layouts, you must build that functionality into your script.
+- Set up the listener BEFORE issuing the dialog to ensure you don't miss responses.
+
+## See Also
+
+- [llListen](./lllisten.mdx) - Listen for chat messages on a channel
+- [llTextBox](./lltextbox.mdx) - Presents text input dialog
+- [llRegionSay](./llregionsay.mdx) - Send chat sim-wide
+- [llWhisper](./llwhisper.mdx) - Send chat limited to 10 meters
+- [llSay](./llsay.mdx) - Send chat limited to 20 meters
+- [llShout](./llshout.mdx) - Send chat limited to 100 meters
+- [llInstantMessage](./llinstantmessage.mdx) - Send private message
+- [llOwnerSay](./llownersay.mdx) - Send chat to owner only
+
+<WikiAttribution />

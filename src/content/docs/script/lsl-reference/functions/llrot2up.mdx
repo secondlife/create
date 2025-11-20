@@ -1,0 +1,61 @@
+---
+title: llRot2Up
+description: |-
+  Returns the up vector defined by Rotation.
+  Returns the up axis represented by the Rotation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRot2Up" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Computes the orientation of the local z-axis (up-direction of prim) relative to the parent (the root prim or the world).
+
+## Mathematical Equivalent
+
+Mathematically equivalent to:
+
+```lsl
+ret = llVecNorm(<0., 0., 1.> * q);
+```
+
+If `q` is known to be a unit quaternion then it can be simplified as:
+
+```lsl
+ret = <0., 0., 1.> * q;
+```
+
+Keep in mind that object and agent rotations will always be unit quaternions. For example, `<0.0, 0.0, 1.0>*llGetRot()` is about 25-30% faster than `llRot2Up(llGetRot())` depending on the VM used. If done often and at extremely fast rates, it can be advantageous to even save `<0.0, 0.0, 1.0>` to a local/global variable and reuse it.
+
+## Examples
+
+Move a prim 5 metres forwards along its own z axis, when touched, no matter how the object is oriented in world. This works for a root or child prim:
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        vector v = llRot2Up( llGetLocalRot() );
+        llSetPos( llGetLocalPos() + v * 5 );
+    }
+}
+```
+
+## Notes
+
+Can be useful to identify the orientation of the local horizontal-plane of the prim, since its z-axis is always perpendicular to this local horizontal plane.
+
+## See Also
+
+- [llRot2Left](../llrot2left/)
+- [llRot2Fwd](../llrot2fwd/)
+- [llRot2Axis](../llrot2axis/)
+- [llRot2Angle](../llrot2angle/)
+
+<WikiAttribution />

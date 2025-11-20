@@ -1,0 +1,271 @@
+---
+title: llLinksetDataWrite
+description: Sets a name:value pair in the linkset's datastore
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLinksetDataWrite" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The `llLinksetDataWrite` and `llLinksetDataWriteProtected` functions create or update a name:value pair in the linkset datastore. The linkset datastore is a semi-permanent key-value store that persists as a prim property regardless of whether the script is deleted or reset (via manual reset, `llResetScript`, `llResetOtherScript`, or cloning the object). If value is an empty string, the pair is deleted.
+
+When these functions are called, the `linkset_data` event is triggered in all scripts running in the linkset with an action of `LINKSETDATA_UPDATE` or `LINKSETDATA_DELETE` if the pair is deleted.
+
+The linkset datastore can contain up to 131,072 bytes (128 KiB) of data and has no impact on script memory usage aside from the functions and events used to interact with it. Each pair written to the datastore consumes a number of bytes equal to the length of name plus the length of value, plus an additional 32 bytes if written using `llLinksetDataWriteProtected`.
+
+## llLinksetDataWriteProtected
+
+The protected variant creates or updates a protected name:value pair from the linkset's datastore. Further attempts to read, write, or update the name:value pair must use the protected versions of those functions and must supply the same string that was used in pass.
+
+### Protected Variant Notes
+
+- Protecting a name:value pair adds an additional 32 bytes to its size in the datastore regardless of the length of pass. The length of pass itself is not counted against the data storage limit.
+- When writing a protected name, the `linkset_data` event fires as normal, however the value parameter will be an empty string.
+
+## Examples
+
+### Basic Usage
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llLinksetDataWrite("test-name", "See you on the other side!");
+        llResetScript();
+    }
+    state_entry()
+    {
+        llOwnerSay(llLinksetDataRead("test-name")); // Should print "See you on the other side!" to the owner
+    }
+}
+```
+
+### Securing Against Tampering
+
+Since the datastore is shared among the entire linkset, one way to avoid name conflicts is to include the prim's UUID in the data pair's name. This example also monitors for `llLinksetDataReset` and unlinks, refreshing the datastore in response:
+
+```lsl
+key this_uuid;
+string lsd_data;
+
+default
+{
+    state_entry()
+    {
+        this_uuid = llGetKey(); // Save the current key into this_uuid for checking later
+        lsd_data = "bar"; // Store the data locally so it can be rewritten if the datastore gets erased
+        llLinksetDataWrite((string)llGetKey() + "-foo", lsd_data); // Write the data
+    }
+    on_rez(integer start_param)
+    {
+        if (llGetKey() != this_uuid)
+        {
+            // Prim UUID has changed!
+            llLinksetDataWrite((string)llGetKey() + "-foo", llLinksetDataRead((string)this_uuid + "-foo"));
+            llLinksetDataDelete((string)this_uuid + "-foo"); // Erase the original data to free up memory
+            this_uuid = llGetKey(); // Update the UUID variable to the new UUID
+        }
+    }
+    linkset_data(integer action, string name, string value)
+    {
+        if (action == LINKSETDATA_UPDATE || action == LINKSETDATA_DELETE)
+        {
+            if (name == (string)llGetKey() + "-foo")
+            {
+                lsd_data = value; // Save in case we need it later
+            }
+        }
+        else if (action == LINKSETDATA_RESET)
+        {
+            // Linkset datastore has been reset!
+            llLinksetDataWrite((string)llGetKey() + "-foo", lsd_data);
+        }
+    }
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK)
+        {
+            // Linkset has changed - rewrite data to be safe
+            llLinksetDataWrite((string)llGetKey() + "-foo", lsd_data);
+        }
+    }
+}
+```
+
+### Simple Blacklist Management
+
+```lsl
+integer gDialogChannel;
+integer gDialogHandle;
+integer gManagingBlocks;
+
+startDialog(key person)
+{
+    gManagingBlocks = 0;
+    gDialogHandle = llListen(gDialogChannel, "", person, "");
+    llDialog(person, "\nSelect action", ["List blocks", "Add block", "Remove block"], gDialogChannel);
+    llSetTimerEvent(60);
+}
+
+stopDialog()
+{
+    llSetTimerEvent(0);
+    llListenRemove(gDialogHandle);
+}
+
+default
+{
+    on_rez(integer sp)
+    {
+        llResetScript();
+    }
+
+    state_entry()
+    {
+        gDialogChannel = (integer)(llFrand(-10000000)-10000000);
+        llListen(PUBLIC_CHANNEL, "", NULL_KEY, "");
+    }
+
+    timer()
+    {
+        stopDialog();
+    }
+
+    touch_start(integer nd)
+    {
+        key toucherKey = llDetectedKey(0);
+        if (toucherKey == llGetOwner())
+        {
+            startDialog(toucherKey);
+        }
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        if (llGetAgentSize(id) == ZERO_VECTOR)
+        {
+            return;
+        }
+
+        if (channel == gDialogChannel)
+        {
+            stopDialog();
+            if (gManagingBlocks)
+            {
+                message = llStringTrim(message, STRING_TRIM);
+                if ((key)message)
+                {
+                    if (gManagingBlocks == 1)
+                    {
+                        llOwnerSay("Addition request has been sent to the blacklist storage");
+                        llLinksetDataWrite("blocklist:" + message, "1");
+                    }
+                    else
+                    {
+                        llOwnerSay("Removal request has been sent to the blacklist storage.");
+                        llLinksetDataDelete("blocklist:" + message);
+                    }
+                }
+                else
+                {
+                    llOwnerSay("The UUID '" + message + "' appears to be invalid.");
+                }
+                startDialog(id);
+            }
+            else if (message == "List blocks")
+            {
+                list blocks = llLinksetDataFindKeys("^blocklist:", 0, 0);
+                integer listLength = llGetListLength(blocks);
+                llOwnerSay("Blacklist items: " + (string)listLength);
+                integer i;
+                while (i < listLength)
+                {
+                    string record = llGetSubString(llList2String(blocks, i), 10, -1);
+                    llOwnerSay("- secondlife:///app/agent/" + record + "/about" + " - " + record);
+                    ++i;
+                }
+                blocks = [];
+                startDialog(id);
+            }
+            else if (message == "Add block" || message == "Remove block")
+            {
+                string label = "add to";
+                gManagingBlocks = 1;
+                if (message == "Remove block")
+                {
+                    gManagingBlocks = 2;
+                    label = "remove from";
+                }
+                gDialogHandle = llListen(gDialogChannel, "", id, "");
+                llTextBox(id, "\nPlease specify one single avatar UUID you'd like to " + label + " the blacklist storage.", gDialogChannel);
+                llSetTimerEvent(60);
+            }
+            return;
+        }
+
+        if (llGetListLength(llLinksetDataFindKeys("blocklist:" + (string)id, 0, 1)) > 0)
+        {
+            llRegionSayTo(id, 0, "You're blacklisted.");
+            return;
+        }
+
+        llRegionSayTo(id, 0, "Hello there, secondlife:///app/agent/" + (string)id + "/about - your message: " + message);
+    }
+
+    linkset_data(integer action, string name, string value)
+    {
+        if (action == LINKSETDATA_RESET || action == LINKSETDATA_DELETE || action == LINKSETDATA_UPDATE)
+        {
+            llOwnerSay("Blacklist storage modified.");
+        }
+    }
+}
+```
+
+## Caveats
+
+- Events are only fired if the linkset's datastore is changed.
+  - Rewriting an existing value to a name:value pair returns `LINKSETDATA_NOUPDATE`.
+  - Writing an empty string to a nonexistent name in the datastore returns `LINKSETDATA_NOTFOUND`.
+
+- There is currently no way to write to or read from a linkset datastore from another linkset.
+
+- The datastore is accessible from the entire linkset but acts as a property of the root prim alone. Therefore, linking and unlinking prims produces the following results:
+  - When linking one linkset to another linkset, the combined linkset datastore includes all pairs from both datastores.
+    - If any pairs have conflicting names, the combined linkset datastore will keep the pair from the original linkset and will silently drop conflicting pairs from newly added prim(s).
+    - If the combined linkset datastore would exceed 131,072 bytes, pairs from the newly linked prim(s) will be added up to the limit. The order of addition is not currently defined.
+  - When unlinking a child prim from a linkset, the datastore remains in the original linkset and the child prim (now its own root prim) has an empty datastore.
+  - When unlinking a root prim from a linkset, the datastore remains in the newly-unlinked root prim and the remaining prims in the original linkset have an empty datastore.
+
+- There is no limit on the size of value aside from the total datastore limit, so care should be taken when writing very large values that could crash other scripts in the linkset via `linkset_data`.
+  - If a script does not define a `linkset_data` event, it will not load any event parameters into its memory when the datastore is written to.
+  - If this is a possible risk, consider using `llLinksetDataWriteProtected`, which does not send value in `linkset_data`, with a static pass.
+
+- It is possible for data to be rolled back to a previous state if the datastore is stored in an object that is restored via a simulator rollback, or in an attachment that is not properly saved back to the server on logout.
+  - Viewer crashes can cause attachment states to not be saved, so care should be taken when using these functions in attachments, as datastore rollbacks are likely to occur occasionally.
+
+## Notes
+
+- Linkset datastore operations are synchronous and are usually processed within one server frame. Therefore, it is possible to synchronize variables between multiple scripts using the datastore alone without resorting to `llMessageLinked`, or to use the datastore directly as extended memory for specific workloads that need to work with extremely large datasets.
+
+## See Also
+
+- [llLinksetDataAvailable](../lllinksetdataavailable/)
+- [llLinksetDataCountKeys](../lllinksetdatacountkeys/)
+- [llLinksetDataDelete](../lllinksetdatadelete/)
+- [llLinksetDataDeleteProtected](../lllinksetdatadeleteprotected/)
+- [llLinksetDataDeleteFound](../lllinksetdatadeletefound/)
+- [llLinksetDataFindKeys](../lllinksetdatafindkeys/)
+- [llLinksetDataListKeys](../lllinksetdatalistkeys/)
+- [llLinksetDataRead](../lllinksetdataread/)
+- [llLinksetDataReadProtected](../lllinksetdatareadprotected/)
+- [llLinksetDataReset](../lllinksetdatareset/)
+- `linkset_data` event
+
+<WikiAttribution />

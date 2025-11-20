@@ -1,0 +1,35 @@
+---
+title: llGetKey
+description: |-
+  Returns the key of the prim the script is attached to.
+  Get the key for the object which has this script.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetKey" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llOwnerSay(llGetKey());
+        llOwnerSay(llGetLinkKey(llGetLinkNumber()));
+    }
+}
+```
+
+This example demonstrates getting the key of the prim the script is in and comparing it with the key obtained from link functions.
+
+## See Also
+
+- [llGetLinkKey](/script/reference/lsl/functions/llgetlinkkey/)
+- [llGetLinkNumber](/script/reference/lsl/functions/llgetlinknumber/)
+
+<WikiAttribution />

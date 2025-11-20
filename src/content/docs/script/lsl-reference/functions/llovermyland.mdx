@@ -1,0 +1,153 @@
+---
+title: llOverMyLand
+description: >-
+  Returns TRUE if id ID over land owned by the script owner, otherwise FALSE.
+
+  Returns TRUE if key ID is over land owned by the object owner, FALSE
+  otherwise.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llOverMyLand" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- On group-deeded land, the object containing the script must be deeded to the same group. It is not enough to set the script to the group.
+
+## Examples
+
+### Basic Land Check with Ignore List
+
+This example detects agents on your land and sends them messages, unless they are in your ignore list:
+
+```lsl
+//-- list of people not to pester, lower case only
+list gLstIgnore = ["void singer"];
+key  gKeyAv;
+
+default{
+    state_entry(){
+        llOwnerSay( "I'll pester anyone on your land I can find,"
+                    + " unless they're in your ignore list." );
+        llSensorRepeat( "", "", AGENT, 96, PI, 30 );
+    }
+
+    sensor( integer vIntFound ){
+        do{
+            gKeyAv = llDetectedKey( --vIntFound );  //-- Decrement sensor variable to walk backwards through all detections
+            //-- check if they are over our land
+            if (llOverMyLand( gKeyAv )){ //-- the return value is automatically tested by the if statemnt
+                //-- check if they are in the ignore list
+                if (!~llListFindList( gLstIgnore, (list)llToLower( llDetectedName( vIntFound ) ) )){ //-- '!~llListFindList' == 'not found in the list'
+                    //-- pester everyone not in the ignore list !!!
+                    llInstantMessage( gKeyAv, "You are on private land, please leave this parcel" );
+                }
+            }
+        }while (vIntFound);
+    }
+}
+```
+
+### Daily Visitor Log
+
+This script tracks and emails you a daily visitor log, using `llOverMyLand` to filter out visitors on other parcels:
+
+```lsl
+// This script will email you a daily count of new visitors and repeat visitors.
+// Visitors are counted once per email update cycle.
+
+// -----------------------------------
+// Configuration: customize this script here.
+// Change this to your email address.
+string MyEmail = "you@example.com";
+// This is a number 0 to 96 meters, anything farther away than that will not be noticed.
+float SensorRange = 96.0;
+// How often to send email updates.
+integer UpdateFrequency = 86400; // Number of seconds in 1 day.
+// -----------------------------------
+
+// Internal Variables -- Do not change.
+list todayVisitors = [];
+list allVisitors = [];
+list repeatVisitors = [];
+list firstTimers = [];
+integer newVisitors = 0;
+integer returnVisitors = 0;
+string ParcelName;
+
+default
+{
+    state_entry()
+    {
+        list parcelDetails = llGetParcelDetails(llGetPos(), [PARCEL_DETAILS_NAME]);
+        ParcelName = llList2String(parcelDetails, 0);
+        llSensorRepeat( "", "", AGENT, SensorRange, PI, 20);
+        llSetTimerEvent(UpdateFrequency); // Email me a regular report.
+        llOwnerSay("Visitor Log Started.");
+    }
+
+    sensor(integer avsFound)
+    {
+        key  avKey;
+        integer avNum;
+        for(avNum=0; avNum<avsFound; avNum++)
+        {
+            avKey = llDetectedKey(avNum);
+            if (llOverMyLand(avKey))
+            {
+                string whom = llDetectedName(avNum);
+                if (!~llListFindList(todayVisitors, [whom]))
+                {
+                    // This person hasn't been seen yet today.
+                    todayVisitors += [whom];
+                    if (~llListFindList(allVisitors, [whom]))
+                    {
+                        // This is a returning visitor.
+                        returnVisitors++;
+                        repeatVisitors += [whom];
+                    }
+                    else
+                    {
+                        // This is a first-time visitor.
+                        newVisitors++;
+                        allVisitors = [whom] + allVisitors;
+                        firstTimers += [whom];
+                    }
+                }
+            }
+        }
+    }
+
+    timer()
+    {
+        list parcelDetails = llGetParcelDetails(llGetPos(), [PARCEL_DETAILS_NAME]);
+        ParcelName = llList2String(parcelDetails, 0);
+        string subj = "Visitor Log for " + ParcelName;
+        string body = "Number of Visitors Total: " + (string)(newVisitors + returnVisitors)
+            + "\nReturning Visitors: " + (string)returnVisitors
+            + "\nNew Visitors: " + (string)newVisitors
+            + "\n\nList of New Visitors:\n\t" + llDumpList2String(firstTimers, "\n\t")
+            + "\n\nList of Returning Visitors:\n\t" + llDumpList2String(repeatVisitors, "\n\t");
+        newVisitors = 0;
+        returnVisitors = 0;
+        todayVisitors = [];
+        repeatVisitors = [];
+        firstTimers = [];
+        if (llGetListLength(allVisitors)>500)
+        {
+            allVisitors = llList2List(allVisitors, 0, 499);
+        }
+        llEmail(MyEmail, subj, body);
+    }
+}
+```
+
+## See Also
+
+- [llReturnObjectsByID](../llreturnobjectsbyid/)
+
+<WikiAttribution />

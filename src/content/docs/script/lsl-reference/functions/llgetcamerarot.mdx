@@ -1,0 +1,98 @@
+---
+title: llGetCameraRot
+description: >-
+  Returns the current camera orientation for the agent the task has permissions
+  for. If no user has granted the PERMISSION_TRACK_CAMERA permission, returns
+  ZERO_ROTATION.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetCameraRot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Seems to act weird when the camera gets too far from the agent.
+
+## Examples
+
+### Camera Follower Script
+
+This example demonstrates how to use `llGetCameraRot` along with `llGetCameraPos` to create an object that follows the user's camera position and orientation. The script uses `llSetLinkPrimitiveParamsFast` to avoid the 0.2-second sleep from individual llSetPos and llSetRot calls.
+
+```lsl
+//Camera Follower Script
+//llGetCameraPos & llGetCameraRot Example
+//By Nika Rugani
+
+integer perm_track = 0x400;
+float second_check = 0.1;
+
+vector object_offset = <2,0,0>; //Offset of the cameras position where the object will set itself
+
+integer die_channel = 0;
+string die_command = "/die";
+
+quickPosRot(vector pos, rotation rot)
+{//This way you don't have the 0.2 second sleeps from llSetPos and llSetRot
+    llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_POSITION, pos, PRIM_ROTATION, rot]);
+}
+
+default
+{
+    on_rez(integer a)
+    {
+        llResetScript();
+    }
+    state_entry()
+    {
+        llRequestPermissions(llGetOwner(), perm_track);
+    }
+    run_time_permissions(integer permission)
+    {
+        if(permission == perm_track)
+        {
+            llSetTimerEvent(second_check);
+            llListen(die_channel, "", llGetOwner(), "");
+        }
+        else
+        {
+            //llResetScript(); //Remove comment to loop the process of requesting permissions if user deny's permission
+            //llDie(); //Remove comment to kill the object if user deny's it
+        }
+    }
+    listen(integer channel, string name, key id, string str)
+    {
+        str = llToLower(str);
+        if(str == die_command)
+        {
+            llDie();
+        }
+    }
+    timer()
+    {
+        vector c_pos = llGetCameraPos(); //Get Users Camera Position
+        rotation c_rot = llGetCameraRot(); //Get Users Camera Rotation
+        c_pos = (c_pos+object_offset*c_rot); //Apply the offset to the position
+        quickPosRot(c_pos, c_rot); //EXECUTE ORDER!
+    }
+}
+```
+
+This example shows the typical pattern for using `llGetCameraRot`:
+1. Request the PERMISSION_TRACK_CAMERA permission with `llRequestPermissions`
+2. In the `run_time_permissions` event, check if permission was granted
+3. Use a timer to periodically retrieve the camera rotation with `llGetCameraRot`
+4. Apply the rotation to position calculations or object transforms
+
+## See Also
+
+- [llGetCameraPos](./llGetCameraPos.mdx) - Get the camera position
+- [llSetCameraParams](./llSetCameraParams.mdx) - Set camera parameters
+- [llSetCameraAtOffset](./llSetCameraAtOffset.mdx) - Set camera offset
+- [llSetCameraEyeOffset](./llSetCameraEyeOffset.mdx) - Set camera eye offset
+
+<WikiAttribution />

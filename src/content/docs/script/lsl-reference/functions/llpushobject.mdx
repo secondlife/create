@@ -1,0 +1,43 @@
+---
+title: llPushObject
+description: |-
+  Applies Impulse and AngularImpulse to ObjectID.
+  Applies the supplied impulse and angular impulse to the object specified.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llPushObject" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Pushes the collided object or avatar.
+default
+{
+    collision_start(integer num_detected)
+    {
+        llPushObject(llDetectedKey(0),<0,0,100>, <0,0,100>, TRUE);
+    }
+}
+```
+
+## Caveats
+
+- Only works on land where Push is not restricted or where the script is owned by the land owner.
+- If the land is owned by a group, the scripted object must be deeded to the same group.
+- In no-push areas an object can only push its owner or itself.
+- The effectiveness of Push is modulated by the amount of script energy available.
+- AngularImpulse is ignored when applying to agents or their attachments.
+- Energy is fully depleted by this function when either Impulse or AngularImpulse is nonzero. If Impulse is nonzero, it will drain all energy in the object before AngularImpulse is processed, causing the push to be purely linear.
+- The push impact is diminished with distance by a factor of distance cubed.
+
+## Notes
+
+- Direction of the Impulse parameter is affected by the Local parameter.
+- There is a simplified code snippet describing how Push is implemented in Havok4 and details how the energy budget affects the final Push magnitude.
+
+<WikiAttribution />

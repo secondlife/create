@@ -1,0 +1,61 @@
+---
+title: llDetectedTouchNormal
+description: >-
+  Returns the surface normal for a triggered touch event.
+
+  Returns a vector that is the surface normal (perpendicular to the surface)
+  where the touch event was triggered.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedTouchNormal" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The surface normal returned represents a vector perpendicular to the surface where the touch event was triggered. Along with `llDetectedTouchBinormal`, this information can be used to find the tangent space at the touch location. To find the third tangent vector, cross the binormal with this vector.
+
+## Caveats
+
+- `TOUCH_INVALID_VECTOR` (same as ZERO_VECTOR `<0.0, 0.0, 0.0>`) is returned when:
+  - The avatar's viewer does not support face touch detection (check `llDetectedTouchFace` to verify support)
+  - The touch has moved off the surface of the prim
+  - The event triggered is not a touch event
+- The rotation of a legacy sphere prim does not influence touch normal like it does with other legacy prims
+- For touch events only: the prim that was touched may not be the prim receiving the event. Use `llDetectedLinkNumber` to check this, and `llDetectedTouchFace` to determine which face was touched
+
+## Examples
+
+```lsl
+default {
+    touch_start(integer total_num) {
+        llOwnerSay((string)llDetectedTouchNormal(0)); // Says the vector where the touched face is pointing to.
+    }
+}
+```
+
+Rotate a prim so the touched position points upwards:
+
+```lsl
+touch_start(integer total_number) {
+    // rotates the prim, so the touched position points upwards
+    llSetRot(llGetRot() * llRotBetween(llDetectedTouchNormal(0), <0, 0, 1>));
+}
+```
+
+## See Also
+
+- [llDetectedLinkNumber](../lldetectedlinknumber/)
+- [llDetectedTouchFace](../lldetectedtouchface/)
+- [llDetectedTouchST](../lldetectedtouchst/)
+- [llDetectedTouchUV](../lldetectedtouchuv/)
+- [llDetectedTouchPos](../lldetectedtouchpos/)
+- [llDetectedTouchBinormal](../lldetectedtouchbinormal/)
+- `touch_start` - Event triggered when avatar starts touching
+- `touch` - Event triggered during touch
+- `touch_end` - Event triggered when avatar stops touching
+
+<WikiAttribution />

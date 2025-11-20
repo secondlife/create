@@ -1,0 +1,133 @@
+---
+title: Learn SLua
+description: A comprehensive guide to scripting in Second Life with SLua (Luau)
+---
+
+import { Card, CardGrid, Tabs, TabItem } from '@astrojs/starlight/components';
+import CodeComparison from '@components/CodeComparison.astro';
+
+SLua brings modern scripting to Second Life using Luau, a high-performance typed variant of Lua developed by Roblox. If you're familiar with Lua, Python, JavaScript, or other modern languages, you'll feel right at home.
+
+## Why SLua?
+
+SLua offers several advantages for Second Life scripting:
+
+- **Modern Language Features** - coroutines, optional typing, objects, and more
+- **Better Performance** - Optimized runtime for complex operations
+- **Familiar Syntax** - If you know Lua, Python, or JavaScript, you're already halfway there
+- **Type Safety** - Optional type annotations catch errors before runtime
+- **Active Development** - Regular improvements and new features
+
+## Coming from LSL?
+
+If you're already familiar with LSL, SLua will feel familiar but more powerful. Here's a quick comparison:
+
+<CodeComparison>
+  <Fragment slot="lsl">
+  ```lsl
+  integer gIsRed = TRUE;
+
+  default {
+    touch_start(integer total_number) {
+      llSay(0, "Changing color!");
+      
+      if (gIsRed) {
+        llSetColor(<0.0, 1.0, 0.0>, ALL_SIDES);
+      } else {
+        llSetColor(<1.0, 0.0, 0.0>, ALL_SIDES);
+      }
+      
+      gIsRed = !gIsRed;  // Toggle state
+    }
+  }
+  ```
+  </Fragment>
+  <Fragment slot="slua">
+  ```luau
+  local isRed: boolean = true
+
+  function LLEvents.touch_start(detected: {DetectedEvent})
+      ll.Say(0, "Changing color!")
+
+      if isRed then
+          ll.SetColor(vector(0.0, 1.0, 0.0), ALL_SIDES)
+      else
+          ll.SetColor(vector(1.0, 0.0, 0.0), ALL_SIDES)
+      end
+
+      isRed = not isRed  -- Toggle state
+  end
+  ```
+  </Fragment>
+</CodeComparison>
+
+## What You'll Learn
+
+:::note[Help Wanted]
+We're building out comprehensive learning materials for SLua. These pages are planned but not yet available. If you'd like to contribute, check out our [GitHub repository](https://github.com/secondlife/create).
+:::
+
+This guide will take you from SLua basics to advanced scripting:
+
+<CardGrid>
+  <Card title="Language Basics" icon="open-book">
+    Variables, types, functions, and control flow
+  </Card>
+
+  <Card title="Working with Events" icon="setting">
+    Handle touch, collision, timer, and other events
+  </Card>
+
+  <Card title="Async Operations" icon="rocket">
+    Use coroutines for cleaner asynchronous code
+  </Card>
+
+  <Card title="Type System" icon="approve-check">
+    Leverage optional types for safer code
+  </Card>
+
+  <Card title="Standard Library" icon="puzzle">
+    Work with strings, tables, math, and more
+  </Card>
+
+  <Card title="Migration Guide" icon="forward">
+    Convert your LSL scripts to SLua
+  </Card>
+</CardGrid>
+
+## Quick Start
+
+Let's write your first SLua script. This simple script makes an object say "Hello!" when touched:
+
+```luau
+-- Listen for touch events
+function LLEvents.touch_start(detected: {DetectedEvent})
+  -- Say hello in local chat
+  ll.Say(0, "Hello, Avatar!")
+end
+```
+
+That's it! Save this script in a prim and touch it to see it work.
+
+## Learning Path
+
+Here's the recommended path through the SLua documentation:
+
+1. **[Language Fundamentals](/script/learn/slua/fundamentals/)** - (HELP WANTED) Start here if you're new to SLua or Lua
+2. **[From LSL to SLua](./from-lsl/)** - Converting your LSL knowledge to SLua
+3. **[Events and Handlers](./events/)** - (HELP WANTED) How to respond to world events
+4. **[Async Programming](./async/)** - (HELP WANTED) Writing asynchronous code with coroutines
+5. **[Working with Types](./types/)** - (HELP WANTED) Using SLua's optional type system
+6. **[Standard Library](./library/)** - (HELP WANTED) Complete reference of available functions
+
+## Resources
+
+- **[SLua Function Reference](/script/slua-reference/)** - Complete API documentation
+- **[Code Recipes](../recipes/)** - (HELP WANTED) Practical examples and patterns
+- **[Suzanna's SLua Guide](https://suzanna-linn.github.io/slua/)** - Comprehensive external resource
+
+## Need Help?
+
+- Visit the [Second Life Forums](https://community.secondlife.com/) for community support
+- Check the [recipes section](/script/recipes/) for working examples
+- Review the [complete SLua reference](/script/reference/slua/) for detailed API documentation

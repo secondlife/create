@@ -1,0 +1,43 @@
+---
+title: llOffsetTexture
+description: |-
+  Sets the texture S and T offsets for the chosen Face.
+  If Face is ALL_SIDES this function sets the texture offsets for all faces.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llOffsetTexture" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+//Offsets the textures on 6 sides
+float offset;
+default
+{
+    state_entry()
+    {
+        integer i;
+
+        for( i = 1; i < 7; i++ )
+        {
+            offset = offset + .1;
+            llOffsetTexture( (float)offset, (float)offset, i);
+        }
+    }
+}
+```
+
+## Notes
+
+If you use `vector offsetVec = llGetTextureOffset()` to get the vector of the current offset, then `u = offsetVec.x` and `v = offsetVec.y`.
+
+## See Also
+
+- [llGetTextureOffset] - Returns a vector in the form (u, v, 0.0)
+
+<WikiAttribution />

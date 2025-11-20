@@ -1,0 +1,67 @@
+---
+title: llGiveInventory
+description: >-
+  Give InventoryItem to destination represented by TargetID, as permitted by the
+  permissions system.
+
+  TargetID may be any agent or an object in the same region.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGiveInventory" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    touch_start(integer n) {
+        //Gives this script to whoever touches the object.
+        llGiveInventory(llDetectedKey(0), llGetScriptName());
+    }
+}
+```
+
+## Caveats
+
+- There is no way to know if the transaction failed. Unless you send a message when inventory is given to a prim and the prim's script checks its inventory and sends a message back using `llRegionSay`.
+- Scripts reach the destination disabled (not running, and cannot be made to run unless the destination object is taken to inventory and rezzed again, or the script is recompiled). To send a running script to a prim use `llSetRemoteScriptAccessPin` and `llRemoteLoadScriptPin`.
+- If the destination is locked then the inventory is not transferred and a "Blocked by permissions" error is shouted on the DEBUG_CHANNEL.
+- If the destination object is not modifiable then the inventory is not transferred and a "Blocked by permissions" error is shouted on the DEBUG_CHANNEL.
+- If inventory is no-copy it is transferred to the destination without copying it. Since it is no-copy, the only copy is given to the destination; removing it from the source prim's inventory.
+  - The `changed` event does **not** fire in this case
+  - To avoid this problem use `llGetInventoryPermMask` to check the permissions of the inventory.
+- Attachments cannot give or receive no-copy inventory. When attempted an error is shouted on DEBUG_CHANNEL.
+- When giving to an attachment that is not owned by the script owner, the receiving attachment must have `llAllowInventoryDrop` set to TRUE.
+- If the destination is an avatar that refuses to accept it (by manual decline or muting), is in busy mode, or is offline with instant messages capped, it is not returned to the prim's inventory; it is deleted.
+  - It is not returned to the owner. It does not show up in their lost and found or any other inventory folder.
+  - It is not put in the target's trash folder.
+- A successful send to an offline avatar by means of `llGiveInventory()` counts as an IM against that avatar's IM cap.
+
+## Throttling
+
+As of 31st January 2012, `llGiveInventory` has similar throttling to instant messages: 5k per hour per owner per region, with a maximum burst of 2.5k. This throttle only affects gives to agents, not to non-agents.
+
+**Practical guidance:** With 3k subscribers, you will want to send slow enough that it takes approximately 45 minutes to send 1 item to each subscriber. A generally safe approach would be to send ~2k as fast as you can, then wait 31 minutes and send another 2k.
+
+Be aware that while you script a system to handle the top of these limits, other busy scripted objects can be adding up to the throttle as well, such as vendors.
+
+## Important Notes
+
+- If the destination is an object, it must be in the same region.
+- If the destination is an avatar, they do not have to be in the same region.
+- If the destination is an avatar, the script sleeps for 2.0 seconds. (Giving to objects or attachments has no delay)
+
+## See Also
+
+- [llGiveInventoryList](../llgiveinventorylist/)
+- [llGiveAgentInventory](../llgiveagentinventory/)
+- [llRemoteLoadScriptPin](../llremoteloadscriptpin/)
+- [llSetRemoteScriptAccessPin](../llsetremotescriptaccesspin/)
+- [llMapDestination](../llmapdestination/)
+- `changed` event
+
+<WikiAttribution />

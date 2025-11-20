@@ -1,0 +1,224 @@
+---
+title: llRemoteLoadScriptPin
+description: >-
+  If the owner of the object containing this script can modify the object
+  identified by the specified object key, and if the PIN matches the PIN
+  previously set using llSetRemoteScriptAccessPin (on the target prim), then the
+  script will be copied into target. Running is a boolean specifying whether the
+  script should be enabled once copied into the target object.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRemoteLoadScriptPin" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Example - Script Copier
+
+```lsl
+//Copy a script to the second prim
+integer PIN=1341134;
+
+default {
+    state_entry() {
+        llRemoteLoadScriptPin( llGetLinkKey(2), "some script", PIN, TRUE, 0xBEEEEEEF );
+    }
+}
+```
+
+### Pin Setter
+
+Simple script used for setting the pin for a prim, so you can later send scripts to it with `llRemoteLoadScriptPin`:
+
+```lsl
+//Child Prim PIN setter
+integer PIN=1341134;
+
+default {
+    state_entry() {
+        llOwnerSay(llGetObjectName()+" : "+(string)llGetKey()+" is ready to accept a describer script using the agreed upon PIN.");
+        llSetRemoteScriptAccessPin(PIN);
+    }
+}
+```
+
+### Rez and Copy a File from a Control Object
+
+This example rezzes a prim from inventory that has a basic control file inside of it and does a basic handshake to setup the pin and transfer the script. After the transfer, the helper script in the rezzed prim deletes itself.
+
+**Control Prim:**
+
+```lsl
+integer controlchan = 0;
+integer controlid = -1;
+start()
+{
+    llSetTimerEvent(0);
+    talkingto = NULL_KEY;
+    integer a = (integer)llFrand(43);
+    controlchan = a * a;
+    controlchan -= controlchan * 3;
+    controlid = llListen(controlchan,"","","set-connect");
+    llRezObject("card",llGetPos()+<0,0,0.1>,<0,0,0>,ZERO_ROTATION,a);
+    llSetTimerEvent(60);
+}
+key talkingto = NULL_KEY;
+integer busy = FALSE;
+integer accesspin = 0;
+default
+{
+    timer()
+    {
+        llSetTimerEvent(0);
+        llOwnerSay("Lost connection!");
+        llListenRemove(controlid);
+        busy = FALSE;
+    }
+    listen(integer chan,string name,key id,string message)
+    {
+        if(chan == controlchan)
+        {
+            if(llGetOwnerKey(id) == llGetOwner())
+            {
+                if(talkingto == NULL_KEY)
+                {
+                    if(message == "set-connect")
+                    {
+                        llSetTimerEvent(0);
+                        talkingto = id;
+                        llListenRemove(controlid);
+                        controlid = llListen(controlchan,"",talkingto,"ready");
+                        llRegionSayTo(id,controlchan,"auto-connect");
+                        llSetTimerEvent(60);
+                    }
+                }
+                else if(id == talkingto)
+                {
+                    if(message == "ready")
+                    {
+                        llSetTimerEvent(0);
+                        accesspin = (integer)llFrand(2345)+213;
+                        llListenRemove(controlid);
+                        controlid = llListen(controlchan,"",talkingto,"pinset");
+                        llSleep(1);
+                        llRegionSayTo(talkingto,controlchan,(string)accesspin);
+                        llSetTimerEvent(60);
+                    }
+                    else if(message == "pinset")
+                    {
+                        llSetTimerEvent(0);
+                        llListenRemove(controlid);
+                        llRemoteLoadScriptPin(talkingto,"demo.lsl",accesspin,1,0);
+                        llSleep(3);
+                        llRegionSayTo(talkingto,controlchan,"finished");
+                        llOwnerSay("Transfer of file finished - control file should have auto deleted itself!");
+                        busy = FALSE;
+                    }
+                }
+            }
+        }
+    }
+    touch_end(integer a)
+    {
+        if(busy == FALSE)
+        {
+            busy = TRUE;
+            if(llGetOwner() == llDetectedKey(0))
+            {
+                start();
+            }
+        }
+    }
+}
+```
+
+**Rezzed Prim:**
+
+```lsl
+integer listen_id = -1;
+integer listen_chan = -1;
+key details_from = NULL_KEY;
+default
+{
+    on_rez(integer a)
+    {
+        if(a == 0)
+        {
+            llOwnerSay("- Direct rez -");
+        }
+        else
+        {
+            llOwnerSay("- Awaiting config connection -");
+            listen_chan = a * a;
+            listen_chan -= listen_chan * 3;
+            listen_id = llListen(listen_chan,"","","auto-connect");
+            llWhisper(listen_chan,"set-connect");
+            llSetTimerEvent(30);
+        }
+    }
+    timer()
+    {
+        llOwnerSay("Failed to connect to rezzer deleting myself!");
+        llSetTimerEvent(0);
+        llDie();
+    }
+    listen(integer chan,string name,key id,string message)
+    {
+        if(llGetOwnerKey(id) == llGetOwner())
+        {
+            if(message == "auto-connect")
+            {
+                llSetTimerEvent(0);
+                llListenRemove(listen_id);
+                listen_id = llListen(listen_chan,"",id,"");
+                llRegionSayTo(id,listen_chan,"ready");
+                details_from = id;
+                llSetTimerEvent(30);
+            }
+            else if(details_from != NULL_KEY)
+            {
+                llSetTimerEvent(0);
+                if(message == "finished")
+                {
+                    llSetRemoteScriptAccessPin((integer)message);
+                    llRemoveInventory(llGetScriptName());
+                }
+                else
+                {
+                    llSetRemoteScriptAccessPin((integer)message);
+                    llRegionSayTo(id,listen_chan,"pinset");
+                }
+                llSetTimerEvent(30);
+            }
+        }
+    }
+}
+```
+
+## Caveats
+
+- If `name` is present in the target prim's inventory, it is silently replaced.
+- `start_param` only lasts until the script is reset.
+- Only the owner of an attachment can modify it while it is being worn. If the target is an attachment owned by a different user (regardless of object modify rights granted), this function will silently fail.
+- If the target is owned by a different user and modify permission has been granted to the script owner, the script owner must be connected to the sim for this function to succeed.
+- If the PIN fails to match, the error "Task ~Prim~ trying to illegally load script onto task ~Other_Prim~!" is shouted on `DEBUG_CHANNEL` (with prim names substituted).
+- If the target is the script's parent (same as `llGetKey()`), then "Unable to add item!" is shouted on `DEBUG_CHANNEL`.
+- If the object containing this script is deeded to a group, the script `name` needs transfer permissions, even if the target is deeded to the same group.
+- When the script is set to run, `state_entry` will be queued.
+
+## Notes
+
+- Only works if the script owner can modify the target prim.
+- There is no signing on the starting messages; only the owner is checked.
+
+## See Also
+
+- [llSetRemoteScriptAccessPin](../llsetremotescriptaccesspin/)
+- [llSetScriptState](../llsetscriptstate/)
+- [llResetOtherScript](../llresetotherscript/)
+
+<WikiAttribution />

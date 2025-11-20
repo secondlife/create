@@ -1,0 +1,48 @@
+---
+title: llSetPhysicsMaterial
+description: >-
+  Sets the selected parameters of the object's physics behavior.
+
+  MaterialBits is a bitmask specifying which of the parameters in the other
+  arguments should be applied to the object. GravityMultiplier, Restitution,
+  Friction, and Density are the possible parameters to manipulate.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetPhysicsMaterial" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Example
+
+```lsl
+llSetPhysicsMaterial(FRICTION, 1.0, 0.9, 0.1, 0.5); // Sets FRICTION to 0.1
+```
+
+### Multiple Settings
+
+```lsl
+llSetPhysicsMaterial(GRAVITY_MULTIPLIER | RESTITUTION | FRICTION | DENSITY, 0.5, 0.9, 0.1, 1.0);
+```
+
+## Caveats
+
+- Using PRIM_MATERIAL to set the material type will reset the values for friction and restitution to that material's defaults.
+- llSetPhysicsMaterial silently fails if called from an attachment.
+
+## Notes
+
+### Material Defaults
+
+Using PRIM_MATERIAL changes the values for friction and restitution to the values listed for the material type. llSetPhysicsMaterial cannot use material type flags.
+
+## See Also
+
+- [llGetPhysicsMaterial](../llgetphysicsmaterial/)
+- [llSetBuoyancy](../llsetbuoyancy/)
+
+<WikiAttribution />

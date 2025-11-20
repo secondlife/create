@@ -1,0 +1,50 @@
+---
+title: llLinksetDataDeleteFound
+description: >-
+  Deletes all key value pairs in the linkset data where the key matches the
+  regular expression in search. Returns a list consisting of [ #deleted, #not
+  deleted ].
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLinksetDataDeleteFound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The `llLinksetDataDeleteFound` function finds and attempts to delete all keys in the linkset data store that match the provided regular expression pattern. This function will delete protected key-value pairs only if the matching pass phrase is provided in the `pass` parameter.
+
+## Return Value
+
+The function returns a list containing:
+- **[0]** - Number of keys successfully deleted
+- **[1]** - Number of keys that could not be deleted (due to non-matching pass phrase)
+
+## Behavior
+
+If this function successfully deletes any keys from the datastore, it will trigger a `linkset_data` event with the type `LINKSET_DATA_MULTIDELETE`. The event's key name will consist of a comma-separated list of the key names removed from the datastore.
+
+## Notes
+
+- The `pattern` parameter is a [regular expression](https://en.wikipedia.org/wiki/Regular_expression)
+- Protected keys can only be deleted if the correct pass phrase is provided
+- This is a powerful operation - use carefully to avoid accidental data loss
+- The function triggers a linkset_data event for all deletions made
+
+## See Also
+
+- [llLinksetDataAvailable](../lllinksetdataavailable/)
+- [llLinksetDataCountKeys](../lllinksetdatacountkeys/)
+- [llLinksetDataDelete](../lllinksetdatadelete/)
+- [llLinksetDataDeleteProtected](../lllinksetdatadeleteprotected/)
+- [llLinksetDataListKeys](../lllinksetdatalistkeys/)
+- [llLinksetDataRead](../lllinksetdataread/)
+- [llLinksetDataReadProtected](../lllinksetdatareadprotected/)
+- [llLinksetDataReset](../lllinksetdatareset/)
+- [llLinksetDataWrite](../lllinksetdatawrite/)
+- [llLinksetDataWriteProtected](../lllinksetdatawriteprotected/)
+
+<WikiAttribution />

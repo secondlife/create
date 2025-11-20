@@ -1,0 +1,97 @@
+---
+title: llGetFreeURLs
+description: |-
+  Returns the number of available URLs for the current script.
+  Returns an integer that is the number of available URLs.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetFreeURLs" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+There is a separate URL limit for the region, and a limit for each agent. The URL limit is the same as the Land Impact limit:
+
+- Agent: 38
+- Openspace Sim: 1,250
+- Homestead Sim: 5,000
+- Full Sim: 20,000
+- Mainland Sim: 22,500
+- 30k Sim: 30,000
+
+## Caveats
+
+- If called from an attachment, there is no way to get the number of free URLs in the region; it will always return the URL count remaining for the agent.
+
+## Examples
+
+### Basic Usage
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        integer numberOfFreeURLs = llGetFreeURLs();
+
+        if (numberOfFreeURLs)
+        {
+            llSay(0, "There are " + (string)numberOfFreeURLs + " available HTTP-In URLs left in this region.");
+        }
+        else
+        {
+            llSay(0, "WARNING: There are no HTTP-In URLs available anymore.");
+        }
+    }
+}
+```
+
+### Allocating URLs
+
+Warning: This script is only for proof-of-concept (demo purposes). DO NOT use it if you don't have the sim owners and/or estate managers OK to test this script. This script can possibly block HTTP communication from and to the sim, bringing down all networked vendors and/or similar machines.
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llRequestURL();
+    }
+
+    http_request(key request_id, string method, string body)
+    {
+        if (method == URL_REQUEST_DENIED)
+        {
+            llSetText("No free URLs!", <1.0, 0.0, 0.0>, 1.0);
+        }
+        else if (method == URL_REQUEST_GRANTED)
+        {
+            llSetText((string)llGetFreeURLs() + " URLs left\n" + body, <1.0, 1.0, 1.0>, 1.0);
+            llRequestURL();
+        }
+        else if (method == "GET")
+        {
+            llHTTPResponse(request_id, 200, "Hello there!");
+        }
+    }
+}
+```
+
+## Notes
+
+- URLs are a finite region resource and should be released when no longer needed.
+
+## See Also
+
+- [llRequestURL](../llrequesturl/)
+- [llRequestSecureURL](../llrequestsecureurl/)
+- [llReleaseURL](../llreleaseurl/)
+- [llHTTPResponse](../llhttpresponse/)
+- [llGetHTTPHeader](../llgethttpheader/)
+- LSL http server
+
+<WikiAttribution />

@@ -1,0 +1,134 @@
+---
+title: llMessageLinked
+description: >-
+  Sends Number, Text, and ID to members of the link set identified by
+  LinkNumber.
+
+  LinkNumber is either a linked number (available through llGetLinkNumber) or a
+  LINK_* constant.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llMessageLinked" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- A script can hear its own linked messages if the link parameter targets the prim it is in. This creates the possibility of an infinite loop—be very careful about how messages are handled and passed along. There are four ways for a script to target itself: by precise link number, `LINK_THIS`, `LINK_SET`, and `LINK_ALL_CHILDREN` (if the prim is a child prim).
+
+- Messages sent to scripts that are sleeping, delayed, or lagged are queued until the end of the delay. The event queue can hold 64 events maximum.
+  - If an event is received and the queue is full, the event is silently dropped.
+  - Avoid sending link_messages to large numbers of scripts simultaneously as it can cause lag spikes. This most often happens when using multi-prim `LINK_*` flags.
+  - Avoid sending link_messages faster than they can be handled—this risks filling the event queue and causing messages to be silently discarded.
+
+- When a script changes state, all pending events are deleted, including queued link_messages.
+
+- If the link parameter is an invalid link number, the function silently fails.
+
+- If the string and ID parameters exceed the available memory of a script that receives the resulting link_message event, that script will crash with a Stack-Heap Collision error.
+
+## Examples
+
+### Basic Message Passing
+
+```lsl
+default
+{
+    // assumptions  // object name: LSLWiki // script name: _lslwiki
+    state_entry()
+    {
+        llMessageLinked(LINK_THIS, 0, llGetScriptName(), "");
+    }
+
+    link_message(integer sender_num, integer num, string msg, key id)
+    {
+        llOwnerSay(msg);
+        // the owner of object LSLWiki will hear
+        // LSLWiki:_lslwiki
+    }
+}
+```
+
+### Example: Infinite Loop (What NOT to do)
+
+This example demonstrates how easy it is to create an infinite loop when using link_messages. Each message triggers another message, cascading until the event queue fills and messages are dropped.
+
+```lsl
+Message_Control(integer l, integer n) // Message_Total_Lack_Of_Control
+{
+    integer r = (++n); // Increment the value of n.
+    llMessageLinked( l, r, "", ""); // Send the result to l
+}
+
+default
+{
+    state_entry()
+    {
+        Message_Control(LINK_SET, 0); // Tell all the scripts in the object that we have state_entered.
+    }
+    link_message(integer Sender, integer Number, string String, key Key) // This script is in the object too.
+    {
+        Message_Control(Sender, Number); // No filtering condition exists.
+        llOwnerSay(((string)Number)); // Look at all the pretty numbers!
+    }
+}
+```
+
+### Quick Debug Helper
+
+```lsl
+default
+{
+    // Quick and dirty debugging link_messages
+    link_message(integer sender_num, integer num, string msg, key id)
+    {
+        llSay(DEBUG_CHANNEL, llList2CSV([sender_num, num, msg, id]));
+    }
+}
+```
+
+### Passing Complex Data via Link Messages
+
+Since link_message parameters are limited to integer, string, and key, use list serialization to pass multiple values or complex types:
+
+```lsl
+default
+{
+    // To propagate an unlimited number of arguments of any type.
+    // Presumed, the separator string isn't used in any source string!
+    state_entry()
+    {
+        list my_list = [1, 2.0, "a string", <1, 2, 3>, <1, 2, 3, 4>, llGetOwner()];
+        string list_parameter = llDumpList2String(my_list, "|");    // Convert the list to a string
+        llMessageLinked(LINK_THIS, 0, list_parameter, "");
+    }
+
+    link_message(integer sender_num, integer num, string list_argument, key id)
+    {
+        list re_list = llParseString2List(list_argument, ["|"], []);    // Parse the string back to a list
+    }
+}
+```
+
+## Notes
+
+- Using `llMessageLinked` in a single-prim object allows developers to mitigate some LSL limits by breaking up functionality between cooperating scripts and synchronizing actions. Be extremely careful not to create infinite loops when doing this.
+
+- An estimated 0.25 to 0.50 second delay between receiving and sending of `llMessageLinked` has been observed by some users.
+
+- Some users have noted occasional failures of linked messages when sending a message to a large number of receiving scripts in different prims using `LINK_SET`, `LINK_ALL_OTHERS`, or `LINK_ALL_CHILDREN`. If you encounter this problem, a workaround is to place all child prim scripts in a single prim, using targeted functions like `llSetLinkPrimitiveParams` to modify the prim in which the script previously resided.
+
+- This function tends to create lower lag levels than `llListen` since it does not need a listener.
+
+- The key parameter can be used as a second string field (in LSL, the key type is implemented as a string with different operators and restrictions).
+
+- The sizes of the string and ID parameters are only limited by available script memory.
+
+## See Also
+
+- `link_message` event
+
+<WikiAttribution />

@@ -1,0 +1,65 @@
+---
+title: llSetAnimationOverride
+description: >-
+  Sets the animation (in object inventory) that will play for the given
+  animation state.
+
+  To use this function the script must obtain the PERMISSION_OVERRIDE_ANIMATIONS
+  permission.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetAnimationOverride" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Override the Sit, Stand and Walk animations
+// 1. place this script and your animations in a prim
+// 2. edit the animation names in the script to your animation's names
+// 3. attach the prim to your avatar
+
+string gMySit = "chop_sit";
+string gMyStand = "FStand _02";
+string gMyWalk = "Kort gang F v4.1";
+
+default
+{
+    attach(key id)
+    {
+        if ( id ) llRequestPermissions(id , PERMISSION_OVERRIDE_ANIMATIONS);
+        else if ( llGetPermissions() & PERMISSION_OVERRIDE_ANIMATIONS ) llResetAnimationOverride("ALL");
+    }
+    run_time_permissions(integer perms)
+    {
+        if ( perms & PERMISSION_OVERRIDE_ANIMATIONS )
+        {
+            llSetAnimationOverride( "Sitting", gMySit);
+            llSetAnimationOverride( "Standing", gMyStand);
+            llSetAnimationOverride( "Walking", gMyWalk);
+        }
+    }
+}
+```
+
+## Caveats
+
+- Animation overrides survive script reset, script removal, attachment removal, crossing into another region and teleporting, but **not relog**.
+- State "Sit on Ground" will play the default animation in addition to any override set. This is required for correct viewer behavior.
+- Some states are transitional and have undefined behavior if set to continuously looping animations. These states are "PreJumping", "Landing", "Soft Landing" and "Standing Up".
+  - Usually this means your avatar will become frozen in place unless you run "Stop Animating My Avatar" from the viewer, so avoid using looping animations for these states.
+- Permissions aren't auto granted if you sit on an object asking for PERMISSION_OVERRIDE_ANIMATIONS.
+- Starting a default animation ("sit" "walk" "fly") with `llStartAnimation` will not start the Override Animation.
+- When this function is used to override the Walking animation, the avatar can no longer walk backward - attempting to do so causes the avatar to turn around. Presumably this is because there's no way to specify a "walking backwards" animation, so actually moving backwards while your legs are moving forward would look wrong.
+
+## See Also
+
+- [llGetAnimationOverride](../llgetanimationoverride/)
+- [llResetAnimationOverride](../llresetanimationoverride/)
+- Internal Animations - Complete list of animation states available for overriding
+
+<WikiAttribution />

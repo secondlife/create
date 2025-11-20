@@ -1,0 +1,36 @@
+---
+title: llGetParcelPrimOwners
+description: >-
+  Returns a list of up to 100 residents who own objects on the parcel at
+  Position, with per-owner land impact totals.
+
+  Requires owner-like permissions for the parcel, and for the script owner to be
+  present in the region.
+
+  The list is formatted as [ key agentKey1, integer agentLI1, key agentKey2,
+  integer agentLI2, ... ], sorted by agent key.
+
+  The integers are the combined land impacts of the objects owned by the
+  corresponding agents.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llGetParcelPrimOwners" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.GetParcelPrimOwners()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llGetParcelPrimOwners](/script/reference/lsl/functions/llGetParcelPrimOwners/)
+
+

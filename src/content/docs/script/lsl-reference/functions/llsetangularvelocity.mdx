@@ -1,0 +1,53 @@
+---
+title: llSetAngularVelocity
+description: >-
+  Sets an object's angular velocity to AngVel, in local coordinates if Local ==
+  TRUE (if the script is physical).
+
+  Has no effect on non-physical objects.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetAngularVelocity" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Consider an object with mass M and gravity disabled (uniform cube, single prim, center of mass at center):
+
+**Using llSetAngularVelocity:**
+```lsl
+llSetAngularVelocity(<0,0,1>, TRUE);
+```
+Starts rotation around the Z local axis with initial omega = 1 radian/second, gradually slowing down over time until rotation stops.
+
+**Compared with llApplyRotationalImpulse:**
+```lsl
+llApplyRotationalImpulse(<0,0,1>, TRUE);
+```
+Starts rotation around the Z local axis with initial omega = 1/M radian/second (inversely proportional to mass), gradually slowing down over time.
+
+**Compared with llTargetOmega:**
+```lsl
+llTargetOmega(<0.0,0.0,1.0>, 1.0, 1.0);
+```
+For physical objects, starts rotation around the Z local axis with omega = 1 radian/second, but unlike llSetAngularVelocity, does not slow down over time—maintains constant rotation.
+
+## Notes
+
+- This function applies rotational velocity independent of object mass, unlike llApplyRotationalImpulse which divides the impulse by mass
+- Only affects physical objects; has no effect on non-physical objects
+- The angular velocity will gradually decrease over time due to friction
+- For permanent continuous rotation without decay, use llTargetOmega instead
+- When `Local` is TRUE, the vector is treated as a local directional vector; when FALSE, it's regional
+
+## See Also
+
+- [llApplyRotationalImpulse](llApplyRotationalImpulse)
+- [llSetVelocity](llSetVelocity)
+- [llTargetOmega](llTargetOmega)
+
+<WikiAttribution />

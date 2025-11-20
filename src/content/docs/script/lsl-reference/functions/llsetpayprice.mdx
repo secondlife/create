@@ -1,0 +1,95 @@
+---
+title: llSetPayPrice
+description: >-
+  Sets the default amount when someone chooses to pay this object.
+
+  Price is the default price shown in the text input field.  QuickButtons
+  specifies the 4 payment values shown in the payment dialog's buttons.
+
+  Input field and buttons may be hidden with PAY_HIDE constant, and may be set
+  to their default values using PAY_DEFAULT.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetPayPrice" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Simple example hiding the price field and showing only one button with a value of 150:
+
+```lsl
+llSetPayPrice(PAY_HIDE, [150, PAY_HIDE, PAY_HIDE, PAY_HIDE])
+```
+
+Complete payment processing example with permission checking:
+
+```lsl
+integer price = 10;
+
+default
+{
+    state_entry()
+    {
+        llSetPayPrice(PAY_HIDE, [PAY_HIDE, PAY_HIDE, PAY_HIDE, PAY_HIDE]);
+        llRequestPermissions(llGetOwner(), PERMISSION_DEBIT);
+    }
+    run_time_permissions(integer perm)
+    {
+        if(perm & PERMISSION_DEBIT)
+            state cash;
+    }
+}
+
+state cash
+{
+    state_entry()
+    {
+        llSetPayPrice(price, [price, PAY_HIDE, PAY_HIDE, PAY_HIDE]);
+    }
+    money(key id, integer amount)
+    {
+        if(amount != price)
+        {
+            llGiveMoney(id, amount);
+            llInstantMessage(id, "You paid " + (string)amount + ", which is the wrong price, the price is: " + (string)price);
+        }
+        else
+        {
+            //insert your give code here.
+            llInstantMessage(id, "You paid the right price");
+        }
+    }
+}
+```
+
+## Caveats and Important Notes
+
+- **Do not trust this function to limit payment amounts.** Always verify the amount paid in the `money` event is the amount you expected.
+- Use only one call to this function across all scripts on an object to prevent confusion about which values are active. You still need to check in the `money` event that the amount is correct.
+- This function only works when called from the root prim of an object. Its effect applies to all prims in the object. Calling it from a child prim has no effect.
+  - There is a known viewer bug where calls from child prims will **prevent** payment to the object entirely.
+- Payment settings persist in the prim even if the script with `llSetPayPrice()` is removed or recompiled.
+- **Caution:** Calling this function enables payment on the prim (or the whole object if it's the root prim) for the current state, even if that state has no `money` event.
+- Otherwise, the pay option will only appear on prims with a running script that has a `money` event (or on all prims if the root has such a script).
+- Money cannot be paid to an attachment; the "Pay" option goes directly to the wearer instead.
+- If `quick_pay_buttons` contains a negative value or zero, that button will not be shown. (Exception: zero is allowed for `price` to set the custom text field value in the Pay window.)
+
+## Constants
+
+The quick pay buttons list uses these constants:
+
+- `PAY_HIDE` (-1) - Hides this quick pay button
+- `PAY_DEFAULT` (-2) - Uses the default value for this quick pay button
+
+Default quick pay button values are: $1, $5, $10, $20 (in order)
+
+## See Also
+
+- [llGiveMoney](/script/reference/lsl/functions/llgivemoney/)
+- [money](/script/reference/lsl/events/money/) event
+
+<WikiAttribution />

@@ -1,0 +1,60 @@
+---
+title: llGetPos
+description: |-
+  Returns the position of the task in region coordinates.
+  Returns the vector position of the task in region coordinates.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetPos" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        // When touched, check the position of
+        // the object, save it to "position",
+        // then convert it into a string and
+        // say it.
+        vector position = llGetPos();
+        llSay(0, (string)position);
+    }
+}
+```
+
+```lsl
+default
+{
+    on_rez(integer param)
+    {
+        // Adding .x .y or .z after the vector name can be used to get the float value of just that axis.
+        vector pos = llGetPos();
+        float Z = pos.z; // <--- Like this.
+        if(Z > 500.0)
+        llOwnerSay("Oooh! I'm up high!");
+    }
+}
+```
+
+## Caveats
+
+- When called from the root of an attachment, returns the wearer's region position. To see the position used, enable **Develop > Avatar > Display Agent Target** and use the red crosshair. If the avatar is sitting on an object, the red crosshair may be hidden by the white one, in the same position.
+- When called in an attachment's child prim, the position given is again relative to the *avatar's* root position and rotation, but with the offset from the root prim added. Visually, the reported position will only be correct if the object's root is attached to `ATTACH_AVATAR_CENTER`, at `ZERO_ROTATION` and `ZERO_VECTOR`. Moving the attachment's root or changing the attachment point will not affect the reported position. Avatar animation is invisible to the simulator, so it also does not affect the reported position.
+
+## See Also
+
+- [llGetLocalPos](../llgetlocalpos/)
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+- [llGetRootPosition](../llgetrootposition/)
+- [llSetPos](../llsetpos/)
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+
+<WikiAttribution />

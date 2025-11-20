@@ -1,0 +1,92 @@
+---
+title: llGetSubString
+description: >-
+  Returns a sub-string from String, in a range specified by the Start and End
+  indices (inclusive).
+
+  Using negative numbers for Start and/or End causes the index to count
+  backwards from the length of the string, so 0, -1 would capture the entire
+  string.
+
+  If Start is greater than End, the sub string is the exclusion of the entries.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetSubString" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Basic substring extraction:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        string word = "Hello!";
+        llOwnerSay(llGetSubString(word, 0, 0));
+        // Object: H
+        llOwnerSay(llGetSubString(word, -1, -1));
+        // Object: !
+        llOwnerSay(llGetSubString(word, 2, 3));
+        // Object: ll
+    }
+}
+```
+
+Practical use case - formatting time with zero-padding:
+
+```lsl
+// Display SL time without using 'if' statements
+default
+{
+    state_entry()
+    {
+        // Synchronize our clock to a fraction of a second
+        float fnow = llGetWallclock();
+        while (fnow == llGetWallclock())   ;   // await a change in seconds
+
+        llSetTimerEvent(1.0);
+    }
+
+    timer()
+    {
+        integer seconds = (integer) llGetWallclock();
+        integer minutes = seconds / 60;
+        seconds = seconds % 60;
+        integer hours = minutes / 60;
+        minutes = minutes % 60;
+
+        string stringHours   = llGetSubString("0" + (string)hours,   -2, -1);
+        string stringMinutes = llGetSubString("0" + (string)minutes, -2, -1);
+        string stringSeconds = llGetSubString("0" + (string)seconds, -2, -1);
+
+        string time = stringHours + ":" + stringMinutes + ":" + stringSeconds;
+
+        llSetText(time, <1.0, 1.0, 1.0>, 1.0);
+    }
+}
+```
+
+## Notes
+
+Character counting starts at 0:
+- `llGetSubString(str, 0, 0)` returns only the first character
+- Negative numbers count backwards from the end of the string, so `-1` refers to the last character
+- `llGetSubString(str, 0, -1)` returns the entire string
+- If Start is greater than End, the substring is the exclusion of the entries
+
+To determine string length, use `llStringLength()`.
+
+## See Also
+
+- [llReplaceSubString](../llreplacesubstring/)
+- [llDeleteSubString](../lldeletesubstring/)
+- [llInsertString](../llinsertstring/)
+- [llStringLength](../llstringlength/)
+
+<WikiAttribution />

@@ -1,0 +1,99 @@
+---
+title: llRequestPermissions
+description: >-
+  Ask AvatarID to allow the script to perform certain actions, specified in the
+  PermissionMask bitmask. PermissionMask should be one or more PERMISSION_*
+  constants. Multiple permissions can be requested simultaneously by ORing the
+  constants together. Many of the permissions requests can only go to object
+  owner.
+
+  This call will not stop script execution. If the avatar grants the requested
+  permissions, the run_time_permissions event will be called.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRequestPermissions" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Request permission to animate an avatar
+
+```lsl
+default
+{
+    touch_start(integer detected)
+    {
+        llRequestPermissions(llDetectedKey(0), PERMISSION_TRIGGER_ANIMATION);
+    }
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {
+            llStartAnimation("sit");
+            llOwnerSay("animation will end in 5 seconds");
+            llSetTimerEvent(5.0);
+        }
+    }
+    timer()
+    {
+        llSetTimerEvent(0.0);
+        llStopAnimation("sit");
+    }
+}
+```
+
+### Request multiple permissions at once
+
+To request two or more permissions at the same time, use the bitwise OR (`|`) operator:
+
+```lsl
+llRequestPermissions(AvatarID, PERMISSION_TAKE_CONTROLS | PERMISSION_TRIGGER_ANIMATION);
+```
+
+Or store the combined permissions in a variable first:
+
+```lsl
+integer perms = PERMISSION_TAKE_CONTROLS | PERMISSION_TRIGGER_ANIMATION;
+llRequestPermissions(AvatarID, perms);
+```
+
+## Caveats
+
+- A dialog is presented to the agent to grant these permissions except when granted automatically (for attached objects).
+- If object is attached to agent, "automatic" permissions are granted without notification upon request.
+- Permissions persist across state changes.
+- Regardless of whether granting is automatic, you should always use the `run_time_permissions` event. Granting permissions takes time, and you shouldn't assume it's completed until the event handler gets invoked.
+- The menu-option "Stop Animating Me" will release certain permissions (`PERMISSION_TRIGGER_ANIMATION` and `PERMISSION_OVERRIDE_ANIMATIONS`) if the script which holds these permissions is in the same region as the agent, and the script is not attached to the permission granter.
+- Permissions do not accumulate. If a permission was requested with a previous call and granted, then in a subsequent call was not requested, that permission is released.
+- Permissions are requested and granted separately for each script, even if they are located in the same object.
+- Scripts may hold permissions for only one agent at a time. To hold permissions for multiple agents you must use more than one script.
+- The result of granting permissions affects the return of `llGetPermissions` and `llGetPermissionsKey` immediately, despite the `run_time_permissions` event being queued.
+- Permission request dialogs never time out.
+- If a script makes two permission requests, whichever response is last is considered the granted permissions.
+- The viewer limits permission requests from any agent to any other agent to 5 dialogs in 10 seconds.
+- Requesting a permission in one state, then changing state before the agent response, will cause `run_time_permissions` to be fired in the new state once the agent responds.
+- Requesting only auto-granted permissions in one state, then immediately changing state, will never fire `run_time_permissions`.
+- It is not possible to request no permissions at all; use `llResetScript` as a workaround if needed.
+
+## Notes on Permission Grants
+
+When an agent grants a script non-automatic permissions, they will receive a notification in chat containing:
+
+- The name of the object that contains the script that has been granted permissions
+- The name of the owner of the object
+- The location of the object in the order "Region name at position"
+- A statement of what permissions were granted
+
+If the script that holds the permissions is in a child prim, the name will be that of the child prim (not the root object) and the position will be its local position (relative to its root).
+
+## See Also
+
+- `run_time_permissions` - Permission receiver event
+- [llGetPermissions](../llgetpermissions/)
+- [llGetPermissionsKey](../llgetpermissionskey/)
+
+<WikiAttribution />

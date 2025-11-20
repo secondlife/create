@@ -1,0 +1,142 @@
+---
+title: llSetLinkAlpha
+description: |-
+  If a prim exists in the link chain at LinkNumber, set Face to Opacity.
+  Sets the Face, on the linked prim specified, to the Opacity.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLinkAlpha" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- `llSetLinkAlpha` will have no visible effect on faces with a PBR material. To work on faces both with and without a PBR material, use one of these snippets:
+
+**To make faces invisible:**
+
+```lsl
+llSetLinkAlpha(LINK_THIS, 0.0, ALL_SIDES);
+llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_GLTF_BASE_COLOR, ALL_SIDES, "", "", "", "", "", 0.0, PRIM_GLTF_ALPHA_MODE_MASK, 1.0, ""]);
+```
+
+**To make faces visible:**
+
+```lsl
+llSetLinkAlpha(LINK_THIS, 1.0, ALL_SIDES);
+llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_GLTF_BASE_COLOR, ALL_SIDES, "", "", "", "", "", "", "", "", ""]);
+```
+
+## Examples
+
+**Make the entire object disappear for 5 seconds**
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        // transparent
+        llSetLinkAlpha(LINK_SET, 0.0, ALL_SIDES);
+        llSetTimerEvent(5.0);
+    }
+
+    timer()
+    {
+        // opaque
+        llSetLinkAlpha(LINK_SET, 1.0, ALL_SIDES);
+        llSetTimerEvent(0.0);
+    }
+}
+```
+
+**Fade in and out on touch**
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        // fade out
+        float alpha = 1.0;
+        while (alpha >= 0.0)
+        {
+            llSetLinkAlpha(LINK_SET, alpha, ALL_SIDES);
+            alpha -= 0.001;
+        }
+
+        // fade in
+        while (alpha < 1.0)
+        {
+            alpha += 0.001;
+            llSetLinkAlpha(LINK_SET, alpha, ALL_SIDES);
+        }
+    }
+}
+```
+
+**Toggle prim visibility by name via chat commands**
+
+```lsl
+list PrimList = ["ALL"];
+// Start our prim list with a dummy entry, so that the index into this list will correspond directly to the link number
+// By making the dummy entry 'ALL' we provide a match for that option too
+
+default
+{
+    changed (integer change)
+    {
+        if (change & CHANGED_LINK)
+            llResetScript();
+    }
+
+    state_entry()
+    {
+        integer PrimCount = llGetNumberOfPrims();
+        llListen(37, "", NULL_KEY, "");
+        integer i;
+        for (i = 1; i <= PrimCount; ++i)
+            PrimList += llToUpper(llGetLinkName(i));
+    }
+
+    listen(integer channel, string name, key id, string msg)
+    {
+        list TempList = llCSV2List(llToUpper(msg));
+        integer ListLen = llGetListLength(TempList);
+        integer alpha = (llList2String(TempList, 0) == "SHOW");
+        // 'SHOW' sets selected prims visible, otherwise set them transparent
+        // e.g.  HIDE,PLATE,SPOON,NAPKIN            <---- makes named prims invisible
+        // e.g.  SHOW,ALL                             <---- makes all prims visible
+
+        integer i;
+        for (i = 1; i < ListLen; ++i)
+        {
+            string ThisPrim = llStringTrim(llList2String(TempList, i), STRING_TRIM);
+            integer LinkNumber = llListFindList(PrimList, [ThisPrim]);
+            if (~LinkNumber)    // i.e. if LinkNumber != -1
+            {
+                if (!LinkNumber)
+                    LinkNumber = LINK_SET;
+                llSetLinkAlpha(LinkNumber, alpha, ALL_SIDES);
+            }
+        }
+    }
+}
+```
+
+## See Also
+
+- [llGetAlpha](/script/reference/lsl/functions/llgetalpha/) - Gets the prim's alpha
+- [llSetAlpha](/script/reference/lsl/functions/llsetalpha/) - Sets the prim's alpha
+- [llGetColor](/script/reference/lsl/functions/llgetcolor/) - Gets the prim's color
+- [llSetColor](/script/reference/lsl/functions/llsetcolor/) - Sets the prim's color
+- [llSetLinkColor](/script/reference/lsl/functions/llsetlinkcolor/)
+- [llSetLinkTexture](/script/reference/lsl/functions/llsetlinktexture/)
+- [llSetLinkPrimitiveParams](/script/reference/lsl/functions/llsetlinkprimitivepar/)
+- [PRIM_COLOR](/script/reference/lsl/functions/prim_color/) - The equivalent parameter for llSetPrimitiveParams
+- [PRIM_GLTF_BASE_COLOR](/script/reference/lsl/functions/prim_gltf_base_color/) - The equivalent PBR parameter for llSetPrimitiveParams
+
+<WikiAttribution />

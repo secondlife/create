@@ -1,0 +1,47 @@
+---
+title: llEuler2Rot
+description: |-
+  Returns the rotation representation of the Euler angles.
+  Returns the rotation represented by the Euler Angle.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llEuler2Rot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The Euler angle vector (in radians) is converted to a rotation by performing rotations around the 3 axes in Z, Y, X order. For example, `llEuler2Rot(<1.0, 2.0, 3.0> * DEG_TO_RAD)` generates a rotation by first rotating 3 degrees around the global Z axis, then rotating the result around the global Y axis, and finally rotating that result 1 degree around the global X axis.
+
+## Examples
+
+```lsl
+default
+{
+    state_entry()
+    {
+        vector input = <73.0, -63.0, 20.0> * DEG_TO_RAD;
+        rotation rot = llEuler2Rot(input);
+        llSay(0,"The Euler2Rot of "+(string)input+" is: "+(string)rot );
+    }
+}
+```
+
+## Implementation Details
+
+The conversion can be expressed mathematically as:
+
+```lsl
+v/=2;
+rotation k = <0.0, 0.0, llSin(v.z), llCos(v.z)> * <0.0, llSin(v.y), 0.0, llCos(v.y)> * <llSin(v.x), 0.0, 0.0, llCos(v.x)>;
+```
+
+## See Also
+
+- [llRot2Euler] - Convert rotation to Euler angles
+- [Euler Angles](https://en.wikipedia.org/wiki/Euler_angles) - Wikipedia reference
+
+<WikiAttribution />

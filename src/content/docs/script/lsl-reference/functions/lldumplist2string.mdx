@@ -1,0 +1,56 @@
+---
+title: llDumpList2String
+description: |-
+  Returns the list as a single string, using Separator between the entries.
+  Write the list out as a single string, using Separator between values.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDumpList2String" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Unlike `llList2CSV`, which dumps a list to a comma-separated formatted string with no choice over the separator, `llDumpList2String` gives you more control. This can be useful if you don't trust commas as a separator because you might be working with data supplied to the script by a user who uses, say, commas as part of a street address.
+
+## Examples
+
+```lsl
+list mylist = ["a", "b", "c", "d"];
+string tmp = llDumpList2String(mylist, "**");
+//tmp now equals: "a**b**c**d"
+```
+
+```lsl
+list mylist = [<10,5,7>, 100, "c", "d"];
+string tmp = llDumpList2String(mylist, "**");
+//tmp now equals: "<10,5,7>**100**c**d"
+```
+
+```lsl
+default {
+    state_entry() {
+        list my_list = [1, 2.0, "a string", llGetOwner()];
+        llOwnerSay("<" + llDumpList2String(my_list, "><") + ">");
+        //says: "<1><2.000000><a string><a822ff2b-ff02-461d-b45d-dcd10a2de0c2>"
+    }
+}
+```
+
+## Notes
+
+- Instead of using `llDumpList2String(myList, "")` you may wish to consider using the more efficient `(string)myList` as it produces an identical result with less memory usage due to eliminating a function-call.
+- Each element of the list is converted to string format in the result, so floats expand to six digits of precision, rotations and vectors are represented with "\<" and "\>" characters, etc.
+
+## See Also
+
+- [llParseString2List](../llparsestring2list/)
+- [llParseStringKeepNulls](../llparsestringkeepnulls/)
+- [llCSV2List](../llcsv2list/)
+- [llList2CSV](../lllist2csv/)
+- Typecast
+
+<WikiAttribution />

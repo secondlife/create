@@ -1,0 +1,84 @@
+---
+interface Props {
+  lslTitle?: string;
+  sluaTitle?: string;
+}
+
+const { lslTitle = "LSL", sluaTitle = "SLua" } = Astro.props;
+---
+
+<div class="code-comparison">
+  <div class="comparison-side">
+    <div class="comparison-header">{lslTitle}</div>
+    <div class="comparison-content">
+      <slot name="lsl" />
+    </div>
+  </div>
+  <div class="comparison-side">
+    <div class="comparison-header">{sluaTitle}</div>
+    <div class="comparison-content">
+      <slot name="slua" />
+    </div>
+  </div>
+</div>
+
+<style>
+  .code-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    align-items: stretch;
+  }
+
+  .comparison-side {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .comparison-header {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    text-align: left;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .comparison-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  /* Override Starlight's content gap styles */
+  .comparison-content, .comparison-side {
+    margin-top: 0 !important;
+  }
+
+  .comparison-content :global(pre) {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    height: 100% !important;
+  }
+
+  .comparison-content :global(.expressive-code) {
+    margin: 0 !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .comparison-content :global(.expressive-code .frame) {
+    border-radius: 0 !important;
+    margin: 0 !important;
+    flex: 1 !important;
+  }
+
+  /* Ensure the first child has no top margin */
+  .comparison-content :global(> *:first-child) {
+    margin-top: 0 !important;
+  }
+</style>

@@ -1,0 +1,32 @@
+---
+title: llPassTouches
+description: >-
+  Configures how touch events are passed to scripts in the linkset.
+
+  If Pass == TRUE, touches involving touch-handling scripted child prims are
+  also passed on to the root prim. If Pass == FALSE (default behavior), such
+  touches will only trigger events in the affected child prim.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llPassTouches" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- A new pass value was introduced in server version 1.40.2 (see SVC-5923)
+
+## Related Events
+
+- [touch_start]
+- [touch]
+- [touch_end]
+
+## See Also
+
+- [llPassCollisions]
+
+<WikiAttribution />

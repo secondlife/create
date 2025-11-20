@@ -1,0 +1,33 @@
+---
+title: llRequestInventoryData
+description: >-
+  Requests data for the named InventoryItem.
+
+  When data is available, the dataserver event will be raised with the key
+  returned from this function in the requested parameter.
+
+  The only request currently implemented is to request data from landmarks,
+  where the data returned is in the form "<float, float, float>" which can be
+  cast to a vector. This position is in region local coordinates.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llRequestInventoryData" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.RequestInventoryData()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llRequestInventoryData](/script/reference/lsl/functions/llRequestInventoryData/)
+
+

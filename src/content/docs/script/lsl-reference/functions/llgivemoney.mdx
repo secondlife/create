@@ -1,0 +1,73 @@
+---
+title: llGiveMoney
+description: |-
+  Transfers Amount of L$ from script owner to AvatarID.
+  This call will silently fail if PERMISSION_DEBIT has not been granted.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGiveMoney" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+There is no way to determine the success of an `llGiveMoney` transaction. If you need to know if a transaction was successful, use `llTransferLindenDollars` instead of `llGiveMoney`.
+
+## Caveats
+
+- An object cannot pay another object
+- It is impossible for a script to tell if an `llGiveMoney` transaction succeeded or failed. Use `llTransferLindenDollars` instead
+- Objects deeded to groups cannot give money (the permission cannot be granted)
+- Use is limited to 30 payments in a 30 second interval for all scripts owned by that resident on a region. Sustained overage will produce a script error and halt payments while the rate remains excessive. Historically, faster payments have failed intermittently
+- Once a script has the `PERMISSION_DEBIT` permission it can empty an account of L$
+  - **Fraud & theft are both Terms of Service violations and crimes. Misuse this function and you risk being banned and legal action. In addition Linden Lab may freeze the accounts of anyone the money is transferred to and restore it to its rightful owners. This may involve retrieving it from third party exchanges and accounts on those exchanges being frozen. The system is not designed to be friendly towards fraud**
+
+## Examples
+
+```lsl
+// Pay 100 L$ to Fred Bloggs when he touches this prim, then die
+// Compare this example with that shown under llTransferLindenDollars
+
+string  Recipient = "Fred Bloggs";      // Authorised recipient
+integer Amount = 100;                   // Amount to pay Fred when he touches the prim
+integer DebitPerms;
+
+default
+{
+    state_entry()
+    {
+        // Ask the owner for permission to debit their account
+        llRequestPermissions(llGetOwner(), PERMISSION_DEBIT);
+    }
+
+    run_time_permissions (integer perm)
+    {
+        if  (perm & PERMISSION_DEBIT)
+            DebitPerms = TRUE;
+    }
+
+    touch_start(integer num_detected)
+    {
+        if (!DebitPerms)
+            return;                     // Cannot proceed - debit permissions not granted
+        if (llDetectedName(0) != Recipient)
+            return;                     // unauthorised person is touching - ignore
+
+        key id = llDetectedKey(0);      // Get toucher's (i.e. Fred's) UUID
+        llGiveMoney(id, Amount);        // Give him the money
+        llDie();                        // Die so Fred can't keep taking money
+    }
+}
+```
+
+## See Also
+
+- [llTransferLindenDollars](../lltransferlindendollars/)
+- [llSetPayPrice](../llsetpayprice/)
+- `money` event - Receive payment events
+- `transaction_result` event - Receive transaction results (available with llTransferLindenDollars)
+
+<WikiAttribution />

@@ -1,0 +1,64 @@
+---
+title: llSetParcelMusicURL
+description: >-
+  Sets the streaming audio URL for the parcel the object is on.
+
+  The object must be owned by the owner of the parcel; if the parcel is group
+  owned the object must be owned by that group.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetParcelMusicURL" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This script changes the music URL based on time of day:
+
+```lsl
+// This script changes the music URL based on time of day.
+
+integer night = FALSE;
+string nighturl = "http://205.188.215.228:8006";
+string dayurl = "http://208.122.59.30:7156";
+
+default
+{
+    state_entry()
+    {
+        llSetTimerEvent(10);
+    }
+
+    timer()
+    {
+        vector pos = llGetSunDirection();
+
+        if ((pos.z < -.75) != night)
+        {
+            night = !night;
+            if (night)
+            {
+                llSetParcelMusicURL(nighturl);
+            }
+            else
+            {
+                llSetParcelMusicURL(dayurl);
+            }
+        }
+    }
+}
+```
+
+## Notes
+
+- The object owner must also be the land owner
+- If the land is deeded to a group, the object must be deeded to the same group for this function to work
+
+## See Also
+
+- [llGetParcelMusicURL] - Gets the music stream URL for the parcel object is on
+
+<WikiAttribution />

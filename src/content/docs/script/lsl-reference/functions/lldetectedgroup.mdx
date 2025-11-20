@@ -1,0 +1,42 @@
+---
+title: llDetectedGroup
+description: >-
+  Returns TRUE if detected object or agent Number has the same user group active
+  as this object.
+
+  It will return FALSE if the object or agent is in the group, but the group is
+  not active.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedGroup" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- There is no way to detect if the prim is in the same group as one of the agent's inactive groups.
+
+## Examples
+
+```lsl
+//Gives inventory only to agents with the same active group
+default
+{
+    touch_start(integer total_number)
+    {
+        if (llDetectedGroup(0) )     //same as llSameGroup(llDetectedKey(0) ) (with llSameGroup, detected must be in the sim)
+            llGiveInventory(llDetectedKey(0), llGetInventoryName(INVENTORY_OBJECT, 0) );
+        else
+            llSay(0, "Wrong active group!");
+    }
+}
+```
+
+## See Also
+
+- [llSameGroup](../llsamegroup/)
+
+<WikiAttribution />

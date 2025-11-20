@@ -1,0 +1,46 @@
+---
+title: llLinksetDataCountFound
+description: >-
+  Returns the number of keys matching the regular expression passed in the
+  search parameter.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLinksetDataCountFound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Count UUID keys using a case-insensitive pattern:
+
+```lsl
+integer numKeysFound = llLinksetDataCountFound("(?i)^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$", 0, 0);
+```
+
+Count UUID keys using a case-sensitive pattern:
+
+```lsl
+integer numKeysFound = llLinksetDataCountFound("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", 0, 0);
+```
+
+## Notes
+
+The `pattern` parameter is a [regular expression](https://en.wikipedia.org/wiki/Regular_expression). For more information about regex patterns and special syntax in LSL, see the regular expressions documentation.
+
+## See Also
+
+- [llLinksetDataAvailable](../lllinksetdataavailable/)
+- [llLinksetDataCountKeys](../lllinksetdatacountkeys/)
+- [llLinksetDataDelete](../lllinksetdatadelete/)
+- [llLinksetDataDeleteProtected](../lllinksetdatadeleteprotected/)
+- [llLinksetDataListKeys](../lllinksetdatalistkeys/)
+- [llLinksetDataRead](../lllinksetdataread/)
+- [llLinksetDataReadProtected](../lllinksetdatareadprotected/)
+- [llLinksetDataReset](../lllinksetdatareset/)
+- [llLinksetDataWrite](../lllinksetdatawrite/)
+- [llLinksetDataWriteProtected](../lllinksetdatawriteprotected/)
+
+<WikiAttribution />

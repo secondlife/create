@@ -1,0 +1,37 @@
+---
+title: llTan
+description: Returns the tangent of Theta (Theta in radians).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTan" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Touch the object with this script in it to see the tangent of random numbers!
+default
+{
+    touch_start(integer num)
+    {
+        float r = llFrand(TWO_PI);
+        llOwnerSay("The tangent of " + (string)r + " in radians or " + (string)(r * RAD_TO_DEG) + " in degrees is " + (string)llTan(r));
+    }
+}
+```
+
+## Caveats
+
+- Due to IEEE754 floating-point representation, `llTan(PI_BY_TWO)` returns `-22877332` (hex: `0xCBAE8A4A`) instead of infinity.
+
+## See Also
+
+- [llSin](../llsin/)
+- [llCos](../llcos/)
+- [llAtan2](../llatan2/)
+
+<WikiAttribution />

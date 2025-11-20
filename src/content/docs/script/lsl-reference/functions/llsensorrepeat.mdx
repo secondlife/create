@@ -1,0 +1,142 @@
+---
+title: llSensorRepeat
+description: >-
+  Initiates a periodic scan every Rate seconds, for Name and ID with Type
+  (AGENT, ACTIVE, PASSIVE, and/or SCRIPTED) within Range meters and Arc radians
+  of forward vector.
+
+  Specifying a blank Name, 0 Type, or NULL_KEY ID will prevent filtering results
+  based on that parameter. A range of 0.0 does not perform a scan.
+
+  Results are returned in the sensor and no_sensor events.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSensorRepeat" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- The repeat of the sensor event is adversely affected by time dilation (lag).
+- Sensors placed in the root prim of attachments will use the direction the avatar is facing as their forward vector. In mouselook, this means it will be wherever the avatar is looking; out of mouselook means whichever way the avatar is pointing (not including where the head points or what animation is playing, just the direction the avatar would move if walking forward).
+- Sensors placed in prims other than the root prim of an attachment will have their forward direction offset relative to the root prim's forward direction (e.g., a sensor in a prim whose +X direction is reverse of the root +X will look backward).
+- Only the most recent `sensor` event is queued. Previous sensor events are replaced.
+- A repeating sensor does not persist across a state change.
+- `llSensorRepeat` can occasionally detect outside its specified range every few cycles when used near sim borders. `llSensor` in a `timer` does not.
+- Only one or zero `llSensorRepeat` calls can be active per script. If `llSensorRepeat` is called a second time without calling `llSensorRemove`, the first `llSensorRepeat` is deactivated and the second one replaces it.
+
+## Notes
+
+- If `name`, `id`, and/or `type` are empty or 0, they are ignored.
+- If `id` is an invalid key or `NULL_KEY`, it is treated as empty.
+- The format requirements for `name` depend upon which `AGENT*` flag is used.
+- The first scan is not performed until `rate` seconds have passed.
+- Script execution continues immediately. When a scan completes, a `sensor` or `no_sensor` event is put in the event queue.
+
+## Examples
+
+### Basic Visitor Detection
+
+This example scans every 30 seconds for visitors within 10 meters and reports new visitors to the object owner when they are in range.
+
+```lsl
+// Written by Steamy Latte.
+// Scans every 30 seconds for visitors within 10 meters.
+// Reports new visitors to object owner when she is in range.
+
+string AllAgents;
+
+default
+{
+    state_entry()
+    {
+        // arc=PI is a sphere, you could look more narrowly in the direction object is facing with PI/2, PI/4 etc.
+        // don't repeat this too often to avoid lag.
+        llSensorRepeat("", "", AGENT_BY_LEGACY_NAME, 10.0, PI, 30.0);
+    }
+    sensor(integer num_detected)
+    {
+        string thisAgent;
+        integer agentNum;
+        for (agentNum=0; agentNum<num_detected; agentNum++)
+        {
+            thisAgent = llDetectedName(agentNum);
+            if (llDetectedKey(agentNum) == llGetOwner())
+            {
+                if (AllAgents != "")
+                {
+                    llOwnerSay("We've had the following visitors:" + AllAgents);
+                    AllAgents = "";
+                }
+            }
+            else if (llSubStringIndex(AllAgents+"\n", "\n"+thisAgent+"\n") < 0)
+            {
+                AllAgents = AllAgents + "\n" + thisAgent;
+            }
+        }
+    }
+}
+```
+
+### Continuous Visitor Tracking
+
+This example continuously scans for visitors within 10 meters and reports new visitors to the object owner. The visitor list is limited to the most recent 200 names to prevent stack/heap collisions.
+
+```lsl
+// Written by Evans Love.
+// (Limited to most recent 200 names by Void Singer to prevent eventual Stack/Heap Collision + clean up)
+// Continuously scans for visitors within 10 meters and reports new visitors to object owner.
+//-------------------------------------------------------------------------------------
+
+integer RESPONSE_CHANNEL = -100;
+float   SCAN_RANGE       = 10.0;
+float   SCAN_INTERVAL    = 20.0;
+list    VISITOR_LIST;
+
+default
+{
+    state_entry()
+    {
+        llSensorRepeat("", NULL_KEY, AGENT_BY_LEGACY_NAME, SCAN_RANGE, PI, SCAN_INTERVAL);
+    }
+
+    sensor(integer number_detected)
+    {
+        integer agent_number;
+
+//      iterate through all detected agents
+        for (; agent_number < number_detected; agent_number++)
+        {
+            string  this_agent_name = llDetectedName(agent_number);
+            key     this_agent_key  = llDetectedKey(agent_number);
+
+//          if the agent is not found on the list
+            if (llListFindList(VISITOR_LIST, [this_agent_name]) == -1)
+            {
+//              add her/him and make the list hold the last 200 visitors
+                VISITOR_LIST = [this_agent_name] + llList2List(VISITOR_LIST, 0, 198);
+
+                llDialog(this_agent_key, "Welcome!", ["Ok"], RESPONSE_CHANNEL);
+
+                llOwnerSay(this_agent_name);
+            }
+//          else agent is already on the list
+        }
+
+    }
+}
+```
+
+## See Also
+
+- [llSensor](../llsensor/)
+- [llSensorRemove](../llsensorremove/)
+- [llOverMyLand](../llovermyland/)
+- `sensor` event - Triggered when a sensor detects something
+- `no_sensor` event - Triggered when a sensor detects nothing
+- [llGetAgentList](../llgetagentlist/)
+
+<WikiAttribution />

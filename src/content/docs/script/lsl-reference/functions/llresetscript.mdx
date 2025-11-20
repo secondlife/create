@@ -1,0 +1,57 @@
+---
+title: llResetScript
+description: Resets the script.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llResetScript" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    // reset script when the object is rezzed
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
+
+    changed(integer change)
+    {
+        // reset script when the owner or the inventory changed
+        if (change & (CHANGED_OWNER | CHANGED_INVENTORY))
+            llResetScript();
+    }
+
+    // script initialization here
+    state_entry()
+    {
+        ;
+    }
+}
+```
+
+## Notes
+
+When a script is reset:
+
+- A full object update is sent to viewers
+- The current event/function is exited without further execution or return
+- Any granted URLs are released
+- All global variables are set to their defaults
+- Timers (including repeating sensors) are cleared
+- Listeners are removed
+- The event queue is cleared
+- The default state is set as the active state
+  - If it has a `state_entry` event, then it is queued
+
+## See Also
+
+- [llResetOtherScript](../llresetotherscript/)
+
+<WikiAttribution />

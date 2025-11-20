@@ -1,0 +1,128 @@
+---
+title: llGetInventoryNumber
+description: >-
+  Returns the quantity of items of a given type (INVENTORY_* flag) in the prim's
+  inventory.
+
+  Use the inventory constants INVENTORY_* to specify the type.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetInventoryNumber" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Simple Item Counter
+
+This script counts the total number of items in the prim (excluding the script itself) and displays it when touched:
+
+```lsl
+integer items_contained;
+
+CountItems()
+{
+  items_contained = llGetInventoryNumber( INVENTORY_ALL );
+  --items_contained; //minus 1, the script itself isn't counted
+}
+
+SayCount()
+{
+  llOwnerSay( "This prim contains " + (string)items_contained + " items." );
+}
+
+default
+{
+  state_entry()
+  {
+    CountItems();
+    SayCount();
+  }
+
+  touch_start(integer total_number)
+  {
+    CountItems();
+    SayCount();
+  }
+}
+```
+
+### Counting a Specific Type
+
+Get the number of objects in the prim's inventory:
+
+```lsl
+objects = llGetInventoryNumber(INVENTORY_OBJECT);
+```
+
+### Inventory Statistics with Hovertext
+
+This example displays detailed inventory statistics in hovertext, allowing you to configure which types to show and count via the prim's description field:
+
+```lsl
+list inv_types = [0, 1, 3, 5, 6, 7, 10, 13, 20, 21];
+list inv_names = ["Textures", "Sounds", "Landmarks", "Clothings", "Objects", "Notecards", "Scripts", "Bodyparts", "Animations", "Gestures"];
+
+processCountInventory()
+{
+    list objDesc = llParseString2List(llGetObjectDesc(), [";"], []);
+    list showList = llParseString2List(llList2String(objDesc, 0), [","], []);
+    list excludeFromCount = llParseString2List(llList2String(objDesc, 1), [","], []);
+
+    string counted = "ITEM COUNTER";
+    integer i = ~llGetListLength(showList);
+    while (++i)
+    {
+        integer showItem = (integer)llList2String(showList, i);
+        integer sIndex = llListFindList(inv_types, [showItem]);
+        if (~sIndex)
+            counted += "\n" + llList2String(inv_names, sIndex) + ": " + (string)llGetInventoryNumber(showItem);
+    }
+    integer totalCount = llGetInventoryNumber(INVENTORY_ALL);
+    for (i = ~llGetListLength(excludeFromCount); ++i;)
+    {
+        integer exclItem = (integer)llList2String(excludeFromCount, i);
+        integer cIndex = llListFindList(inv_types, [(string)exclItem]);
+        if (~cIndex)
+            totalCount = totalCount - llGetInventoryNumber(exclItem);
+    }
+
+    counted += "\n \n" + "Total: " + (string)totalCount;
+    llSetText(counted, <1,1,0>, 1);
+}
+
+default
+{
+    state_entry()
+    {
+        processCountInventory();
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_INVENTORY)
+        {
+            processCountInventory();
+        }
+    }
+}
+```
+
+## Notes
+
+- When using `INVENTORY_ALL`, the script itself is included in the count, so subtract 1 if you want to count only the other items
+- Use the appropriate `INVENTORY_*` flag to count specific types of items in the prim's inventory
+
+## See Also
+
+- [llGetInventoryAcquireTime](/script/reference/lsl/functions/llgetinventoryacquiretime/) - Returns the time the item was added to the prim's inventory
+- [llGetInventoryName](/script/reference/lsl/functions/llgetinventoryname/) - Returns the inventory item's name
+- [llGetInventoryType](/script/reference/lsl/functions/llgetinventorytype/) - Tests if an inventory item exists and returns its type
+- [llGetInventoryCreator](/script/reference/lsl/functions/llgetinventorycreator/) - Returns the inventory item's creator
+- [llGetInventoryPermMask](/script/reference/lsl/functions/llgetinventorypermmask/) - Returns the inventory item's permissions
+- [llGetInventoryKey](/script/reference/lsl/functions/llgetinventorykey/) - Returns the inventory item's UUID (if full perm)
+
+<WikiAttribution />

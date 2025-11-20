@@ -1,0 +1,98 @@
+---
+title: llUnSit
+description: >-
+  If agent identified by AvatarID is sitting on the object the script is
+  attached to or is over land owned by the object's owner, the agent is forced
+  to stand up.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llUnSit" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Example 1: UnSit on Sit Using a Sit Target
+
+```lsl
+// UnSit on Sit, Using a sit target
+default
+{
+    state_entry()
+    {
+        llSitTarget(<0.0, 0.0, 0.1>, ZERO_ROTATION); // Needed for llAvatarOnSitTarget to work. The vectors components must not all be set to 0.0
+    }
+    changed(integer change) // Triggered when various changes are sensed.
+    {
+        if(change & CHANGED_LINK) // When an agent sits on an object they become a new link.
+        {
+            key user = llAvatarOnSitTarget(); // Store the UUID of any agent sitting on the sit target.
+            if(user) // An avatar is on the sit target.
+                llUnSit(user); // Un-Sit the avatar.
+        }
+    }
+}
+```
+
+### Example 2: UnSit on Sit Without a Sit Target
+
+```lsl
+// UnSit on Sit, NOT using a sit target
+
+default
+{
+    changed(integer change) // Triggered when various changes are sensed.
+    {
+        if(change & CHANGED_LINK) // When an agent sits on an object they become a new link.
+        {
+            integer links = 0; // Create an integer type variable.
+            if(llGetObjectPrimCount(llGetKey()) < (links = llGetNumberOfPrims())) // During the check store the number of links.
+            // If the number of prims is fewer than the number of links, the last must be an avatar.
+                llUnSit(llGetLinkKey(links)); // Use the key of the last link to be added (the avatar) to call llUnSit().
+            else
+                llOwnerSay("Some kind of linking or unlinking has changed me but, I am not being sat on.");
+            // llUnSit() triggers the changed event too (the number of links is reduced by 1).
+        }
+    }
+}
+```
+
+### Example 3: Unsit All Avatars
+
+```lsl
+unsit_all_avatars()
+{
+    integer objectPrimCount = llGetObjectPrimCount(llGetKey());
+    integer currentLinkNumber = llGetNumberOfPrims();
+
+    for (; objectPrimCount < currentLinkNumber; --currentLinkNumber)
+        llUnSit(llGetLinkKey(currentLinkNumber));
+}
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        unsit_all_avatars();
+    }
+}
+```
+
+## Notes
+
+- `llUnSit()` triggers the `changed` event when it removes a sitting avatar (the number of links is reduced by 1)
+- The agent must meet one of these conditions for the function to work:
+  - The agent is sitting on the scripted object
+  - The agent is over land owned by the scripted object's owner and/or a group the owner has land rights for
+- When detecting avatars without a sit target, check if `llGetObjectPrimCount(llGetKey()) < llGetNumberOfPrims()` to determine if an avatar is sitting
+
+## See Also
+
+- [llAvatarOnSitTarget](/script/reference/lsl/functions/llavataronsittarget/) - Get the UUID of any agent sitting on a sit target
+- [llSitTarget](/script/reference/lsl/functions/llsittarget/) - Set a sit target for avatars
+- [changed](/script/reference/lsl/functions/changed/) - Event triggered when various changes are sensed
+
+<WikiAttribution />

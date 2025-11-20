@@ -1,0 +1,30 @@
+---
+title: llModPow
+description: >-
+  Returns a Value raised to the Power, mod Modulus. ((a**b)%c) b is capped at
+  0xFFFF (16 bits).
+
+  Returns (Value ^ Power) % Modulus. (Value raised to the Power, Modulus). Value
+  is capped at 0xFFFF (16 bits).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llModPow" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+integer x = llModPow(13743, 14200, 10000); // = 1
+integer y = llModPow(0xc734abfa, 0x8371b314, 0xffffffff); // = -1481328730, corresponding to unsigned value of 2813638566
+```
+
+## Notes
+
+- Internally, the parameters are considered unsigned integers. This means it's possible to get extra range by using negative values or hexadecimal, and interpreting the result as such as well.
+- This function used to have a forced delay of 1.0 and precision issues before an update in January 2025.
+
+<WikiAttribution />

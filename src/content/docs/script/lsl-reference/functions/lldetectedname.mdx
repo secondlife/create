@@ -1,0 +1,37 @@
+---
+title: llDetectedName
+description: |-
+  Returns the name of detected object or avatar number.
+  Returns the name of detected object number.
+  Returns empty string if Number is not a valid index.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedName" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        string name = llDetectedName(0);
+
+        llOwnerSay("Touched by " + name);
+
+       // name is the legacy name, as in "John Doe", or "John Resident" if the avatar has the default last name.
+    }
+}
+```
+
+## Notes
+
+- Returns NULL_KEY if the item index is not valid.
+- If the detected item is an avatar, the legacy name is returned (e.g., "John Doe" or "John Resident" if the avatar has the default last name).
+
+<WikiAttribution />

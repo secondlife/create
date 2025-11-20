@@ -1,0 +1,78 @@
+---
+title: llAvatarOnLinkSitTarget
+description: >-
+  If an avatar is sitting on the link's sit target, return the avatar's key,
+  NULL_KEY otherwise.
+
+  Returns a key that is the UUID of the user seated on the specified link's
+  prim.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAvatarOnLinkSitTarget" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- A prim does not have a sit target unless `llSitTarget` or `llLinkSitTarget` has been called with a **nonzero** vector as the first argument.
+- The root link number changes from zero to one when someone sits on an unlinked prim.
+  - So `(llAvatarOnLinkSitTarget(0) == NULL_KEY)` is always true. Nobody ever sits on link number 0.
+
+## Notes
+
+The position of an avatar on a sit target can be determined with the use of `llGetObjectDetails`.
+
+If an object has multiple seats (each seat has a script that sets a sit target with `llSitTarget`, or the linkset has a script that assigns several `llLinkSitTarget`s), the following method determines which sit target an avatar ends up at:
+
+- If the prim that is clicked on **has** a sit target and that sit target is not full, that sit target is used.
+- If the prim that is clicked on **has no sit target**, and one or more other linked prims have sit targets that are not full, the sit target of the prim with the lowest link number will be used.
+
+## Examples
+
+```lsl
+// Unseat a second avatar on this object
+
+string one_sitter_message = "Hey!  I don't take passengers.";
+
+default
+{
+    state_entry()
+    {
+        // Sit target 1 is your sit target on the root prim
+        llLinkSitTarget(1,<0.0,0.0,0.5>,ZERO_ROTATION);
+        // Sit target 2 is the target on child prim 2, a small transparent prim inside the object
+        llLinkSitTarget(2, <0.0,0.0,0.1>,ZERO_ROTATION);
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK)
+        {
+            // An avatar on child prim 2, whether seated by choice or by redirection after sit target 1 is occupied, will be unseated.
+            if (llAvatarOnLinkSitTarget(2))
+            {
+                llRegionSayTo(llAvatarOnLinkSitTarget(2),PUBLIC_CHANNEL, one_sitter_message);
+                llUnSit(llAvatarOnLinkSitTarget(2));
+            }
+            // Now pay attention to the avatar on the root prim.
+            key agent = llAvatarOnLinkSitTarget(1);
+            if (agent)
+            {
+                llRegionSayTo(agent,PUBLIC_CHANNEL,"Hello!");
+            }
+        }
+    }
+}
+```
+
+## See Also
+
+- [llAvatarOnSitTarget](../llavataronsittarget/)
+- [llLinkSitTarget](../lllinksittarget/)
+- [llGetLinkKey](../llgetlinkkey/)
+- `changed` event with `CHANGED_LINK`
+
+<WikiAttribution />

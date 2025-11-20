@@ -1,0 +1,76 @@
+---
+title: llTextBox
+description: >-
+  Opens a dialog for the specified avatar with message Text, which contains a
+  text box for input. Any text that is entered is said on the specified Channel
+  (as if by the avatar) when the "OK" button is clicked.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTextBox" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Basic text box with listener example:
+
+```lsl
+integer  gListener;
+default
+{
+    touch_start(integer total_number)
+    {
+        // See 'discussion' page for more comments on choosing a channel and possible left-open listener
+        integer channel = -13572468;
+        // "" saves byte-code over NULL_KEY
+        gListener = llListen( channel, "", "", "");
+        llTextBox(llDetectedKey(0), "Some info text for the top of the window...", channel);
+    }
+    listen(integer channel, string name, key id, string message)
+    {
+        llListenRemove(gListener);
+        llSay(0, "You wrote: " + message);
+    }
+}
+```
+
+Trimming carriage returns from user input:
+
+```lsl
+message = llStringTrim(message, STRING_TRIM);
+```
+
+If the user hits Enter before clicking the "Submit" button, there will be a final carriage return in the message. The example above shows how to easily remove it.
+
+## Caveats
+
+- Not supported in official Linden Lab viewers prior to version 2.4, and some third-party viewers may not support it. Unsupported viewers will display a dialog box with a single option of "!!llTextBox!!".
+- There is no way by script to kill a text box.
+- There is no way for the script to detect if the user clicked the "ignore" button (no chat is generated as a result of pressing this button).
+- If the listening prim is out of 20 meter range of the sending prim when the "Submit" button is pressed, it will not be able to hear the response. This limitation also affects attachments if the wearer moves more than 20 meters from where the listener is located.
+- The textbox input is limited to 250 bytes (characters). If the input can be over 250 characters, you will have to accept it through chat instead.
+- There is an undocumented throttle on llTextBox requests. Exceeding it will shout an error on DEBUG_CHANNEL until the "average" falls.
+
+### Message Limits
+
+- If the message exceeds 7 (Viewer 3) or 8 (Viewer 1) lines, a scroll bar will appear.
+- The message must be less than 512 bytes and not empty. Otherwise, it will shout an error on DEBUG_CHANNEL. One easy way to create an empty message is to use a line feed: `llTextBox(avatar_key," \n",dialog_channel);`
+
+## Notes
+
+- Instead of mouse clicking "Submit", you can use keyboard shortcuts: press Tab and then Enter to submit the text box.
+
+## See Also
+
+- [llDialog](../lldialog/)
+- [llListen](../lllisten/)
+- [llSay](../llsay/)
+- [llWhisper](../llwhisper/)
+- [llShout](../llshout/)
+- [llRegionSay](../llregionsay/)
+- listen (event)
+
+<WikiAttribution />

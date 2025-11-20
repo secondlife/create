@@ -1,0 +1,39 @@
+---
+title: llPlaySoundSlave
+description: >-
+  Plays attached Sound once, at Volume (0.0 - 1.0), synced to next loop of most
+  audible sync master.
+
+  Behaviour is identical to llPlaySound, unless there is a "Sync Master"
+  present. If a Sync Master is already playing, the Slave sound will not be
+  played until the Master hits its loop point and returns to the beginning.
+
+  llPlaySoundSlave will play the sound exactly once; if it is desired to have
+  the sound play every time the Master loops, either use llLoopSoundSlave with
+  extra silence padded on the end of the sound or ensure that llPlaySoundSlave
+  is called at least once per loop of the Master.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llPlaySoundSlave" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- As an object can only have a single active sound, this function should be called from a different prim than the one that defined a sync master, otherwise it will remove the master sound, and no sound will be available to sync-to.
+- This function is affected by the Sound Queueing property of the parent prim - this means it's possible to queue a slave sound prior to starting a master, without having to use more than one prim as an emitter. (See example on llLoopSoundMaster).
+
+## See Also
+
+- [llPlaySound] - Plays a sound attached once.
+- [llLoopSound] - Plays a sound attached indefinitely.
+- [llLoopSoundMaster]
+- [llLoopSoundSlave]
+- [llTriggerSound] - Plays a sound unattached.
+- [llTriggerSoundLimited]
+- [llSetSoundQueueing]
+
+<WikiAttribution />

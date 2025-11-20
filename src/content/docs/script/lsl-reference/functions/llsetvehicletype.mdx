@@ -1,0 +1,31 @@
+---
+title: llSetVehicleType
+description: >-
+  Activates the vehicle action on the object with vehicle preset Type.
+
+  Valid Types and an explanation of their characteristics can be found in wiki
+  documentation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetVehicleType" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+llSetVehicleType(VEHICLE_TYPE_BALLOON);
+```
+
+## Caveats
+
+- Scripted Vehicles can have a maximum Physics weight of 32.0. Above that the function will fail with a warning on the Debug Channel.
+
+## See Also
+
+- [Linden Vehicle Tutorial]
+
+<WikiAttribution />

@@ -1,0 +1,60 @@
+---
+title: llWind
+description: Returns the wind velocity at the object position + Offset.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llWind" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Wind Velocity
+
+```lsl
+default
+{
+    touch_start(integer num)
+    {
+        llSay(0, "Wind velocity: " + (string)llWind(ZERO_VECTOR));
+    }
+}
+```
+
+### Wind as Angle and Speed
+
+This example interprets the wind vector as a compass direction and speed in meters per second:
+
+```lsl
+// wind interpretation as angle and speed
+default
+{
+    state_entry()
+    {
+        vector windVector = llWind( ZERO_VECTOR);
+        float windSpeed = llVecMag( windVector);
+        float windDirection = llAtan2( windVector.y, windVector.x);
+        integer compassWind = ( 450 - (integer)( RAD_TO_DEG*windDirection))%360;
+        llOwnerSay( "\nWind direction: "+(string)compassWind+"°\nWind speed: "+(string)windSpeed+" m/S");
+    }
+}
+```
+
+## Notes
+
+The offset parameter allows you to query wind velocity at positions relative to the prim's current location.
+
+## Issues
+
+- Wind effects rendered by the viewer may not always match the actual wind velocity returned by this function
+
+## See Also
+
+- [llCloud](../llcloud/)
+- Weather systems in Second Life
+- Moderated in-world wind techniques
+
+<WikiAttribution />

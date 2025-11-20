@@ -1,0 +1,50 @@
+---
+title: llTransferOwnership
+description: Transfers ownership of an object, or a copy of the object to a new agent.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTransferOwnership" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Transfers ownership of an object rezzed in world to the specified agent. The object must be transferable by its current owner and must not be an attachment.
+
+Optionally this function may force the object to derez itself into the destination agent's inventory, or make a copy of itself directly into inventory.
+
+## Examples
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        llTransferOwnership(llDetectedKey(0), TRANSFER_FLAG_COPY, []);
+    }
+}
+```
+
+## Caveats
+
+- The agent must be in the region
+- There is no way to detect if the receiver ignored, rejected or blocked the transaction (aside from a `changed` event never occurring)
+- The function fails with a return code of `TRANSFER_NO_PERMS` if:
+  - The object is no-transfer
+  - The object is no-copy and the flags include the `TRANSFER_FLAG_COPY` flag
+- Calling this function from an attachment will fail and return `TRANSFER_NO_ATTACHMENT`
+- **WARNING:** Any no-trans items in the transferred object will be removed from the object received by the target agent. If the transfer is of the object itself, these items are lost.
+- **WARNING:** If the transfer is a copy, any no-copy inventory items will be present in the object received by the target agent and removed from the original.
+
+## See Also
+
+- [llGiveInventoryList](../llgiveinventorylist/)
+- [llRemoteLoadScriptPin](../llremoteloadscriptpin/)
+- [llSetRemoteScriptAccessPin](../llsetremotescriptaccesspin/)
+- [llMapDestination](../llmapdestination/)
+- changed event
+
+<WikiAttribution />

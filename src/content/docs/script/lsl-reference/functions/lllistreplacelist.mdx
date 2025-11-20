@@ -1,0 +1,93 @@
+---
+title: llListReplaceList
+description: >-
+  Returns a list that is Target with Start through End removed and ListVariable
+  inserted at Start.
+
+  Returns a list replacing the slice of the Target list from Start to End with
+  the specified ListVariable. Start and End are inclusive, so 0, 1 would replace
+  the first two entries and 0, 0 would replace only the first list entry.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListReplaceList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If `start` is past the end of `dest`, then `src` is appended to `dest`; it will not add null entries. To avoid this, create empty elements in the list first. A similar outcome occurs when using negative indexes.
+- Just calling the function will not update the variable. You must store it (unless of course you are planning to act on the results straight away).
+
+  **Bad:**
+  ```lsl
+  llListReplaceList(MyList, ["New Item"], 2, 2)
+  ```
+
+  **Good:**
+  ```lsl
+  MyList = llListReplaceList(MyList, ["New Item"], 2, 2)
+  ```
+
+- In LSO ONLY (not Mono): if you are storing to the same list, it can be more memory effective to clear the list before you store.
+
+  **Good:**
+  ```lsl
+  MyList = llListReplaceList(MyList, ["New Item"], 2, 2)
+  ```
+
+  **Better:**
+  ```lsl
+  MyList = llListReplaceList((MyList = []) + MyList, ["New Item"], 2, 2)
+  ```
+
+## Examples
+
+```lsl
+default {
+    state_entry() {
+        list MyOldList = ["a", "b", "e", "d"];
+        list MyNewList = llListReplaceList(MyOldList, ["c"], 2, 2);  // Replace the range starting and ending at index 2 with ["c"]
+
+        llOwnerSay("\"" + llList2CSV(MyOldList) + "\"  ->  \"" + llList2CSV(MyNewList) + "\"");
+        // Will say: "a, b, e, d"  ->  "a, b, c, d"
+    }
+}
+```
+
+More commonly, you will be updating an existing list, replacing 1 or more items:
+
+```lsl
+default {
+    state_entry() {
+        list MyList = ["a", "b", "x", "y"];
+        MyList = llListReplaceList(MyList, ["c", "d"], 2, 3);  // Replace entries 2 & 3 with new values
+
+        llOwnerSay("\"" + llList2CSV(MyList) + "\"");  // Display the modified list
+        // Will say: "a, b, c, d"
+    }
+}
+```
+
+## Notes
+
+- To be clear, the list you are replacing in doesn't have to actually be a list of many elements. It can be a single item that you make into a single element list just by placing square brackets around it.
+
+  ```lsl
+  list TargetList = ["a", "b", "c", "z", "e"];
+  list InsertList = ["d"];
+  ```
+
+- To act on a single element in a list, just specify its index as both start and end. For instance, `0, 0` would act only on the first element in the list; `7, 7` would act only on the 8th element.
+
+- For a function that will operate as `llListReplaceList` does, but work on strided lists, see `ListStridedUpdate`.
+
+## See Also
+
+- [llDeleteSubList](../lldeletesublist/)
+- [llListInsertList](../lllistinsertlist/)
+- [llList2List](../lllist2list/)
+
+<WikiAttribution />

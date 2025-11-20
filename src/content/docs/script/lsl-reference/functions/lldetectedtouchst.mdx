@@ -1,0 +1,134 @@
+---
+title: llDetectedTouchST
+description: >-
+  Returns a vector that is the surface coordinates where the prim was touched.
+
+  The X and Y vector positions contain the horizontal (S) and vertical (T) face
+  coordinates respectively.
+
+  Each component is in the interval [0.0, 1.0].
+
+  TOUCH_INVALID_TEXCOORD is returned if the surface coordinates cannot be
+  determined (e.g. when the viewer does not support this function).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedTouchST" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Touch Detection
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        integer touchFace = llDetectedTouchFace(0);
+        vector  touchST   = llDetectedTouchST(0);
+
+        // ZERO_VECTOR (<0.0, 0.0, 0.0> ... the origin) is in the bottom left corner of the face
+        // touchST.x goes across the face from the left to the right
+        // touchST.y goes up the face from the bottom to the top
+
+        if (touchFace == -1)
+            llWhisper(PUBLIC_CHANNEL, "Sorry, your viewer doesn't support touched faces.");
+        else if (touchST == TOUCH_INVALID_TEXCOORD)
+            llWhisper(PUBLIC_CHANNEL, "Sorry, the touch position upon the face could not be determined.");
+        else
+            llSay(PUBLIC_CHANNEL, "llDetectedTouchST(0) = " + (string)touchST
+                    + "\ntouchST.x = " + (string)touchST.x
+                    + "\ntouchST.y = " + (string)touchST.y);
+    }
+}
+```
+
+### Grid-Based Touch Detection
+
+This example divides a prim face into a 12x12 grid and identifies which square was touched:
+
+```lsl
+integer numberOfRows    = 12;
+integer numberOfColumns = 12;
+
+default
+{
+    touch_start(integer total_number)
+    {
+        vector  touchST     = llDetectedTouchST(0);
+
+        // ZERO_VECTOR (<0.0, 0.0, 0.0> ... the origin) is in the bottom left corner of the face
+        // touchST.x goes across the face from the left to the right
+        // touchST.y goes up the face from the bottom to the top
+
+        integer columnIndex = (integer) (touchST.x * numberOfColumns);
+        integer rowIndex    = (integer) (touchST.y * numberOfRows);
+        integer cellIndex   = (rowIndex * numberOfColumns) + columnIndex;
+
+        llSay(PUBLIC_CHANNEL, "ST grid (" + (string)columnIndex + ", " + (string)rowIndex
+                            + ") --> cell " + (string)cellIndex);
+    }
+}
+```
+
+### Dynamic Texture Positioning
+
+This example uses touch position to dynamically position a texture on a prim face:
+
+```lsl
+default
+{
+    touch(integer num_detected)
+    {
+        integer link    = llDetectedLinkNumber(0);
+        integer face    = llDetectedTouchFace(0);
+        vector  touchST = llDetectedTouchST(0);
+
+        // ZERO_VECTOR (<0.0, 0.0, 0.0> ... the origin) is in the bottom left corner of the face
+        // touchST.x goes across the face from the left to the right
+        // touchST.y goes up the face from the bottom to the top
+
+        string uuid = "23badbe7-6d8c-639b-0131-bb321f8e9db5";
+
+        llSetLinkPrimitiveParamsFast(link, [
+            PRIM_TEXTURE, face, uuid, <1.0, 1.0, 0.0>, touchST, 0,
+            PRIM_FULLBRIGHT, ALL_SIDES, TRUE]);
+    }
+}
+```
+
+## Caveats
+
+`TOUCH_INVALID_TEXCOORD` (`<-1.0, -1.0, 0.0>`) is returned when:
+
+- The avatar's viewer does not support face touch detection (check `llDetectedTouchFace()` to determine if face touch detection is supported)
+- The touch has moved off the surface of the prim
+- The touch happened too close to the edge of the face to determine a location
+- The event triggered is not a touch event
+
+## Notes
+
+- This function only works with touch events (`touch_start`, `touch`, `touch_end`)
+- The prim that was touched may not be the prim receiving the event; use `llDetectedLinkNumber` to check for this
+- Use `llDetectedTouchFace` to determine which face was touched
+- Coordinates use S (horizontal, X component) and T (vertical, Y component) notation
+- The origin `<0.0, 0.0, 0.0>` is in the bottom left corner of the face
+- With some mesh objects, coordinate values outside the 0.0-1.0 range have been observed
+
+## See Also
+
+- [llDetectedLinkNumber](../lldetectedlinknumber/)
+- [llDetectedTouchFace](../lldetectedtouchface/)
+- [llDetectedTouchUV](../lldetectedtouchuv/)
+- [llDetectedTouchPos](../lldetectedtouchpos/)
+- [llDetectedTouchNormal](../lldetectedtouchnormal/)
+- [llDetectedTouchBinormal](../lldetectedtouchbinormal/)
+- `touch_start` - Touch event (initial detection)
+- `touch` - Touch event (continuous during drag)
+- `touch_end` - Touch event (when touch ends)
+
+<WikiAttribution />

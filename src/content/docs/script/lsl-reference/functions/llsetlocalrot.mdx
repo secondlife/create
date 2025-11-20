@@ -1,0 +1,57 @@
+---
+title: llSetLocalRot
+description: Sets the rotation of a child prim relative to the root prim.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLocalRot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Drop this script into a child prim to rotate it in 1 degree increments on each touch:
+
+```lsl
+rotation rot_xyzs;
+
+default
+{
+    state_entry()
+    {
+        vector xyz_angles = <0,1.0,0>; // This defines a 1 degree change on the Y axis
+        vector angles_in_radians = xyz_angles*DEG_TO_RAD; // Change to radians
+        rot_xyzs = llEuler2Rot(angles_in_radians); // Convert to a rotation
+    }
+
+    touch_start(integer s)
+    {
+        llSetLocalRot(llGetLocalRot()*rot_xyzs); // Apply the increment rotation to the prim's current rotation
+    }
+}
+```
+
+## Alternative Approach
+
+This is an equivalent call from any prim in the same link set:
+
+```lsl
+//-- where "target_prim" is the link number of the prim you want to set the local rotation of
+llSetLinkPrimitiveParamsFast( target_prim, [PRIM_ROT_LOCAL, rot] );
+```
+
+## See Also
+
+- [llGetRot](../llgetrot/)
+- [llGetLocalRot](../llgetlocalrot/)
+- [llGetRootRotation](../llgetrootrotation/)
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+- [llGetLinkPrimitiveParams](../llgetlinkprimitiveparams/)
+- [llSetRot](../llsetrot/)
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- [llSetLinkPrimitiveParamsFast](../llsetlinkprimitiveparamsfast/)
+
+<WikiAttribution />

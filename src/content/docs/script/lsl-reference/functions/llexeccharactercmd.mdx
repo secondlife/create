@@ -1,0 +1,90 @@
+---
+title: llExecCharacterCmd
+description: >-
+  Execute a character command.
+
+  Send a command to the path system.
+
+  Currently only supports stopping the current path-finding operation or causing
+  the character to jump.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llExecCharacterCmd" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+vector patrol;
+
+default
+{
+    state_entry()
+    {
+        patrol = llGetPos();
+        llCreateCharacter([CHARACTER_MAX_SPEED, 25, CHARACTER_DESIRED_SPEED, 15.0]);
+        state awake;
+    }
+}
+
+state awake
+{
+    state_entry()
+    {
+        llSay(0, "I am guarding now");
+        list points = [patrol + <5,0,0>, patrol - <5,0,0>];
+        llPatrolPoints(points, []);
+    }
+
+    touch_start(integer total_number)
+    {
+        state sleep;
+    }
+}
+
+state sleep
+{
+    state_entry()
+    {
+        llSay(0, "Going to sleep");
+        llExecCharacterCmd(CHARACTER_CMD_SMOOTH_STOP, []);
+    }
+
+    touch_start(integer total_number)
+    {
+        patrol = llGetPos();
+        //Jump to attention!
+        llExecCharacterCmd(CHARACTER_CMD_JUMP, [0.5]);
+        state awake;
+    }
+}
+```
+
+This example demonstrates:
+- Creating a character with pathing capabilities
+- Using `CHARACTER_CMD_SMOOTH_STOP` to stop the character's movement
+- Using `CHARACTER_CMD_JUMP` with a height parameter to make the character jump
+
+## Caveats
+
+- If another script in the same object issues `CHARACTER_CMD_STOP` then pathing in all scripts is cancelled.
+
+## See Also
+
+- [llCreateCharacter](../llcreatecharacter/)
+- [llDeleteCharacter](../lldeletecharacter/)
+- [llEvade](../llevade/)
+- [llGetClosestNavPoint](../llgetclosestnavpoint/)
+- [llFleeFrom](../llfleefrom/)
+- [llNavigateTo](../llnavigateto/)
+- [llPatrolPoints](../llpatrolpoints/)
+- [llPursue](../llpursue/)
+- [llUpdateCharacter](../llupdatecharacter/)
+- [llWanderWithin](../llwanderwithin/)
+- path_update (event)
+
+<WikiAttribution />

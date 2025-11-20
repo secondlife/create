@@ -1,0 +1,55 @@
+---
+title: llDetachFromAvatar
+description: Remove the object containing the script from the avatar.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetachFromAvatar" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Only works in the root prim of the attachment; calling it from a script in a child prim will cause it to fail silently.
+- If the attachment was attached using `llAttachToAvatarTemp`, the `attach()` event will not be called because the object will be destroyed before the event gets processed.
+
+## Notes
+
+- The detached object remains in the user's inventory (unless it was a temporary attachment, in which case it will be destroyed).
+- The detached object is no longer present in the sim. There is no LSL equivalent of the "Drop" command that moves an attachment onto the ground. Use `llRezObject` if you need similar behavior.
+- There is no way to delete an attachment with a script or to drop it to the ground.
+
+## Examples
+
+```lsl
+default
+{
+    attach(key AvatarKey)
+    {
+        // Give instructions for use and prevent item from being attached to avatar
+        if(AvatarKey)
+        {
+            // Event is called on both attach and detach, but Key is only valid on attach
+            llOwnerSay("We hope you will enjoy your purchase, but if you really want to use this item properly, you should: 1) drag it from your inventory to the ground 2) Right click on it and select \"open\" 3) copy its contents to inventory.");
+            llRequestPermissions(AvatarKey, PERMISSION_ATTACH);
+        }
+    }
+    run_time_permissions(integer perm)
+    {
+        if(perm & PERMISSION_ATTACH)
+        {
+            llDetachFromAvatar();
+        }
+    }
+}
+```
+
+## See Also
+
+- [llAttachToAvatar](../llattachtoavatar/)
+- [llGetAttached](../llgetattached/)
+- `attach` event
+
+<WikiAttribution />

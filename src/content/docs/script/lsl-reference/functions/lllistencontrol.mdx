@@ -1,0 +1,63 @@
+---
+title: llListenControl
+description: >-
+  Makes a listen event callback active or inactive. Pass in the value returned
+  from llListen to the iChannelHandle parameter to specify which listener you
+  are controlling.
+
+  Use boolean values to specify Active
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListenControl" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This example demonstrates toggling a listener on and off by touching the object:
+
+```lsl
+integer handle;
+integer toggle;
+
+default {
+    state_entry() {
+        handle = llListen(5, "", NULL_KEY, "");    // Establish a listener to listen to anything on channel 5
+        llListenControl(handle, FALSE);            // ... but make the listener inactive for now
+        llSetText("not listening", <0.0,0.0,0.0>, 1.0);
+    }
+
+    touch_start(integer total_number) {
+        toggle = !toggle;
+        llListenControl(handle, toggle);           // Make the listener active or inactive as required
+
+        if(toggle) {
+            llSay(0, "now listening on channel 5");
+            llSetText("listening on ch 5", <1.0,0.0,0.0>, 1.0);
+        }
+        else {
+            llSay(0, "not listening any more");
+            llSetText("not listening", <0.0,0.0,0.0>, 1.0);
+        }
+    }
+
+    listen(integer channel, string name, key id, string message) {
+        llSay(0, name + " just said " + message);
+    }
+}
+```
+
+## Caveats
+
+- On state change or script reset, all listens are removed automatically.
+
+## See Also
+
+- [llListen] - Establishes a listen event
+- [llListenRemove] - Removes a specific listener
+- [listen] - Event triggered when messages are received
+
+<WikiAttribution />

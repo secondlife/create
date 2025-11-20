@@ -1,0 +1,207 @@
+---
+title: llListen
+description: >-
+  Creates a listen callback for Text on Channel from SpeakersName and SpeakersID
+  (SpeakersName, SpeakersID, and/or Text can be empty) and returns an identifier
+  that can be used to deactivate or remove the listen.
+
+  Non-empty values for SpeakersName, SpeakersID, and Text will filter the
+  results accordingly, while empty strings and NULL_KEY will not filter the
+  results, for string and key parameters respectively.
+
+  PUBLIC_CHANNEL is the public chat channel that all avatars see as chat text.
+  DEBUG_CHANNEL is the script debug channel, and is also visible to nearby
+  avatars. All other channels are are not sent to avatars, but may be used to
+  communicate with scripts.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListen" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+For the listen event to be triggered, it must first match the criteria set forth by the filters. Only when all criteria have been met is a listen event generated:
+
+1. The message must be transmitted on the specified channel
+2. If SpeakersID is a valid key and not NULL_KEY, the speaker's key must match it (key matching is not case sensitive)
+3. If SpeakersName is set, the speaker's legacy name must match exactly (case sensitive)
+4. If Text is set, the spoken message must match exactly (case sensitive)
+
+## Filter Behavior
+
+Empty filters don't exclude anything:
+- Empty string `""` for SpeakersName or Text means no filter
+- NULL_KEY for SpeakersID means no filter
+- Blank filters allow more messages through, but may increase lag
+
+## Examples
+
+### Single Listen Handle
+
+Listens to the owner's chat on the public channel and responds once, then stops listening:
+
+```lsl
+//  Says beep to owner the first-time owner says something in main chat
+//  and then stops listening
+
+integer listenHandle;
+
+remove_listen_handle()
+{
+    llListenRemove(listenHandle);
+}
+
+default
+{
+    state_entry()
+    {
+        //  target only the owner's chat on channel 0 (PUBLIC_CHANNEL)
+        listenHandle = llListen(0, "", llGetOwner(), "");
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        //  we filtered to only listen on channel 0
+        //  to the owner's chat in the llListen call above
+
+        llOwnerSay("beep");
+
+        //  stop listening until script is reset
+        remove_listen_handle();
+    }
+
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+        {
+            llResetScript();
+        }
+    }
+}
+```
+
+### Multiple Listen Handles
+
+Opens two listen handles when touched, filtering by different channels:
+
+```lsl
+//  Opens two listen handles upon touch_start and
+//  stops listening whenever something heard passes either filter
+
+integer listenHandle_a;
+integer listenHandle_b;
+
+remove_listen_handles()
+{
+    llListenRemove(listenHandle_a);
+    llListenRemove(listenHandle_b);
+}
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        key    id   = llDetectedKey(0);
+        string name = llDetectedName(0);
+
+        listenHandle_a = llListen(5, "", id, "");
+        listenHandle_b = llListen(6, "", NULL_KEY, "");
+
+        llSay(0, "Listening now to '" + name + "' on channel 5.");
+        llSay(0, "Listening now to anybody/anything on channel 6.");
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        if (channel == 5)
+            llSay(0, name + " said: '/5 " + message + "'");
+
+        if (channel == 6)
+            llSay(0, name + " said: '/6 " + message + "'");
+
+        remove_listen_handles();
+    }
+}
+```
+
+## Performance Considerations
+
+**Avoid Channel Zero Without Filters**
+
+Listening on PUBLIC_CHANNEL (0) with no filters is extremely laggy:
+
+```lsl
+// BAD - Don't do this!
+llListen(0, "", NULL_KEY, "")  // Listens to ALL chat from everyone in range
+```
+
+This listens to all chat from everyone in chat range and should be avoided. Instead, set SpeakersName or SpeakersID where possible.
+
+**Most Efficient Method**
+
+According to Kelly Linden's explanation of how the listener queue works:
+
+1. Chat gets added to a history
+2. Scripts with listen events check the history during their run time
+3. Filters are applied in this order: channel → self-chat check → distance/RegionSay → SpeakersID → SpeakersName → Text
+4. Only when a message passes all applicable filters is a listen event queued
+
+The most efficient communication method is llRegionSay on a rarely used channel, or llRegionSayTo where appropriate for targeted messaging.
+
+## Limits and Constraints
+
+- **Maximum 65 listens per script**: Exceeding this causes "Script run-time error" and "Too Many Listens" errors
+- **Auto-cleanup**: All listens are automatically removed on state change or script reset
+- **State changes as shortcut**: You can use state changes to quickly release all listens instead of calling llListenRemove individually
+- **Handle management**: Handles are assigned sequentially starting at +1 through +2,147,483,647, then roll over to -2,147,483,648. Repeated identical filters return the same handle.
+- **Listener persistence**: Once registered, a listen's filters cannot be updated. Owner changes don't update the listen filter—you must detect CHANGED_OWNER and close/reopen the listen.
+
+## Channel-Specific Behavior
+
+**Message Truncation by Channel**
+
+- Script messages on positive/negative channels: truncated to 1024 bytes
+- Avatar chat on positive channels: truncated to 1023 bytes
+- Avatar chat on negative channels: truncated to 254 bytes
+
+**Debug Channel**
+
+- Scripts can listen to and speak on DEBUG_CHANNEL
+- Server script errors are broadcast at llSay distance
+- Messages are hidden from viewers unless sent by the current user's objects
+- Users typically see only the hovering script error icon in viewer
+
+**Negative Channels**
+
+- Modern viewers can send chat on negative channels directly from chat bar (not just llDialog/llTextBox)
+- Formerly, only llDialog/llTextBox responses could send on negative channels
+- Negative channels are good for applications not requiring direct avatar chat
+
+## Important Caveats
+
+- **Channel range bug**: If you use an integer literal outside the valid range (-2,147,483,648 to 2,147,483,647), LSL will treat it as -1 without a compilation error. Safe rule: never use more than 9 digits.
+- **Float conversion**: If a channel number comes from float conversion (e.g., llFrand result), out-of-range floats convert to -2,147,483,648.
+- **Self-chat filtering**: A prim cannot hear/listen to chat it generates, but can hear chat from linked prims or chat indirectly generated (via llDialog, llTextBox, or linked prims).
+- **Owner persistence**: If the object changes owner, the listen remains registered to the previous owner. Detect CHANGED_OWNER and reopen the listen with the new owner.
+
+## See Also
+
+- [llListenRemove](/script/reference/lsl/functions/lllistenremove/) - Removes a listen
+- [llListenControl](/script/reference/lsl/functions/lllistencontrol/) - Enables/Disables a listen
+- [llWhisper](/script/reference/lsl/functions/llwhisper/) - Sends chat limited to 10 meters
+- [llSay](/script/reference/lsl/functions/llsay/) - Sends chat limited to 20 meters
+- [llShout](/script/reference/lsl/functions/llshout/) - Sends chat limited to 100 meters
+- [llRegionSay](/script/reference/lsl/functions/llregionsay/) - Sends chat limited to current sim
+- [llRegionSayTo](/script/reference/lsl/functions/llregionsayto/) - Sends chat region wide to a specific avatar or object
+- [listen event](/script/reference/lsl/events/listen/) - The event triggered when a listen matches
+
+<WikiAttribution />

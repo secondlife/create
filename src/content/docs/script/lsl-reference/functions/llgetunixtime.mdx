@@ -1,0 +1,57 @@
+---
+title: llGetUnixTime
+description: >-
+  Returns the number of seconds elapsed since 00:00 hours, Jan 1, 1970 UTC from
+  the system clock.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetUnixTime" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Reset tracker
+integer BOOT_TIME;
+default
+{
+    state_entry()
+    {
+        BOOT_TIME = llGetUnixTime();
+        llSetTimerEvent(0.1);
+    }
+
+    timer()
+    {
+        llSetText((string)(llGetUnixTime() - BOOT_TIME) + " Seconds since boot.\n\n ", <1,0,0>, 1.0);
+        llSetTimerEvent(1);
+    }
+}
+```
+
+## Caveats
+
+Time codes before the year 1902 or past the end of 2037 are limited due to the size of LSL's 32-bit integers. As of writing (2024) this is just 14 years away now and any scripts relying on this function may have logical errors.
+
+## Helper Functions
+
+The following helper functions can be useful when working with Unix timestamps:
+
+- **Unix2StampLst** - Converts Unix Time stamp to a list. Example: 1234567890 to [2009, 2, 13, 23, 31, 30]
+- **Stamp2UnixInt** - Converts date to Unix Time stamp. Example: [2009, 2, 13, 23, 31, 30] to 1234567890
+- **uuLinuxTime** - Converts date to Unix Time stamp (from Linux kernel's sources)
+- **Unix2WeekdayStr** - Gets the weekday from a Unix Time stamp. Example: "Friday" from 1234567890
+- **Unix2PST_PDT** - Converts Unix Time stamp to an SLT date/time string with PST or PDT indication as appropriate
+- **Unix2GMTorBST** - Converts Unix Time stamp to a UK date/time string with GMT or BST indication as appropriate
+
+## See Also
+
+- [llGetTimestamp](../llgettimestamp/)
+- [llGetDate](../llgetdate/)
+- [llGetTime](../llgettime/)
+
+<WikiAttribution />

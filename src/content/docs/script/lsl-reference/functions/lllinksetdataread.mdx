@@ -1,0 +1,68 @@
+---
+title: llLinksetDataRead
+description: Returns the value stored for a key in the linkset.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLinksetDataRead" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If the `name` parameter is an empty string, this function returns an empty string
+- If the name:value pair was created with `llLinksetDataWriteProtected`, this function cannot read it and returns an empty string
+- Use `llLinksetDataReadProtected` with the correct passphrase to read protected data
+
+## Examples
+
+Reading a value from the linkset datastore:
+
+```lsl
+default {
+    state_entry() {
+        // Write a value first
+        llLinksetDataWrite("myKey", "myValue");
+
+        // Read it back
+        string value = llLinksetDataRead("myKey");
+        llSay(0, "Value: " + value);
+    }
+}
+```
+
+Checking if a key exists by testing for empty string:
+
+```lsl
+default {
+    state_entry() {
+        string value = llLinksetDataRead("someKey");
+        if (value == "") {
+            llSay(0, "Key not found or is empty");
+        } else {
+            llSay(0, "Found: " + value);
+        }
+    }
+}
+```
+
+## Notes
+
+The `llLinksetDataRead` function only reads unprotected name:value pairs. For reading protected pairs, use `llLinksetDataReadProtected` with the appropriate passphrase. Both functions consume 10 energy and have no sleep time.
+
+## See Also
+
+- [llLinksetDataWrite](../lllinksetdatawrite/)
+- [llLinksetDataWriteProtected](../lllinksetdatawriteprotected/)
+- [llLinksetDataReadProtected](../lllinksetdatareadprotected/)
+- [llLinksetDataDelete](../lllinksetdatadelete/)
+- [llLinksetDataDeleteProtected](../lllinksetdatadeleteprotected/)
+- [llLinksetDataCountKeys](../lllinksetdatacountkeys/)
+- [llLinksetDataListKeys](../lllinksetdatalistkeys/)
+- [llLinksetDataFindKeys](../lllinksetdatafindkeys/)
+- [llLinksetDataAvailable](../lllinksetdataavailable/)
+- [llLinksetDataReset](../lllinksetdatareset/)
+
+<WikiAttribution />

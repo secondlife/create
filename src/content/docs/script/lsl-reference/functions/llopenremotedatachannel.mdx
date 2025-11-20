@@ -1,0 +1,56 @@
+---
+title: llOpenRemoteDataChannel
+description: This function is deprecated.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llOpenRemoteDataChannel" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+XML-RPC should not be used anymore. Use [HTTP Server](/script/reference/lsl/functions/llHTTPResponse/) instead, which is the modern replacement.
+
+## Caveats
+
+- If an object moves from one region to another it must re-open the channel
+  - The object will get the *same* channel as before, but without re-opening no requests will get through
+- Any channel that is not used for 14 days will be cleaned up
+  - It may be advisable to somewhat regularly (before expected use or on a regular schedule) check that the channel is good and hasn't changed by calling `llOpenRemoteDataChannel` and comparing to the previous channel
+- XML-RPC requests often time-out due to the front-end server being overloaded
+  - LL has continued to upgrade the server hardware periodically, but it has remained unreliable
+  - LL developers have advised that the XML-RPC design isn't scalable (due to the single server bottle-neck) and that the service is "deprecated"
+  - If an XML-RPC request does time-out, the script's `remote_data` event may or may not be triggered (and any script response is lost)
+
+## Examples
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llOpenRemoteDataChannel();
+    }
+    changed(integer c)
+    {
+        if(c & (CHANGED_REGION | CHANGED_TELEPORT))
+            llOpenRemoteDataChannel();
+    }
+    remote_data( integer event_type, key channel, key message_id, string sender, integer idata, string sdata )
+    {
+        if (event_type == REMOTE_DATA_CHANNEL) { // channel created
+        }
+    }
+}
+```
+
+## See Also
+
+- `remote_data` event
+- [llHTTPResponse](../llhttpresponse/)
+- HTTP Polling - Recommended alternative to XML-RPC
+
+<WikiAttribution />

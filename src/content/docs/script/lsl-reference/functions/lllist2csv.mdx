@@ -1,0 +1,50 @@
+---
+title: llList2CSV
+description: |-
+  Creates a string of comma separated values from the list.
+  Create a string of comma separated values from the specified list.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llList2CSV" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function's functionality is equivalent to `llDumpList2String(src, ", ")`. The result is more or less CSV format, but it does not conform in all its details.
+
+## Examples
+
+```lsl
+default
+{
+    state_entry()
+    {
+        list my_list = [FALSE, PI, "a string", ZERO_VECTOR, ZERO_ROTATION, NULL_KEY];
+        llOwnerSay(llList2CSV(my_list));
+    }
+}
+```
+
+## Caveats
+
+- `llCSV2List` will not reverse the process if there are commas or oddly matched angle brackets (`<` and `>`) in any of the original strings. For details see the article on `llCSV2List`.
+- One way around this is to first use `llEscapeURL` on any user-supplied strings before adding them to the list. `llUnescapeURL` will reverse `llEscapeURL`.
+- If your strings may contain commas but not unmatched angle brackets, you can wrap your strings with angle brackets (< and >) like you would use double quotes around the string and then use `llGetSubString` with START at 1 and END at -2 to remove them.
+
+## Notes
+
+- Values are separated with a comma and a space (", ").
+- To reverse the process, use `llCSV2List` (see Caveats section).
+
+## See Also
+
+- [llCSV2List](../llcsv2list/)
+- [llDumpList2String](../lldumplist2string/)
+- [llParseString2List](../llparsestring2list/)
+- [llParseStringKeepNulls](../llparsestringkeepnulls/)
+
+<WikiAttribution />

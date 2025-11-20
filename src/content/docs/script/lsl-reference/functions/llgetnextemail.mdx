@@ -1,0 +1,56 @@
+---
+title: llGetNextEmail
+description: >-
+  Fetch the next queued email with that matches the given address and/or
+  subject, via the email event.
+
+  If the parameters are blank, they are not used for filtering.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetNextEmail" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llOwnerSay("My email address is: " + (string)llGetKey() + "@lsl.secondlife.com");
+
+        // check every half minute
+        llSetTimerEvent(30.0);
+    }
+
+    timer()
+    {
+        //Check for emails
+        llGetNextEmail("", "");
+    }
+
+    email(string time, string address, string subj, string message, integer num_left)
+    {
+          llOwnerSay("I got an email: " + subj + "\n" + message);
+     }
+}
+```
+
+## Notes
+
+- The email event will be triggered only if address and subject match the parameters provided
+- Neither parameter is case sensitive
+- If a parameter is an empty string, that parameter will be treated as a wildcard and matches anything
+- If both parameters are empty strings, the first email in the queue will be matched
+- The email queue is FIFO (First In First Out) - the first item put into the queue is the first one out
+
+## See Also
+
+- [llEmail]
+- [email event]
+
+<WikiAttribution />

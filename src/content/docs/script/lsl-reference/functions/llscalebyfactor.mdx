@@ -1,0 +1,71 @@
+---
+title: llScaleByFactor
+description: >-
+  Attempts to resize the entire object by ScalingFactor, maintaining the
+  size-position ratios of the prims.
+
+
+  Resizing is subject to prim scale limits and linkability limits. This function
+  can not resize the object if the linkset is physical, a pathfinding character,
+  in a keyframed motion, or if resizing would cause the parcel to overflow.
+
+  Returns a boolean (an integer) TRUE if it succeeds, FALSE if it fails.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llScaleByFactor" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+//  Touching this script causes the object to double or halve in size.
+
+integer growing;
+
+default
+{
+    state_entry()
+    {
+        llSay(PUBLIC_CHANNEL, "Touch to toggle scale.");
+    }
+
+    touch_start(integer num_detected)
+    {
+        growing = !growing;
+
+        float min_factor = llGetMinScaleFactor();
+        float max_factor = llGetMaxScaleFactor();
+
+        llSay(PUBLIC_CHANNEL, "min_scale_factor = " + (string)min_factor
+                            + "\nmax_scale_factor = " + (string)max_factor);
+
+        integer success;
+
+        if (growing) success = llScaleByFactor(2.0);
+        else         success = llScaleByFactor(0.5);
+
+        if (!success) llSay(PUBLIC_CHANNEL, "Scaling failed!");
+    }
+}
+```
+
+## Caveats
+
+- Due to floating point precision issues (often, sqrt(x*x) != x), avoid rescaling by the values returned by `llGetMinScaleFactor` and `llGetMaxScaleFactor`. To guarantee successful rescaling, use values slightly within the limits returned by those functions.
+
+## Notes
+
+- Resizing is subject to prim scale limits and linkability limits
+- The function fails if the linkset is physical, a pathfinding character, in a keyframed motion, or if resizing would cause the parcel to overflow
+- The function maintains the size-position ratios of all prims in the linkset
+
+## See Also
+
+- [llGetMaxScaleFactor](../llgetmaxscalefactor/)
+- [llGetMinScaleFactor](../llgetminscalefactor/)
+
+<WikiAttribution />

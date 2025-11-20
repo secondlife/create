@@ -1,0 +1,57 @@
+---
+title: llSetAgentRot
+description: Sets the avatar rotation to the given value.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetAgentRot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function turns the avatar to face the direction indicated by the `rot` parameter. The `flags` parameter is a placeholder for future expansion—there are no flags defined at this time, so pass a constant value of `0`.
+
+## Caveats
+
+- This function requires `PERMISSION_TRIGGER_ANIMATION`
+- This function will only rotate an avatar around the yaw angle. More complex rotations may be passed in, but the yaw is extracted and then renormalized
+- Rotating to `ZERO_ROTATION` will face an avatar due east
+- This function will not change the rotation for a seated avatar. Update the agent's sit target instead
+  - Special case: If the agent is seated on a prim WITHOUT a sit target, they will be turned to face the set rotation when they stand
+- Viewers prior to 7.2.1.17108480561 will not show your own avatar's rotation being affected by this function, but others will see your rotation update
+
+## Examples
+
+```lsl
+// Turn the touching avatar to face the same direction as the prim.
+
+default
+{
+    state_entry()
+    {
+        llSetText("Avatar Rotator", llGetColor(ALL_SIDES), 1.0);
+    }
+
+    touch_start(integer total_number)
+    {
+        llRequestPermissions(llDetectedKey(0), PERMISSION_TRIGGER_ANIMATION);
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {
+            llSetAgentRot(llGetRot(), 0);
+        }
+    }
+}
+```
+
+## See Also
+
+- [llRequestPermissions](../llrequestpermissions/)
+
+<WikiAttribution />

@@ -1,0 +1,126 @@
+---
+title: llLoopSoundMaster
+description: >-
+  Plays attached Sound, looping at volume (0.0 - 1.0), and declares it a sync
+  master.
+
+  Behaviour is identical to llLoopSound, with the addition of marking the source
+  as a "Sync Master", causing "Slave" sounds to sync to it. If there are
+  multiple masters within a viewers interest area, the most audible one (a
+  function of both distance and volume) will win out as the master.
+
+  The use of multiple masters within a small area is unlikely to produce the
+  desired effect.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLoopSoundMaster" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- This function is affected by the Sound Queueing property of the parent prim - this means it's possible to queue a slave sound prior to starting a master, without having to use more than one prim as an emitter.
+
+## Examples
+
+### Basic Usage
+
+```lsl
+// for an uploaded .wav file called "MasterLoop" in inventory
+llLoopSoundMaster("MasterLoop", 1.0);
+```
+
+### Engine Sound Loop Example
+
+The following example demonstrates how using `llSetSoundQueueing` affects the interaction between master and slave sounds. In this example, it's used to simulate a car engine with different states (start, idle, accelerate, decelerate):
+
+```lsl
+integer playState; //see LUT below.
+
+list lut = ["Engine start, idle.","Accelerate, speed loop.","Decelerate, idle.", "Idle, stop"];
+
+default
+{
+    state_entry()
+    {
+        llSetSoundQueueing(TRUE); //Set this so the we don't skip the 1st 'slave' sound.
+    }
+
+    touch_start(integer total_number)
+    {
+        llWhisper(0, "Sound: " + llList2String(lut,playState));
+        if(!playState) //start engine.
+        {
+            llPlaySoundSlave("engine start",1); //This sound is skipped if Sound Queueing is not set.
+            llLoopSoundMaster("idle",1);
+        }
+        else if(playState == 1) //accelerate, then play driving loop
+        {
+            llPlaySoundSlave("accelerate",1);
+            llLoopSoundMaster("speed",1);
+        }
+        else if(playState == 2) //decelerate to idle.
+        {
+            llPlaySoundSlave("decelerate",1);
+            llLoopSoundMaster("idle",1);
+        }
+        else //stop the engine.
+        {
+            llPlaySoundSlave("engine stop",1);
+            llSleep(2); //Wait until the above sound completes.
+            llStopSound(); //Call this to prevent the master loop from restarting randomly (e.g. upon script reset or region change).
+            playState = -1; //This actually resets to 0, as it's incremented below.
+        }
+        ++playState; //increment playState.
+    }
+}
+```
+
+### Sound Master On/Off Toggle
+
+The following script can be added to an object to toggle a sound master on and off:
+
+```lsl
+//This integer (actually a boolean) will be used to manage the toggle effect.
+integer soundState = FALSE;
+//Change MasterLoop to the sound clip you want to use.
+string soundClip = "MasterLoop";
+
+default {
+    state_entry()
+    {
+        //Displays red "OFF" as floating text above the prim
+        llSetText("OFF", <1,0,0>, 1.0);
+    }
+    touch_start(integer num_detected)
+    {
+        //When touched, soundState inverts its current boolean value. 1 becomes 0, 0 becomes 1.
+        soundState = !soundState;
+        if(soundState)
+        {
+            //Run this code when entering soundState 'on'
+            //Displays green "ON" as floating text above the prim
+            llSetText("ON", <0,1,0>, 1.0);
+            llLoopSoundMaster(soundClip, 1.0);
+        }else
+        {   //Run this code when entering soundState 'off'
+            //When touched, stop sound & display red "OFF" as floating text.
+            llSetText("OFF", <1,0,0>, 1.0);
+            llStopSound();
+        }
+    }
+}
+```
+
+## See Also
+
+- [llLoopSound](../llloopsound/)
+- [llLoopSoundSlave](../llloopsoundslave/)
+- [llPlaySoundSlave](../llplaysoundslave/)
+- [llSetSoundQueueing](../llsetsoundqueueing/)
+- [llStopSound](../llstopsound/)
+
+<WikiAttribution />

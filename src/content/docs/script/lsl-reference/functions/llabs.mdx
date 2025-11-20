@@ -1,0 +1,61 @@
+---
+title: llAbs
+description: Returns the absolute (positive) version of Value.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAbs" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+//      returns: "The absolute value of -4 is: 4"
+        llSay(PUBLIC_CHANNEL, "The absolute value of -4 is: "+(string)llAbs(-4) );
+    }
+}
+```
+
+Here's a more elaborate example:
+
+```lsl
+ShowAbsolute(integer inputInteger)
+{
+    string output = "llAbs(" + (string)inputInteger + ") --> " + (string)llAbs(inputInteger);
+
+    llSay(PUBLIC_CHANNEL, output);
+}
+
+default
+{
+    state_entry()
+    {
+        ShowAbsolute(-3);   //  llAbs(-3)  --> 3
+        ShowAbsolute(5);    //  llAbs(5)   --> 5
+        ShowAbsolute(-20);  //  llAbs(-20) --> 20
+        ShowAbsolute(0);    //  llAbs(0)   --> 0
+    }
+}
+```
+
+## Caveats
+
+- The llAbs of -2147483648 is -2147483648. This is because the positive integer 2147483648 is outside the range of allowed LSL integer values.
+
+## Notes
+
+- Using `val-(val<<1)*(val<0)` is roughly two times faster than llAbs, as it avoids a function call and produces identical results.
+
+## See Also
+
+- [llFabs](/script/reference/lsl/functions/llFabs/) - float version of llAbs
+- [Absolute value (Wikipedia)](https://en.wikipedia.org/wiki/Absolute_value)
+
+<WikiAttribution />

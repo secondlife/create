@@ -1,0 +1,53 @@
+---
+title: llAxisAngle2Rot
+description: Returns the rotation that is a generated Angle about Axis.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAxisAngle2Rot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        vector axis = <0.0, 0.0, 1.0>;
+        float angle = 90.0 * DEG_TO_RAD;
+        rotation rot = llAxisAngle2Rot(axis, angle);
+        vector euler = llRot2Euler(rot) * RAD_TO_DEG;
+
+        llOwnerSay((string) euler);
+        //Says <0.0, 0.0, 90.0> since it is rotating 90 degrees on the Z axis caused by the 1.0 placed in the Z vector spot.
+    }
+}
+```
+
+## Notes
+
+- The `axis` parameter does not need to be normalized; only the direction is important.
+- The `angle` parameter should be between 0 and PI radians. Values higher than PI will be converted to `2*PI - angle`. This is because rotation is a rigid motion—rotating left by 90 degrees produces the same result as rotating right by 270 degrees.
+
+## Implementation Reference
+
+Here's how this function works internally:
+
+```lsl
+rotation llAxisAngle2Rot( vector axis, float angle )
+{
+    axis = llVecNorm( axis ) * llSin( angle/2 );
+    return <axis.x, axis.y, axis.z, llCos( angle/2 )>;
+}
+```
+
+## See Also
+
+- [llRot2Angle]
+- [llRot2Axis]
+
+<WikiAttribution />

@@ -1,0 +1,49 @@
+---
+title: llDetectedType
+description: "Returns the type (AGENT, ACTIVE, PASSIVE, SCRIPTED) of detected object.\nReturns 0 if number is not a valid index.\nNote that number is a bit-field, so comparisons need to be a bitwise checked. e.g.:\ninteger iType = llDetectedType(0);\n{\n\t// ...do stuff with the agent\n}"
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedType" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Type and Name of Collision Source
+
+```lsl
+default {
+    collision_start(integer vIntCollided) {
+        integer vBitType;
+        string vStrType;
+        do {
+            vBitType = llDetectedType(--vIntCollided);
+            if (vBitType & AGENT_BY_LEGACY_NAME)
+                vStrType = "avatar";
+            else
+                vStrType = "object";
+            llOwnerSay("An " + vStrType + " named '" + llDetectedName(vIntCollided) + "' collided with me");
+        }
+        while (vIntCollided);
+    }
+}
+```
+
+This example loops through all detected collisions and determines whether each collision source is an avatar or an object. It uses bitwise AND (`&`) to check if the `AGENT_BY_LEGACY_NAME` flag is set in the type field.
+
+## Notes
+
+- The return value is a **bit field**, so you must use bitwise operators (`&`) for comparisons
+- Returns `0` if the number parameter is not a valid detected object index
+- Use constants like `AGENT_BY_LEGACY_NAME`, `AGENT_LIST`, `ACTIVE`, `PASSIVE`, and `SCRIPTED` to check the type bits
+
+## See Also
+
+- [llDetectedName](../lldetectedname/)
+- [llDetectedKey](../lldetectedkey/)
+- [llSensor](../llsensor/)
+
+<WikiAttribution />

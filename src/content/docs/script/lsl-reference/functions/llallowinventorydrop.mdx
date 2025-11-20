@@ -1,0 +1,121 @@
+---
+title: llAllowInventoryDrop
+description: >-
+  If Flag == TRUE, users without object modify permissions can still drop
+  inventory items into the object.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAllowInventoryDrop" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+To perform the drop operation, drag an item from your inventory and drop it onto the prim **while holding down Ctrl**. When everything is correct, the prim will be framed in red just before you release it.
+
+Ownership of the dropped inventory item changes to the owner of the prim. Next owner permissions kick in on the item that was dropped. Non-transfer items cannot be dropped into a prim owned by someone else.
+
+## Examples
+
+### Basic Event Handling - Non-Modifier Drop
+
+When `llAllowInventoryDrop` is set to TRUE and an item is successfully dropped by someone without modify permissions, the `changed` event occurs with the `CHANGED_ALLOWED_DROP` bit set:
+
+```lsl
+changed(integer change)
+{
+    if (change & CHANGED_ALLOWED_DROP)
+        llSay(0, "Your contribution is appreciated, o ye non-permitted modifier!");
+}
+```
+
+### Basic Event Handling - Modifier Drop
+
+When an item is successfully dropped by someone with modify permissions, the event that occurs is `CHANGED_INVENTORY`, regardless of the state of `llAllowInventoryDrop()`:
+
+```lsl
+changed(integer change)
+{
+    if (change & CHANGED_INVENTORY)
+        llSay(0, "Your contribution is appreciated, o ye permitted modifier!");
+}
+```
+
+### Testing for Either Changed Event
+
+To test for either changed event, use bitwise OR:
+
+```lsl
+changed(integer change)
+{
+    //PUBLIC_CHANNEL has the integer value 0
+    if (change & (CHANGED_ALLOWED_DROP | CHANGED_INVENTORY))
+        llSay(PUBLIC_CHANNEL, "yeppers, inventory changed somehow.");
+}
+```
+
+### Toggle Inventory Drop on Touch
+
+This example toggles `llAllowInventoryDrop` off and on with each touch:
+
+```lsl
+integer allow;
+
+default
+{
+    touch_start(integer num)
+    {
+        llAllowInventoryDrop(allow = !allow);
+        llOwnerSay("llAllowInventoryDrop == " + llList2String(["FALSE","TRUE"], allow));
+    }
+
+    changed(integer change)
+    {
+        //note that it's & and not &&... it's bitwise!
+        if (change & CHANGED_ALLOWED_DROP)
+            llOwnerSay("The inventory has changed as a result of a user without mod permissions dropping
+                        an item on the prim and it being allowed by the script.");
+    }
+}
+```
+
+## Caveats and Limitations
+
+- **Link Sets**: In a link set, `llAllowInventoryDrop` must be executed from a script within the root prim or it fails silently.
+
+- **Scripts Cannot Be Dropped**: Scripts are an exception to what is allowed to be dropped in. If a user without modify permissions attempts to drop a script, the inventory addition is rejected and the prim shouts "Not permitted to edit this!" For security reasons, only the owner or those with modify rights can drop scripts.
+
+- **Locked Objects**: Will not work if "Locked" is ticked under the Object tab in the prim properties.
+
+- **Texture Drop Precision**: When dropping a texture, ensure you see a red box framing the target prim and don't release Ctrl until the texture is actually inside the box. If you see a white frame or release Ctrl too soon, the texture will be applied to the prim face instead of being added to inventory.
+
+- **No Way to Identify Dropper**: There is no built-in way to tell who dropped the item. If you need this information, consider making the user touch the prim first to capture their details from the touch event, then enable `llAllowInventoryDrop` and capture the drop event.
+
+- **No Way to Identify What Was Dropped**: There is no way based solely on `llAllowInventoryDrop` to determine what was dropped. See the WhoAddedWhat script pattern for solutions.
+
+- **Modify Rights Bypass**: People with modify rights to your stuff can drop items anyway, even without `llAllowInventoryDrop`. Similarly, if you own a prim but lack modify rights, you cannot drop anything unless the creator first enabled `llAllowInventoryDrop(TRUE)`.
+
+- **Irreversible Drop**: If you have a prim you don't have modify rights to, but the creator set `llAllowInventoryDrop(TRUE)`, you can drop stuff in but can never delete it. You can only move it to your inventory.
+
+## User Experience Notes
+
+- **Communication Required**: If you want users to drag and drop items, explain the process clearly and emphasize holding down Ctrl.
+
+- **Motor Skill Requirements**: Fine motor skills are needed for this operation. Users with unsteady hands or using trackpads may struggle.
+
+- **Unintended Drops**: When users fill containers via drag and drop, they may accidentally drop items into the wrong prim part (like into a bow instead of the giftbox). Consider offering an alternative: have users right-click the prim, choose "Open", and drag items into the Object Contents window, which provides a much larger, safer target.
+
+## Use Cases
+
+A common application is a public "suggestion box" that allows people to drop notecards without requiring modify permissions.
+
+## See Also
+
+- `changed` event
+- `CHANGED_ALLOWED_DROP` constant
+- `CHANGED_INVENTORY` constant
+
+<WikiAttribution />

@@ -1,0 +1,51 @@
+---
+title: llSetEnvironment
+description: Returns a string with the requested data about the region.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetEnvironment" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- An environment set locally on the viewer will override any environment set from this function.
+- When changing a parcel's environment it must first have had an environment set.
+- If the parcel is group-owned, the script must either be deeded to the group, or the script owner must have "Modify environment settings and day cycle" group ability **and** have an active agent in the sim.
+
+## Notes
+
+The owner of the script must have permission to modify the environment on the parcel or be an estate manager to change the entire region.
+
+An override for a given parameter can be set at the region scope or parcel scope. It can also be set for a single sky track, all sky tracks, or both. If an override of a given parameter is specified for both an individual track and all tracks, the individual track's override takes priority.
+
+### Position Parameter Details
+
+- Use `<-1, -1, z>` for the entire region
+- The z-component specifies which sky track to change, based on elevation
+- Use `z=-1` to set an override on the special 'all tracks' slot
+
+### Return Values
+
+- `1` - The parcel or region will attempt to change the applied environment
+- `ENV_NO_ENVIRONMENT` (-3) - There is no environment on this parcel to modify
+- `ENV_INVALID_RULE` (-5) - There was an issue with one of the rules
+- `ENV_VALIDATION_FAIL` (-6) - Unable to validate values passed
+- `ENV_THROTTLE` (-8) - The scripts have exceeded the throttle. Wait and retry the request
+- `ENV_NO_PERMISSIONS` (-9) - The script does not have rights to modify this parcel or region
+
+### Parameters
+
+Passing an empty list will remove any modifications from previous calls to llSetEnvironment.
+
+Note that the list of valid parameters differs from those available for llGetEnvironment.
+
+## See Also
+
+- [llReplaceAgentEnvironment]
+- [llGetEnvironment]
+
+<WikiAttribution />

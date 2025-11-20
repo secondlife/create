@@ -1,0 +1,43 @@
+---
+title: llDetectedOwner
+description: |-
+  Returns the key of detected object's owner.
+  Returns invalid key if Number is not a valid index.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedOwner" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    collision_start(integer num_detected)
+    {
+        string output =
+            "\nkey of colliding object's owner ... or the colliding avatar: " + (string)llDetectedOwner(0)
+            + "\nkey of this object's owner: " + (string)llGetOwner()
+            + "\nname of colliding object/avatar: " + llDetectedName(0)
+            + "\nkey of colliding object/avatar: " + (string)llDetectedKey(0)
+            + "\nkey of the prim containing this script: " + (string)llGetKey()
+            + "\nkey of this object's root prim: " + (string)llGetLinkKey(LINK_ROOT);
+        llSay(0, output);
+    }
+}
+```
+
+## Notes
+
+If the detected type is an avatar, the key of that avatar is returned. Avatars are owned by themselves. `llGetOwnerKey` works the same way with regards to avatar UUIDs.
+
+## See Also
+
+- [llGetOwnerKey](../llgetownerkey/)
+- [llGetOwner](../llgetowner/)
+
+<WikiAttribution />

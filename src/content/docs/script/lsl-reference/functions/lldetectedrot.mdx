@@ -1,0 +1,71 @@
+---
+title: llDetectedRot
+description: |-
+  Returns the rotation of detected object or avatar number.
+  Returns <0.0, 0.0, 0.0, 1.0> if Number is not a valid offset.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedRot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The following example demonstrates how to use `llDetectedRot` to determine the compass direction that a detected avatar is facing:
+
+```lsl
+//-- list of compass directions starting at East, rotated clockwise
+list gLstCompassPoints = [ "East", "NorthEast", "North", "NorthWest", "West", "SouthWest", "South", "SouthEast" ];
+
+//-- convert rotation to z-axis compass direction
+string CompassDirection( rotation rRotBase )
+{
+  integer iCountCompassPoints = llGetListLength(gLstCompassPoints);
+  //-- convert rotation to a direction
+  vector vDirection = <0.0, 1.0, 0.0> / rRotBase;
+  //-- take the direction and determine the z rotation
+  float fAngle = llAtan2(vDirection.x, vDirection.y);
+  //-- take the angle and find the compass point
+  integer iCompassPoint = llRound(fAngle * iCountCompassPoints / TWO_PI);
+  //-- convert to string
+  return llList2String( gLstCompassPoints, iCompassPoint );
+}
+
+default{
+  state_entry()
+  {
+    llSay( 0, "Touch me to get your compass facing" );
+  }
+
+  touch_start( integer vIntTouchCount )
+  {
+    integer vIntCounter = 0;
+    do
+    {
+      llSay( 0,
+             llDetectedName( vIntCounter )
+             + " is facing "
+              //-- next line gets avatar rotation and converts to compass direction
+             + CompassDirection( llDetectedRot( vIntCounter ) ) );
+    } while ( ++vIntCounter < vIntTouchCount );
+  }
+}
+```
+
+## Notes
+
+- Returns `<0.0, 0.0, 0.0, 1.0>` (ZERO_ROTATION) if the specified number is not a valid detected object.
+- The detected object's rotation is relative to the region's coordinate system.
+- This function is typically used within sensor events like `touch_start`, `sensor`, or `land_collision_start`.
+
+## See Also
+
+- [llDetectedPos](../lldetectedpos/)
+- [llDetectedVel](../lldetectedvel/)
+- [llDetectedName](../lldetectedname/)
+- [llDetectedKey](../lldetectedkey/)
+
+<WikiAttribution />

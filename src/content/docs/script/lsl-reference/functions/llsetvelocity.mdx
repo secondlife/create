@@ -1,0 +1,30 @@
+---
+title: llSetVelocity
+description: >-
+  If the object is physics-enabled, sets the object's linear velocity to
+  Velocity.
+
+  If Local==TRUE, Velocity is treated as a local directional vector; otherwise,
+  Velocity is treated as a global directional vector.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetVelocity" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Provides instantaneous velocity not dependent on object energy or mass
+- Only works with physics-enabled objects
+- Use `local=TRUE` for local directional vectors (relative to object rotation)
+- Use `local=FALSE` for regional directional vectors (absolute directions)
+
+## See Also
+
+- [llSetAngularVelocity](/script/reference/lsl/functions/llsetangularvelocity)
+- [llApplyImpulse](/script/reference/lsl/functions/llapplyimpulse)
+
+<WikiAttribution />

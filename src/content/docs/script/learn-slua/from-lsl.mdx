@@ -1,0 +1,592 @@
+---
+title: From LSL to SLua
+description: Essential guide for LSL scripters transitioning to SLua
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import CodeComparison from '@components/CodeComparison.astro';
+
+## For LSL Scripters
+
+You already know how Second Life scripting works—events, permissions, object communication, inventory management. All of that knowledge transfers directly to SLua. This page focuses on the syntax and pattern differences you need to know.
+
+<Aside type="tip">
+  **LSL still works!** Your existing scripts continue to run, and LSL is fully supported. SLua is an option, not a requirement.
+</Aside>
+
+## Why Consider SLua?
+
+- **Faster execution** and **~50% less memory** than LSL/Mono
+- **Modern features**: coroutines, gradual typing, multiple return values
+- **Easier development**: familiar syntax, better tooling, standard libraries
+- **Same ll* functions** you already know
+
+## Syntax Quick Reference
+
+### Comments & Structure
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+// Single line comment
+/* Multi-line
+   comment */
+
+integer x = 5;  // Semicolons required
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+-- Single line comment
+--[[ Multi-line
+     comment ]]
+
+local x: number = 5  -- Semicolons optional (rarely used)
+```
+</Fragment>
+</CodeComparison>
+
+### Variables & Types
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+// Type declarations required
+integer health = 100;
+float damage = 25.5;
+string name = "Alice";
+vector pos = <10, 20, 30>;
+rotation rot = <0, 0, 0, 1>;
+key uuid = "...";
+list items = [1, 2, 3];
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+-- Dynamic typing with optional annotations
+local health: number = 100
+local damage: number = 25.5
+local name: string = "Alice"
+local pos: vector = vector(10, 20, 30)
+local rot: quaternion = quaternion(0, 0, 0, 1)
+local uuid: string = "..."  -- keys are strings
+local items: {number} = {1, 2, 3}  -- tables, not lists
+```
+</Fragment>
+</CodeComparison>
+
+<Aside type="caution">
+  **Type annotations recommended!** While optional, they catch errors before runtime and make code self-documenting.
+</Aside>
+
+### Operators
+
+| Operation | LSL | SLua | Notes |
+|-----------|-----|------|-------|
+| Not equal | `!=` | `~=` | Different operator |
+| Logical AND | `&&` | `and` | Word, not symbol |
+| Logical OR | `\|\|` | `or` | Word, not symbol |
+| Logical NOT | `!` | `not` | Word, not symbol |
+| String concat | `+` | `..` | **Different operator** |
+| Increment | `x++` | `x = x + 1` or `x += 1` | No `++` operator |
+| Decrement | `x--` | `x = x - 1` or `x -= 1` | No `--` operator |
+| Power | `llPow(2, 3)` | `2 ^ 3` | Native operator |
+| Integer division | `7 / 4` → `1` | `7 // 4` → `1` | Use `//` not `/` |
+| String length | `llStringLength(s)` | `#s` | Native operator |
+
+### Control Flow
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+// if, then, else
+if (x > 5) {
+    // ...
+} else if (x > 0) {
+    // ...
+} else {
+    // ...
+}
+
+// while
+while (count > 0) {
+    count--;
+}
+
+// for
+for (i = 0; i < 10; i++) {
+    // ...
+}
+
+// do-while
+do {
+    count++;
+} while (count < 10);
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+-- if, then, else
+if x > 5 then
+    -- ...
+elseif x > 0 then
+    -- ...
+else
+    -- ...
+end
+
+-- while
+while count > 0 do
+    count -= 1
+end
+
+-- for (numeric)
+for i = 0, 9 do
+    -- ...
+end
+
+-- repeat-until (like do-while)
+repeat
+    count += 1
+until count >= 10
+```
+</Fragment>
+</CodeComparison>
+
+### Functions
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+float calculateDamage(float base, float mult) {
+    return base * mult;
+}
+
+// Single return value only
+float result = calculateDamage(10.0, 1.5);
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+-- Always use type annotations
+function calculateDamage(base: number, mult: number): number
+    return base * mult
+end
+
+-- Multiple return values
+function getStats(): (number, number, string)
+    return 100, 50, "Healthy"
+end
+
+local health: number, mana: number, status: string = getStats()
+```
+</Fragment>
+</CodeComparison>
+
+### Lists vs Tables
+
+Tables are SLua's most powerful data structure. Unlike LSL's separate `list` type, tables serve **two purposes**: they work as both arrays (like LSL lists) and dictionaries/maps (which LSL doesn't have).
+
+#### Tables as Arrays (LSL list replacement)
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+list items = [10, 20, 30, 40];
+
+// 0-based indexing
+integer first = llList2Integer(items, 0);  // 10
+integer second = llList2Integer(items, 1); // 20
+
+// List operations
+items += [50];  // Append
+integer len = llListLength(items);
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+local items: {number} = {10, 20, 30, 40}
+
+-- 1-based indexing (critical difference)
+local first: number = items[1]  -- 10
+local second: number = items[2]  -- 20
+
+-- Table operations
+table.insert(items, 50)  -- Append
+local len: number = #items
+```
+</Fragment>
+</CodeComparison>
+
+<Aside type="danger">
+  **1-based indexing!** This is the #1 source of migration bugs. Arrays/tables start at index 1, not 0!
+</Aside>
+
+#### Tables as Dictionaries/Maps
+
+LSL doesn't have a dictionary/map type—you had to use two parallel lists for key-value pairs. SLua tables can store key-value pairs natively:
+
+```luau
+-- Dictionary/map
+local playerData: {[string]: number} = {
+    ["Alice"] = 100,
+    ["Bob"] = 85,
+    ["Charlie"] = 92
+}
+
+-- Access values by key
+local aliceScore: number = playerData["Alice"]  -- 100
+
+-- Add/update entries
+playerData["Diana"] = 88
+playerData["Alice"] = 105  -- Update
+
+-- Check if key exists
+if playerData["Unknown"] ~= nil then
+    ll.Say(0, "Found!")
+end
+
+-- Iterate over key-value pairs
+for name: string, score: number in playerData do
+    ll.Say(0, `{name}: {score}`)
+end
+```
+
+**Shorthand syntax for string keys:**
+```luau
+-- Instead of brackets and quotes, use dot notation
+local player = {
+    name = "Alice",
+    health = 100,
+    position = vector(10, 20, 30)
+}
+
+ll.Say(0, player.name)  -- "Alice"
+player.health = 50  -- Update
+```
+
+#### Mixed Tables
+
+Tables can even mix numeric indices and string keys:
+
+```luau
+local data = {
+    10, 20, 30,  -- Indices 1, 2, 3
+    name = "Alice",  -- String key
+    active = true    -- String key
+}
+
+ll.Say(0, `First: {data[1]}`)  -- 10
+ll.Say(0, `Name: {data.name}`)  -- "Alice"
+```
+
+<Aside type="tip">
+  Tables are versatile data structures. Use them with numeric indices for arrays, or with string keys for dictionaries/maps. They replace LSL lists and provide dictionary/map functionality that LSL never had.
+</Aside>
+
+### String Operations
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+string msg = "Hello" + " " + "World";
+string name = "Alice";
+string greeting = "Hi " + name + "!";
+
+integer len = llStringLength(msg);
+string sub = llGetSubString(msg, 0, 4);  // "Hello"
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+local msg: string = `Hello World`
+local name: string = "Alice"
+local greeting: string = `Hi {name}!`
+
+local len: number = #msg  -- or string.len(msg)
+local sub: string = string.sub(msg, 1, 5)  -- "Hello" (1-based!)
+```
+</Fragment>
+</CodeComparison>
+
+### ll* Functions
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+llSay(0, "Hello");
+llSetPos(<10, 20, 30>);
+llSetRot(<0, 0, 0, 1>);
+llGiveInventory(avatar, "Object");
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+ll.Say(0, "Hello")
+ll.SetPos(vector(10, 20, 30))
+ll.SetRot(rotation(0, 0, 0, 1))
+ll.GiveInventory(avatar, "Object")
+```
+</Fragment>
+</CodeComparison>
+
+**Key difference:** Use `ll.FunctionName` (dot notation), not `llFunctionName`.
+
+## Event Handling: The Big Change
+
+This is the most significant difference between LSL and SLua. Instead of state-based event handlers, SLua uses **event callbacks** with `LLEvents:on()`.
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+integer clickCount = 0;
+
+default {
+    state_entry() {
+        llSay(0, "Ready!");
+    }
+
+    touch_start(integer num_detected) {
+        clickCount++;
+        llSay(0, "Clicked " + (string)clickCount + " times");
+
+        if (clickCount >= 5) {
+            llSay(0, "Done counting!");
+        }
+    }
+}
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+local clickCount: number = 0
+
+ll.Say(0, "Ready!")
+
+LLEvents:on("touch_start", function(num_detected: number)
+    clickCount += 1
+    ll.Say(0, `Clicked {clickCount} times`)
+
+    if clickCount >= 5 then
+        ll.Say(0, "Done counting!")
+    end
+end)
+```
+</Fragment>
+</CodeComparison>
+
+### SLua Event Patterns
+
+**Basic event handler:**
+```luau
+LLEvents:on("touch_start", function(num_detected: number)
+    ll.Say(0, `Touched by {ll.DetectedName(1)}`)
+end)
+```
+
+**Multiple events (run simultaneously):**
+```luau
+LLEvents:on("touch_start", function(num_detected: number)
+    ll.Say(0, "Touched!")
+end)
+
+LLEvents:on("collision_start", function(num_detected: number)
+    ll.Say(0, "Collision!")
+end)
+```
+
+**Listen events:**
+```luau
+ll.Listen(0, "", NULL_KEY, "")
+
+LLEvents:on("listen", function(channel: number, name: string, id: string, message: string)
+    ll.Say(0, `{name} said: {message}`)
+end)
+```
+
+**Accessing detected data:**
+```luau
+LLEvents:on("touch_start", function(num_detected: number)
+    for i = 1, num_detected do
+        local name: string = ll.DetectedName(i)
+        local key: string = ll.DetectedKey(i)
+        ll.Say(0, `{name} touched me!`)
+    end
+end)
+```
+
+## Global Variables
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+// All script-level variables are global
+integer health = 100;
+string playerName = "Alice";
+
+myFunction() {
+    health = 50;  // Modifies global
+}
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+-- Script-level variables (no 'local') are global
+health = 100
+playerName = "Alice"
+
+function myFunction()
+    -- Use 'local' for function-scoped variables
+    local temp: number = 5
+    health = 50  -- Modifies global
+end
+```
+</Fragment>
+</CodeComparison>
+
+## Common Patterns
+
+### Door Script
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+integer isOpen = FALSE;
+vector closedPos;
+vector openPos;
+
+default {
+    state_entry() {
+        closedPos = llGetPos();
+        openPos = closedPos + <0, 0, 2>;
+    }
+
+    touch_start(integer num) {
+        if (isOpen) {
+            llSetPos(closedPos);
+            isOpen = FALSE;
+        } else {
+            llSetPos(openPos);
+            isOpen = TRUE;
+        }
+    }
+}
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+local isOpen: boolean = false
+local closedPos: vector = ll.GetPos()
+local openPos: vector = closedPos + vector(0, 0, 2)
+
+LLEvents:on("touch_start", function(num_detected: number)
+    if isOpen then
+        ll.SetPos(closedPos)
+        isOpen = false
+    else
+        ll.SetPos(openPos)
+        isOpen = true
+    end
+end)
+```
+</Fragment>
+</CodeComparison>
+
+### Timer Events
+
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+integer counter = 0;
+
+default {
+    state_entry() {
+        llSetTimerEvent(1.0);
+    }
+
+    timer() {
+        counter++;
+        llSay(0, "Count: " + (string)counter);
+    }
+}
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+local counter: number = 0
+
+LLTimers:every(1.0, function()
+    counter += 1
+    ll.Say(0, `Count: {counter}`)
+end)
+```
+</Fragment>
+</CodeComparison>
+
+## Type Annotations Guide
+
+While types are optional, **use them in your code!** They catch errors and improve readability. Learn more about [Luau's type system](https://luau.org/typecheck).
+
+```luau
+-- Basic types
+local count: number = 0
+local name: string = "Alice"
+local active: boolean = true
+
+-- SL types
+local pos: vector = vector(10, 20, 30)
+local rot: rotation = rotation(0, 0, 0, 1)
+local id: string = "uuid-here"
+
+-- Tables/arrays
+local scores: {number} = {95, 87, 92}
+local names: {string} = {"Alice", "Bob"}
+
+-- Custom types
+type Player = {
+    name: string,
+    health: number,
+    position: vector
+}
+
+local player: Player = {
+    name = "Alice",
+    health = 100,
+    position = vector(0, 0, 0)
+}
+
+-- Function types (always use!)
+function heal(player: Player, amount: number): Player
+    player.health = player.health + amount
+    return player
+end
+```
+
+## Standard Libraries
+
+SLua includes Lua standard libraries you can use alongside ll* functions. See the full [Luau library reference](https://luau.org/library) for more details.
+
+```luau
+-- String library
+string.upper("hello")  -- "HELLO"
+string.sub("hello", 1, 2)  -- "he" (1-based!)
+string.format("Health: %d", health)
+
+-- Table library
+table.insert(items, value)
+table.remove(items, index)
+table.sort(items)
+
+-- Math library
+math.floor(3.7)  -- 3
+math.ceil(3.2)  -- 4
+math.random(1, 10)  -- Random 1-10
+math.abs(-5)  -- 5
+```
+
+## Next Steps
+
+- **[SLua Basics](/script/learn/slua/basics/)** - Deep dive into the language
+- **[SLua Events](/script/learn/slua/events/)** - Master event handling patterns
+- **[SLua Reference](/script/reference/slua/functions/)** - All ll* functions
+- **[SLua FAQ](https://wiki.secondlife.com/wiki/SLua_FAQ)** - Common questions

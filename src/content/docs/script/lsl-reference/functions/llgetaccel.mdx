@@ -1,0 +1,51 @@
+---
+title: llGetAccel
+description: |-
+  Returns the acceleration of the object relative to the region's axes.
+  Gets the acceleration of the object.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAccel" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Returns `ZERO_VECTOR` in attachments regardless of the avatar's acceleration
+- Returns `ZERO_VECTOR` in child prims regardless of the linkset's acceleration
+
+## Examples
+
+A simple way to help keep a physical object in place by counteracting acceleration:
+
+```lsl
+// A very simple (and not very effective) way of keeping a physical object in place.
+// If the object is moving when the script is put in the object, then the object will continue to move,
+// so long as it doesn't accelerate.
+// If you ever want to actually stop an object, use llMoveToTarget(llGetPos(), .1)
+default {
+    moving_start() {
+        vector ac;
+        // Go forever
+        while(llVecMag(ac = llGetAccel()) > .001) { // We're accelerating...
+            llApplyImpulse(-ac, 0); // Slow us down.
+        }
+    }
+}
+```
+
+## See Also
+
+- [llGetOmega](../llgetomega/)
+- [llGetVel](../llgetvel/)
+- [llGetTorque](../llgettorque/)
+- [llGetMass](../llgetmass/)
+- [llGetForce](../llgetforce/)
+- [llSetForce](../llsetforce/)
+- [llSetTorque](../llsettorque/)
+- [llSetForceAndTorque](../llsetforceandtorque/)
+
+<WikiAttribution />

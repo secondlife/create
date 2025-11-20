@@ -1,0 +1,54 @@
+---
+title: llName2Key
+description: Look up Agent ID for the named agent in the region.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llName2Key" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+tellName2Key(string avatarName)
+{
+    key keyFromName = llName2Key(avatarName);
+    if (keyFromName == NULL_KEY)
+    {
+        llSay(0, "There is no agent with the name '" + avatarName + "' currently signed onto the region.");
+        return;
+    }
+    llSay(0, "Avatar key for name '" + avatarName + "': " + (string)keyFromName);
+}
+
+default
+{
+    touch_start(integer total_number)
+    {
+        tellName2Key("rider.linden");
+        tellName2Key("Rider Linden");
+        tellName2Key(llDetectedName(0));
+    }
+}
+// If Rider Linden touches the object, the three lines should contain the answer c5a07167-9bbe-4944-a7b0-a9677afa134d
+```
+
+## Caveats
+
+- This function does not operate on historical names. For historical name lookup, use [llRequestUserKey](/script/reference/lsl/functions/llrequestuserkey/).
+
+## Notes
+
+- Agent names are always provided in the form "First[ Last]" or "first[.last]" (first name with an optional last name).
+- If the last name is omitted, a last name of "Resident" is assumed.
+- Case is not considered when resolving agent names.
+- If there is no agent with the specified name currently signed onto the region, this function returns `NULL_KEY`.
+
+## See Also
+
+- [llRequestUserKey](/script/reference/lsl/functions/llrequestuserkey/) - Fetch avatar UUID by current or historical username
+
+<WikiAttribution />

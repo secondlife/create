@@ -1,0 +1,85 @@
+---
+title: llSetAgentEnvironment
+description: >-
+  Sets an agent's environmental values to the specified values. Must be used as
+  part of an experience.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetAgentEnvironment" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+float gTransitionTime = 3.0;
+list gListEnvironmentParams = [
+    SKY_CLOUD_TEXTURE, TEXTURE_PLYWOOD,
+    SKY_GAMMA, 10.0,
+    WATER_NORMAL_SCALE, <5.0, 5.0, 5.0>
+];
+
+default
+{
+    touch_start(integer total_number)
+    {
+        key person = llDetectedKey(0);
+        if (llGetAgentSize(person) != ZERO_VECTOR)
+        {
+            llRequestExperiencePermissions(person, "");
+        }
+        else
+        {
+            llInstantMessage(person, "You need to be in the same region to change environment");
+        }
+    }
+
+    experience_permissions(key agent_id)
+    {
+        integer envTest = llSetAgentEnvironment(agent_id, gTransitionTime, gListEnvironmentParams);
+        if (envTest == 1)
+        {
+            llRegionSayTo(agent_id, 0, "Applying environment for " + (string)agent_id);
+        }
+        else
+        {
+            llRegionSayTo(agent_id, 0, "Cannot apply environment for " + (string)agent_id + " due to reason id: " + (string)envTest);
+        }
+    }
+
+    experience_permissions_denied(key agent_id, integer reason)
+    {
+        llRegionSayTo(agent_id, 0, "Denied experience permissions for " + (string)agent_id + " due to reason id: " + (string)reason);
+    }
+}
+```
+
+## Caveats
+
+- The list of valid parameters differs from those available for llGetEnvironment
+- The agent's viewer may choose to ignore this command
+- An environment set locally on the viewer will override any environment set from this function
+
+## Return Values
+
+The function returns an integer indicating the result:
+
+- `1` - The agent has been instructed to change their environment
+- `ENV_NOT_EXPERIENCE` (`-1`) - The script is not running as part of an experience with a valid experience key
+- `ENV_NO_EXPERIENCE_PERMISSION` (`-2`) - The agent has not granted permission
+- `ENV_NO_ENVIRONMENT` (`-3`) - The environment inventory object could not be found
+- `ENV_INVALID_AGENT` (`-4`) - Unable to find specified agent
+- `ENV_INVALID_RULE` (`-5`) - There was an issue with one of the rules
+- `ENV_VALIDATION_FAIL` (`-6`) - Unable to validate values passed
+- `ENV_NO_EXPERIENCE_LAND` (`-7`) - The experience has not been enabled or cannot run on the land
+- `ENV_THROTTLE` (`-8`) - The scripts have exceeded the throttle; wait and retry the request
+
+## See Also
+
+- [llReplaceAgentEnvironment](../llreplaceagentenvironment/)
+- [llGetEnvironment](../llgetenvironment/)
+
+<WikiAttribution />

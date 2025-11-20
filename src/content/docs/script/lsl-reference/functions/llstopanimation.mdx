@@ -1,0 +1,64 @@
+---
+title: llStopAnimation
+description: >-
+  This function stops the specified animation on the avatar who received the
+  script's most recent permissions request.
+
+  Animation may be an animation in task inventory, a built-in animation, or the
+  uuid of an animation.
+
+  Requires PERMISSION_TRIGGER_ANIMATION.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStopAnimation" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If the animation to be stopped is the only playing animation (as found via `llGetAnimationList`), it will continue to play to its end (if looped it will continue indefinitely)
+  - If you must stop a looped animation, playing a single frame non-looped one immediately after stopping it, at low priority, will clear the list.
+
+## Examples
+
+### Basic Animation Control
+
+```lsl
+default
+{
+    touch_start(integer detected)
+    {
+        llRequestPermissions(llDetectedKey(0), PERMISSION_TRIGGER_ANIMATION);
+    }
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {
+            llStartAnimation("sit");
+            llOwnerSay("animation will end in 5 seconds");
+            llSetTimerEvent(5.0);
+        }
+    }
+    timer()
+    {
+        llSetTimerEvent(0.0);
+        llStopAnimation("sit");
+    }
+}
+```
+
+### Using Animation Overrides
+
+```lsl
+llStopAnimation(llGetAnimationOverride("Sitting"))
+```
+
+## See Also
+
+- [llGetAnimationList](../llgetanimationlist/)
+- [llStartAnimation](../llstartanimation/)
+
+<WikiAttribution />

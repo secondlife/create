@@ -1,0 +1,55 @@
+---
+title: llMD5String
+description: >-
+  Returns a string of 32 hex characters that is an RSA Data Security Inc., MD5
+  Message-Digest Algorithm of Text with Nonce used as the salt.
+
+  Returns a 32-character hex string. (128-bit in binary.)
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llMD5String" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+**Security Warning:** The MD5 hashing algorithm should not be used because it is too easy to generate collisions (two inputs which result in the same hash). See [CERT Advisory](http://www.kb.cert.org/vuls/id/836068).
+
+## Technical Details
+
+The nonce is cast to a string and appended to the source after a colon. The formula is:
+
+```
+MD5Hash(src + ":" + nonce)
+```
+
+This is important to know if you are calculating a hash in another language and wish to compare with one calculated in LSL.
+
+The character encoding used by llMD5String is UTF-8.
+
+## Examples
+
+```lsl
+llSay(0, llMD5String("Hello, Avatar!", 0)); // returns 112abd47ceaae1c05a826828650434a6
+```
+
+### Comparison with Linux
+
+You can verify LSL MD5 hashes using the command line:
+
+```bash
+$ echo -n 'Hello, Avatar!:0' | openssl md5
+112abd47ceaae1c05a826828650434a6
+```
+
+Note the nonce is appended after a colon, matching the LSL behavior.
+
+## See Also
+
+- [llSHA1String](/script/reference/lsl/functions/llsha1string/)
+- [llSHA256String](/script/reference/lsl/functions/llsha256string/)
+
+<WikiAttribution />

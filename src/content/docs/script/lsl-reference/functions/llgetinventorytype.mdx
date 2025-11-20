@@ -1,0 +1,133 @@
+---
+title: llGetInventoryType
+description: |-
+  Returns the type of the named inventory item.
+  Like all inventory functions, llGetInventoryType is case-sensitive.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetInventoryType" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### List all inventory items with their types
+
+This example iterates through all items in the prim's inventory and displays each item's name and type:
+
+```lsl
+string get_type_info(integer inputInteger)
+{
+    if (inputInteger == INVENTORY_TEXTURE)
+        return "INVENTORY_TEXTURE";
+
+    else if (inputInteger == INVENTORY_SOUND)
+        return "INVENTORY_SOUND";
+
+    else if (inputInteger == INVENTORY_LANDMARK)
+        return "INVENTORY_LANDMARK";
+
+    else if (inputInteger == INVENTORY_CLOTHING)
+        return "INVENTORY_CLOTHING";
+
+    else if (inputInteger == INVENTORY_OBJECT)
+        return "INVENTORY_OBJECT";
+
+    else if (inputInteger == INVENTORY_NOTECARD)
+        return "INVENTORY_NOTECARD";
+
+    else if (inputInteger == INVENTORY_SCRIPT)
+        return "INVENTORY_SCRIPT";
+
+    else if (inputInteger == INVENTORY_BODYPART)
+        return "INVENTORY_BODYPART";
+
+    else if (inputInteger == INVENTORY_ANIMATION)
+        return "INVENTORY_ANIMATION";
+
+    else if (inputInteger == INVENTORY_GESTURE)
+        return "INVENTORY_GESTURE";
+
+    else if (inputInteger == INVENTORY_SETTING)
+        return "INVENTORY_SETTING";
+
+    else
+        return "inventory type unknown";
+}
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        integer totalItems = llGetInventoryNumber(INVENTORY_ALL);
+
+        integer index;
+        while (index < totalItems)
+        {
+            string itemName = llGetInventoryName(INVENTORY_ALL, index);
+            integer type = llGetInventoryType(itemName);
+
+            // PUBLIC_CHANNEL has the integer value 0
+            llSay(PUBLIC_CHANNEL,
+                "'" + itemName + "' (" + get_type_info(type) + ")");
+
+            ++index;
+        }
+    }
+}
+```
+
+## Helpers
+
+### Case-insensitive inventory lookup
+
+This utility function finds an item by name regardless of case and validates its type:
+
+```lsl
+string InventoryName(string name, integer type)
+{ // finds an item in a case insensitive fashion of the given type and returns its true name.
+    integer a = llGetInventoryType(name);
+    if(!~a) // a == INVENTORY_NONE
+    { // it should be noted that INVENTORY_NONE == INVENTORY_ALL == -1; which is why '!~a' works.
+        string lc_name = llToLower(name);
+        a = llGetInventoryNumber(type);
+        while(a)
+        { // (a = ~-a) is equivalent to --a, but runs faster.
+            if(llToLower(name = llGetInventoryName(type, a = ~-a)) == lc_name)
+            { // we found a match ^_^
+                return name;
+            }
+        }
+    }
+    else if((a == type) ^ (!~type)) // return name, as long as a == type or type == INVENTORY_ALL
+    { // we already know that a != INVENTORY_NONE, but just in case we use xor instead of or.
+        return name;
+    }
+    return ""; // no match ~_~
+}
+
+integer InventoryExists(string name, integer type)
+{ // only included to show how this type of check could be done if the value of 'type' is not constant and could be INVENTORY_ALL.
+    return (llGetInventoryType(name) == type) ^ (!~type);
+} // Since INVENTORY_ALL == INVENTORY_NONE, the extra part on the end is required to invert the result.
+```
+
+## Notes
+
+- Returns `INVENTORY_NONE` if the named item does not exist (no errors or messages are generated), making this function ideal for testing the existence of a certain item in inventory
+- This function is case-sensitive—item names must match exactly, including capitalization
+- Useful for determining inventory type before performing type-specific operations
+
+## See Also
+
+- [llGetInventoryAcquireTime](../llgetinventoryacquiretime/)
+- [llGetInventoryName](../llgetinventoryname/)
+- [llGetInventoryNumber](../llgetinventorynumber/)
+- [llGetInventoryCreator](../llgetinventorycreator/)
+- [llGetInventoryPermMask](../llgetinventorypermmask/)
+- [llGetInventoryKey](../llgetinventorykey/)
+
+<WikiAttribution />

@@ -1,0 +1,36 @@
+---
+title: llPlaySoundSlave
+description: >-
+  Plays attached Sound once, at Volume (0.0 - 1.0), synced to next loop of most
+  audible sync master.
+
+  Behaviour is identical to llPlaySound, unless there is a "Sync Master"
+  present. If a Sync Master is already playing, the Slave sound will not be
+  played until the Master hits its loop point and returns to the beginning.
+
+  llPlaySoundSlave will play the sound exactly once; if it is desired to have
+  the sound play every time the Master loops, either use llLoopSoundSlave with
+  extra silence padded on the end of the sound or ensure that llPlaySoundSlave
+  is called at least once per loop of the Master.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llPlaySoundSlave" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.PlaySoundSlave()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llPlaySoundSlave](/script/reference/lsl/functions/llPlaySoundSlave/)
+
+

@@ -1,0 +1,75 @@
+---
+title: llNavigateTo
+description: >-
+  Navigate to destination.
+
+  Directs an object to travel to a defined position in the region or adjacent
+  regions.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llNavigateTo" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+vector last_touched_pos;
+key last_touched_key;
+
+default
+{
+    state_entry()
+    {
+        llCreateCharacter([CHARACTER_DESIRED_SPEED, 50.0]);
+    }
+
+    touch_start(integer total_number)
+    {
+        last_touched_key = llDetectedKey(0);
+        last_touched_pos = llList2Vector(llGetObjectDetails(last_touched_key, [OBJECT_POS]), 0);
+        llNavigateTo(last_touched_pos, []);
+        llSetTimerEvent(0.2);
+    }
+
+    timer()
+    {
+        vector last_touched_pos_now = llList2Vector(llGetObjectDetails(last_touched_key, [OBJECT_POS]), 0);
+        if ( llVecDist(last_touched_pos_now, last_touched_pos) > 1 )
+        {
+            last_touched_pos = last_touched_pos_now;
+            llNavigateTo(last_touched_pos, []);
+        }
+    }
+}
+```
+
+## Caveats
+
+- Must use llCreateCharacter first or the function will fail with a viewer error.
+- Vertical positions specified for any vectors should be chosen to be as close as possible to the actual height of the surface requested. Large difference between the provided vertical position and the actual terrain/object will result in failure of the behavior.
+- If you want to chase an agent or object as per the example above, it's much more elegant and less sim resource intensive to use llPursue instead.
+
+## Notes
+
+- FORCE_DIRECT_PATH can be used to rescue characters that have somehow fallen off the navigable zone as it doesn't use the navmesh. (Needs verification.)
+- The position vector can be set outside the current region by using extended range region coordinates: e.g., to go to the SE corner of the region to the East of the current one, you could llNavigateTo(\<0.0, 512.0, 0.0\>, []);
+
+## See Also
+
+- [llCreateCharacter](../llcreatecharacter/)
+- [llDeleteCharacter](../lldeletecharacter/)
+- [llEvade](../llevade/)
+- [llExecCharacterCmd](../llexeccharactercmd/)
+- [llGetClosestNavPoint](../llgetclosestnavpoint/)
+- [llFleeFrom](../llfleefrom/)
+- [llPatrolPoints](../llpatrolpoints/)
+- [llPursue](../llpursue/)
+- [llUpdateCharacter](../llupdatecharacter/)
+- [llWanderWithin](../llwanderwithin/)
+- path_update (event)
+
+<WikiAttribution />

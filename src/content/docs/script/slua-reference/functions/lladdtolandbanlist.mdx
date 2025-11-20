@@ -1,0 +1,38 @@
+---
+title: llAddToLandBanList
+description: >-
+  Add avatar ID to the parcel ban list for the specified number of Hours.
+
+  A value of 0 for Hours will add the agent indefinitely.
+
+  The smallest value that Hours will accept is 0.01; anything smaller will be
+  seen as 0.
+
+  When values that small are used, it seems the function bans in approximately
+  30 second increments (Probably 36 second increments, as 0.01 of an hour is 36
+  seconds).
+
+  Residents teleporting to a parcel where they are banned will be redirected to
+  a neighbouring parcel.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llAddToLandBanList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.AddToLandBanList()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llAddToLandBanList](/script/reference/lsl/functions/llAddToLandBanList/)
+
+

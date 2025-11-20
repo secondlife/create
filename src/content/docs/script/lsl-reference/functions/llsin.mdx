@@ -1,0 +1,37 @@
+---
+title: llSin
+description: Returns the sine of Theta (Theta in radians).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSin" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Due to IEEE 754 floating-point precision, `llSin(PI)` returns `-8.742278E-8` (hex: `0xB3BBBD2E`) instead of `0.0`. The error is cumulative with multiples of PI. For example, `llSin(100000.0*PI)` returns `0.015890` when the result should be `0.0`.
+
+## Examples
+
+```lsl
+// Touch the object with this script in it to see the sine of random numbers!
+default
+{
+    touch_start(integer num)
+    {
+        float r = llFrand(TWO_PI);
+        llOwnerSay("The sine of " + (string)r + " in radians or " + (string)(r * RAD_TO_DEG) + " in degrees is " + (string)llSin(r));
+    }
+}
+```
+
+## See Also
+
+- [llAsin](../llasin/)
+- [llCos](../llcos/)
+- [llTan](../lltan/)
+
+<WikiAttribution />

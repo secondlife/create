@@ -1,0 +1,59 @@
+---
+title: llTargetRemove
+description: Removes positional target Handle registered with llTarget.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTargetRemove" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+integer target_id;
+vector target_pos;
+
+default
+{
+    state_entry()
+    {
+        target_pos = llGetPos() + <1.0, 0.0, 0.0>;
+        target_id = llTarget(target_pos, 0.5);
+    }
+    at_target(integer tnum, vector targetpos, vector ourpos)
+    {
+        if (tnum == target_id)
+        {
+            llOwnerSay("object is within range of target");
+            llOwnerSay("target position: " + (string)targetpos + ", object is now at: " + (string)ourpos);
+            llOwnerSay("this is " + (string)llVecDist(targetpos, ourpos) + " meters from the target");
+            llTargetRemove(target_id);
+        }
+    }
+    not_at_target()
+    {
+        llOwnerSay(
+            "not there yet - object is at " + (string)llGetPos() +
+            ", which is " + (string)llVecDist(target_pos, llGetPos()) +
+            " meters from the target (" + (string)target_pos + ")"
+        );
+    }
+}
+```
+
+## Notes
+
+Use `llTargetRemove` to stop monitoring a positional target that was registered with `llTarget`. This is typically done in the `at_target` event when the target has been reached, as shown in the example above.
+
+## See Also
+
+- [llTarget](../lltarget/)
+- [llRotTarget](../llrottarget/)
+- [llRotTargetRemove](../llrottargetremove/)
+- at_target event
+- not_at_target event
+
+<WikiAttribution />

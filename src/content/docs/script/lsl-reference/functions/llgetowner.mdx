@@ -1,0 +1,143 @@
+---
+title: llGetOwner
+description: |-
+  Returns the object owner's UUID.
+  Returns the key for the owner of the object.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetOwner" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Simple usage to retrieve and display the owner's UUID:
+
+```lsl
+llOwnerSay( (string)llGetOwner()); // speaks in chat the "key" (UUID code) of the avatar.
+llOwnerSay( llKey2Name(llGetOwner())); // speaks in chat the name of the owner if in the sim.
+```
+
+Detecting owner changes with the `changed` event:
+
+```lsl
+default
+{
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+            llResetScript();
+    }
+
+    state_entry()
+    {
+        key owner = llGetOwner();
+        llInstantMessage(owner, "Only you can hear me. Isn't that eerie.");
+    }
+}
+```
+
+## Caveats
+
+- When the owner of an object changes, code that depends on this function's return value will not automatically update for the new owner or be automatically re-evaluated. This requires the reregistration of listens and requesting of permissions from the new owner as needed.
+- Caching the return value requires manual updates. It's up to the programmer to work around this limitation for any code that caches the owner UUID.
+- When the object is deeded to a group, the UUID returned is that of the group.
+
+## Notes
+
+To retrieve the owner's name while the owner is in the region use `llKey2Name`, `llGetUsername`, or `llGetDisplayName`. Use `llRequestAgentData`, `llRequestUsername`, or `llRequestDisplayName` when the owner is not in the region.
+
+### Handling Owner Changes
+
+A common issue is that previously-activated events referring to the owner (like `llListen`) don't automatically change when the owner changes. The most often-seen result is a listen registered to the owner will continue to listen to the **previous** owner rather than the **current** owner. This is not a bug but part of the design.
+
+Detection of owner change can be achieved with:
+- The `changed` event with the `CHANGED_OWNER` flag (most reliable)
+- Storing the old value and periodically checking if it has changed (e.g., in `on_rez`). Note: this won't detect if the object is sold with "sell original" in-world.
+
+### Re-initializing Owner-Specific Code
+
+For scripts that need to maintain state across ownership transfers, use a helper function to reinitialize owner-specific code:
+
+```lsl
+integer listen_handle;
+
+init()
+{
+    key owner = llGetOwner();
+    llListenRemove(listen_handle);
+    // PUBLIC_CHANNEL has the integer value 0
+    listen_handle = llListen(PUBLIC_CHANNEL, "", owner, "");
+    llRequestPermissions(owner, PERMISSION_TRIGGER_ANIMATION);
+}
+
+default
+{
+    state_entry()
+    {
+        init();
+        //insert additional startup code here that doesn't need to run each rez/owner change
+        //for example, reading settings from a notecard
+    }
+
+    on_rez(integer start)
+    {
+        init();
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+            init();
+    }
+
+    run_time_permissions(integer perm)
+    {//always use the run_time_permissions event with llRequestPermissions, never assume
+        if(perm & PERMISSION_TRIGGER_ANIMATION)
+        {
+            //setup your animation code here, start your timers, etc.
+            llOwnerSay("I have animation permissions");
+        }
+    }
+}
+```
+
+### Helper: Checking Owner or Group Members
+
+To determine the owner of an object that might be group-deeded, use this helper function. Setting the `groupAdmin` parameter to `TRUE` means group members should always count as owners, even if the object isn't deeded to that group:
+
+```lsl
+integer isOwner(key id, integer groupAdmin) {
+    integer result = FALSE;
+    {
+        key owner = llGetOwner();
+        if (id == owner) result = TRUE;
+        else { // If object is group owned, avatar need only belong to same group
+            integer sameGroup = llSameGroup(id);
+            if (groupAdmin) result = sameGroup;
+            else {
+                key group = (key)((string)llGetObjectDetails(llGetKey(), [OBJECT_GROUP]));
+                if (group == owner) result = sameGroup;
+            }
+        }
+    }
+    return result;
+}
+```
+
+## See Also
+
+- [llGetCreator]
+- [llGetOwnerKey]
+- [llDetectedOwner]
+- [llKey2Name]
+- [llGetUsername]
+- [llGetDisplayName]
+- [llRequestAgentData]
+- [llRequestUsername]
+- [llRequestDisplayName]
+
+<WikiAttribution />

@@ -1,0 +1,127 @@
+---
+title: llRezObjectWithParams
+description: Instantiate owner's InventoryItem with the given parameters.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRezObjectWithParams" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Example - Empty Parameters
+
+The list of parameters is entirely optional. If you want to rez an object exactly where the rezzer is, you may call the function with an empty list.
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        llRezObjectWithParams("Object", []);
+    }
+}
+```
+
+### Temporary Spinning Object
+
+The following example rezzes an object slightly above the rezzer, slowly spinning and with automatic cleanup.
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        llRezObjectWithParams("Object", [
+            REZ_FLAGS, REZ_FLAG_TEMP | REZ_FLAG_PHANTOM,
+            REZ_POS, <0,0,1>, TRUE, TRUE,
+            REZ_OMEGA, <0,0,1>, TRUE, 0.5, PI
+        ]);
+    }
+}
+```
+
+### Bullet From Attachment
+
+This is a basic example of firing a typical bullet from a worn attachment. The bullet is fired with a left-click during mouselook.
+
+```lsl
+default
+{
+    control(key id, integer level, integer edge)
+    {
+        integer click = level & edge;
+
+        if (click & CONTROL_ML_LBUTTON) {
+            llRezObjectWithParams("Bullet", [
+                REZ_POS, <2,0,0>, TRUE, TRUE, // Relative offset 2 meters forward
+                REZ_ROT, ZERO_ROTATION, TRUE, // Relative rotation
+                REZ_VEL, <100,0,0>, TRUE, FALSE, // Relative velocity 100m/s forward
+                REZ_DAMAGE, 40,
+                REZ_LOCK_AXES, <1,1,1>, // Disable all rotation
+                REZ_FLAGS, 0
+                | REZ_FLAG_PHYSICAL
+                | REZ_FLAG_TEMP
+                | REZ_FLAG_DIE_ON_COLLIDE
+                | REZ_FLAG_DIE_ON_NOENTRY
+                | REZ_FLAG_NO_COLLIDE_OWNER
+                | REZ_FLAG_NO_COLLIDE_FAMILY
+                | REZ_FLAG_BLOCK_GRAB_OBJECT
+            ]);
+        }
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if (perm) {
+            llTakeControls(CONTROL_ML_LBUTTON, TRUE, FALSE);
+        }
+    }
+
+    attach(key id)
+    {
+        if (id) {
+            llRequestPermissions(llGetOwner(), PERMISSION_TAKE_CONTROLS);
+        }
+    }
+
+    state_entry()
+    {
+        if (llGetAttached()) {
+            llRequestPermissions(llGetOwner(), PERMISSION_TAKE_CONTROLS);
+        }
+    }
+}
+```
+
+## Caveats
+
+- Silently fails to rez the inventory object if `REZ_POS` is too far from the geometric center of the object trying to rez (generally 10 meters; see `llRezObject`).
+- When scripting attachments meant to rez objects, remember that when used in the root of an attached object, `llGetPos` doesn't return the position of the attachment but instead returns the position of the avatar's bounding box geometric center. Read the documentation for `llGetPos` and `llParticleSystem` for more information.
+- If the object is unattached and the owner of the object does not have copy permission on the inventory item, the object will no longer be present in inventory after it is rezzed (so another attempt to rez the same object will fail). If the owner does have copy permission, a copy is rezzed and the original remains in inventory.
+- If the object is attached and the owner does not have copy permission on the inventory item, an error is shouted on the DEBUG_CHANNEL: "Cannot rez no copy objects from an attached object."
+- Silently fails if you don't have offline building rights on the land. To have the right, your objects need to either:
+  - Be on land you own yourself
+  - Be on land where anyone is allowed to build (e.g., a sandbox)
+  - Be deeded to the group that owns the land
+  - Be set to the same group that owns the land and the land has the parcel flag 'allow group to build' set
+  - The group role "Always allow 'Create Objects'" will only work to override this when you are online, in the region, or have a child agent in the region
+
+## Related Information
+
+- For establishing communications between the rezzing object and the new prim, see the `object_rez` event documentation
+- Check `llGetParcelFlags` to test if the parcel allows this script to rez
+
+## See Also
+
+- [llRezAtRoot](../llrezatroot/)
+- [llRezObject](../llrezobject/)
+- [llGetStartParameter](../llgetstartparameter/)
+- [llGodLikeRezObject](../llgodlikerezobject/)
+- `object_rez` event - Triggered when this object rezzes an object from inventory
+- `PRIM_TEMP_ON_REZ` constant
+
+<WikiAttribution />

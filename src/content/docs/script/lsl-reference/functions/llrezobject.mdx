@@ -1,0 +1,98 @@
+---
+title: llRezObject
+description: >-
+  Instantiate owners InventoryItem at Position with Velocity, Rotation and with
+  start StartParameter.
+
+  Creates object's inventory item at Position with Velocity and Rotation
+  supplied. The StartParameter value will be available to the newly created
+  object in the on_rez event or through the llGetStartParameter function.
+
+  The Velocity parameter is ignored if the rezzed object is not physical.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRezObject" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Rez on Touch
+
+```lsl
+default
+{
+    touch_start(integer param)
+    {
+        llRezObject("Object", llGetPos() + <0.0,0.0,1.0>, <0.0,0.0,0.0>, <0.0,0.0,0.0,1.0>, 0);
+    }
+}
+```
+
+### Relative Position, Rotation, and Velocity
+
+This example demonstrates rezzing an object with position, rotation, and velocity all described relative to the rezzing prim's coordinate system:
+
+```lsl
+string object = "Object"; // Name of object in inventory
+vector relativePosOffset = <2.0, 0.0, 1.0>; // "Forward" and a little "above" this prim
+vector relativeVel = <1.0, 0.0, 0.0>; // Traveling in this prim's "forward" direction at 1m/s
+rotation relativeRot = <0.707107, 0.0, 0.0, 0.707107>; // Rotated 90 degrees on the x-axis compared to this prim
+integer startParam = 10;
+
+default
+{
+    touch_start(integer a)
+    {
+        vector myPos = llGetPos();
+        rotation myRot = llGetRot();
+
+        vector rezPos = myPos + relativePosOffset * myRot;
+        vector rezVel = relativeVel * myRot;
+        rotation rezRot = relativeRot * myRot;
+
+        llRezObject(object, rezPos, rezVel, rezRot, startParam);
+    }
+}
+```
+
+## Caveats
+
+- The root prim of the rezzed object is not positioned at `pos`—instead, the geometric center is positioned there. Use `llRezAtRoot` if you need the root prim at the exact position.
+- Silently fails to rez if `pos` is too far from the geometric center of the rezzing object. If rezzing mysteriously fails, ensure you're using a formula like `llGetPos() + <0.0,0.0,1.0>` for the position rather than a hardcoded vector like `<0.0,0.0,1.0>`.
+- When rezzing from attachments, `llGetPos()` returns the position of the avatar's bounding box geometric center, not the attachment's position. See the caveats for `llParticleSystem` for more information.
+- If the object is unattached and the owner lacks copy permission on the inventory item, the object is consumed from inventory when rezzed (subsequent rez attempts fail). If the owner has copy permission, a copy is rezzed and the original remains.
+- If the object is attached and the owner lacks copy permission, an error is shouted on DEBUG_CHANNEL: "Cannot rez no copy objects from an attached object."
+- Silently fails if you lack offline building rights. Required permissions include:
+  - Own the land, OR
+  - Land allows anyone to build (e.g., sandbox), OR
+  - Object is deeded to the land group, OR
+  - Object is set to the land group and the parcel has "allow group to build" enabled
+  - Group role "Always allow 'Create Objects'" only works when you're online in the region.
+
+## Maximum Rez Distance
+
+The maximum distance you can rez from is determined by object size. These measurements were taken on server version 1.38:
+
+- Distance is measured between the centers of the rezzing prim and the rezzed prim
+- A 10.0 meter cube can rez a 0.5 meter cube approximately 18.6 meters away
+- A 0.01 meter cube can rez a 0.5 meter cube approximately 10.0 meters away
+
+## Notes
+
+- The `param` value becomes the start parameter for the rezzed object's `on_rez` event and is retrievable via `llGetStartParameter`
+- For object-to-object communication, see `object_rez` event examples
+- Velocity is ignored if the rezzed object is not physical
+
+## See Also
+
+- [llRezAtRoot](../llrezatroot/)
+- [llGetStartParameter](../llgetstartparameter/)
+- [llGodLikeRezObject](../llgodlikerezobject/)
+- `object_rez` - Event triggered when this object rezzes another object
+- `PRIM_TEMP_ON_REZ` - Prim property for temporary rezzing
+
+<WikiAttribution />

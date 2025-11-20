@@ -1,0 +1,148 @@
+---
+title: llRequestInventoryData
+description: >-
+  Requests data for the named InventoryItem.
+
+  When data is available, the dataserver event will be raised with the key
+  returned from this function in the requested parameter.
+
+  The only request currently implemented is to request data from landmarks,
+  where the data returned is in the form "<float, float, float>" which can be
+  cast to a vector. This position is in region local coordinates.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRequestInventoryData" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- This function only returns data for landmark items in inventory. Other item types are not supported.
+- The vector returned from landmarks is the distance in meters of the landmark's location relative to `<0,0,0>` in the region in which the script is running.
+  - For a landmark pointing to a location in the current region, that's the same as a region coordinate; however, when used with a landmark pointing to a different region the vector's x and y values can be quite large (and/or negative).
+  - The vector is suitable for use in calculating a global coordinate or a landmark's distance from the object containing the script in the current region or across the entire Second Life grid.
+
+## Examples
+
+### Map Destination Example
+
+Open map for owner to the first landmark in object inventory on touch. Note: this must be in an attached object (llMapDestination requirement for non-touch use).
+
+```lsl
+key vgKeyOwner;
+
+default
+{
+  touch_start( integer vIntNull )
+  {
+    if (llDetectedKey( 0 ) == vgKeyOwner)
+    {
+      integer vIntLMcount = llGetInventoryNumber( INVENTORY_LANDMARK );
+      // Make sure we have a landmark in inventory
+      if (vIntLMcount)
+      {
+        llRequestInventoryData( llGetInventoryName( INVENTORY_LANDMARK, 0 ) );
+      }
+    }
+  }
+
+  dataserver( key vKeyNull, string vStrData )
+  {
+    // Because we don't know who touched us in this event, this
+    // only works for the owner when called from the dataserver
+    llMapDestination( llGetRegionName(), (vector)vStrData, ZERO_VECTOR );
+  }
+
+  on_rez( integer vIntNull )
+  {
+    llResetScript();
+  }
+
+  state_entry()
+  {
+    vgKeyOwner = llGetOwner();
+  }
+}
+```
+
+### Sit Teleporter Example
+
+An easily-configurable teleporter that sets its destination by getting it from a landmark in the prim's inventory. Note: this teleporter is subject to the 300m distance limit for llSitTarget.
+
+This script:
+- On state entry, requests inventory data and sets text for first landmark found in inventory (complains if none)
+- On getting data, sets sit target
+- On change in inventory, resets script
+- On sit, teleports the person and unsits
+
+```lsl
+key requestid;
+
+default
+{
+    state_entry()
+    {
+        // Complain if there are no landmarks
+        if (llGetInventoryNumber(INVENTORY_LANDMARK) == 0)
+        {
+            llSay(0, "There are no landmarks in me. You need to put a landmark in me for me to work.");
+        }
+        else
+        {
+            // Set floating text according to the landmark name
+            llSetText("Teleport to " + llGetInventoryName(INVENTORY_LANDMARK, 0), <1.0, 1.0, 1.0>, 1.0);
+            // Request the landmark data
+            requestid = llRequestInventoryData(llGetInventoryName(INVENTORY_LANDMARK, 0));
+        }
+    }
+
+    dataserver(key id, string data)
+    {
+        if (id == requestid)
+        {
+            // Data will be in vector format
+            rotation rot = ZERO_ROTATION / llGetRot();
+            vector dest = (vector)data;
+            vector offset = (dest - llGetPos()) * rot;
+            llSitTarget(offset, rot);
+        }
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK)
+        {
+            // It was a link change
+            llSleep(0.5); // llUnSit works better with this delay
+            key user = llAvatarOnSitTarget();
+            if (user)
+            {
+                // Somebody is sitting on me
+                llUnSit(user); // Unsit them
+            }
+        }
+        // When doing "ifs" on bitwise things, it's best to do them separate instead of using else..if,
+        // in case you hit the one in a billion chance when the inventory and link changes are reported in the same event.
+        if (change & CHANGED_INVENTORY)
+        {
+            // Reset on inventory change, so people don't have to manually reset when they add a new landmark
+            llResetScript();
+        }
+    }
+
+    on_rez(integer param)
+    {
+        llResetScript();
+    }
+}
+```
+
+## See Also
+
+- [llMapDestination](../llmapdestination/)
+- dataserver event
+
+<WikiAttribution />

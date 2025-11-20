@@ -1,0 +1,59 @@
+---
+title: llBase64ToString
+description: >-
+  Converts a Base64 string to a conventional string.
+
+  If the conversion creates any unprintable characters, they are converted to
+  question marks.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llBase64ToString" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Basic example:
+
+```lsl
+default {
+    state_entry()
+    {
+        string test = llBase64ToString("U2VjcmV0Ok9wZW4=");
+        llSay(0, test);
+    }
+}
+```
+
+Decoding a Base64 string:
+
+```lsl
+llBase64ToString("U2VjcmV0Ok9wZW4="); //will return the string "Secret:Open"
+```
+
+### Basic Authentication
+
+This function can be used in Basic Access Authentication headers:
+
+```
+GET / HTTP/1.1
+User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.2)
+Host: www.example.com
+Authorization: Basic U2VjcmV0Ok9wZW4=
+```
+
+## Caveats
+
+- If the conversion creates any unprintable characters, they are converted to spaces.
+- Converts invalid characters into question marks (?).
+
+## See Also
+
+- [llStringToBase64]
+- [llBase64ToInteger]
+- [llXorBase64] - Article also discusses xor based Cryptography
+
+<WikiAttribution />

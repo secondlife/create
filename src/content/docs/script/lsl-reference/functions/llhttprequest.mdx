@@ -1,0 +1,184 @@
+---
+title: llHTTPRequest
+description: >-
+  Sends an HTTP request to the specified URL with the Body of the request and
+  Parameters.
+
+  Returns a key that is a handle identifying the HTTP request made.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llHTTPRequest" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic HTTP Request
+
+```lsl
+key http_request_id;
+
+default
+{
+    state_entry()
+    {
+        http_request_id = llHTTPRequest("url", [], "");
+    }
+
+    http_response(key request_id, integer status, list metadata, string body)
+    {
+        if (request_id != http_request_id) return;// exit if unknown
+
+        vector COLOR_BLUE = <0.0, 0.0, 1.0>;
+        float  OPAQUE     = 1.0;
+
+        llSetText(body, COLOR_BLUE, OPAQUE);
+    }
+}
+```
+
+### PHP Wrapper for Header Parsing
+
+```php
+<?php
+    // Author Waster Skronski.
+    // General Public License (GPL).
+    // Mind that some headers are not included because they're either useless or unreliable.
+
+    $USE_APACHE_HEADERS = TRUE;// switch to false if you need CGI methods
+
+    if ($USE_APACHE_HEADERS)
+    {
+        $headers    = apache_request_headers();
+        $objectgrid = $headers["X-SecondLife-Shard"];
+        $objectname = $headers["X-SecondLife-Object-Name"];
+        $objectkey  = $headers["X-SecondLife-Object-Key"];
+        $objectpos  = $headers["X-SecondLife-Local-Position"];
+        $ownerkey   = $headers["X-SecondLife-Owner-Key"];
+        $ownername  = $headers["X-SecondLife-Owner-Name"];
+        $regiondata = $headers["X-SecondLife-Region"];
+        $regiontmp  = explode ("(",$regiondata);        // cut coords off
+        $regionpos  = explode (")",$regiontmp[1]);
+        $regionname = substr($regiontmp[0],0,-1);       // cut last space from region name
+    } else {
+        $db         = $GLOBALS;
+        $headers    = $db['$_ENV'];
+        $objectgrid = $headers["HTTP_X_SECONDLIFE_SHARD"];
+        $objectname = $headers["HTTP_X_SECONDLIFE_OBJECT_NAME"];
+        $objectkey  = $headers["HTTP_X_SECONDLIFE_OBJECT_KEY"];
+        $ownerkey   = $headers["HTTP_X_SECONDLIFE_OWNER_KEY"];
+        $objectpos  = $headers["HTTP_X_SECONDLIFE_LOCAL_POSITION"];
+        $ownername  = $headers["HTTP_X_SECONDLIFE_OWNER_NAME"];
+        $regiondata = $headers["HTTP_X_SECONDLIFE_REGION"];
+        $regiontmp  = explode ("(",$regiondata);
+        $regionpos  = explode (")",$regiontmp[1]);
+        $regionname = substr($regiontmp[0],0,-1);
+    }
+?>
+```
+
+### PHP Wrapper for GoDaddy and Non-Apache Servers
+
+```php
+<?php
+// FETCH HEADERS START
+
+if (!function_exists('apache_request_headers'))
+{
+    function apache_request_headers() {
+        foreach($_SERVER as $key=>$value) {
+            if (substr($key,0,5)=="HTTP_") {
+                $key=str_replace(" ","-",ucwords(strtolower(str_replace("_"," ",substr($key,5)))));
+                $out[$key]=$value;
+            }else{
+                $out[$key]=$value;
+            }
+        }
+        return $out;
+    }
+}
+// Mind that some headers are not included because they're either useless or unreliable
+$headers    = apache_request_headers();
+$objectgrid = $headers["X-Secondlife-Shard"];
+$objectname = $headers["X-Secondlife-Object-Name"];
+$objectkey  = $headers["X-Secondlife-Object-Key"];
+$objectpos  = $headers["X-Secondlife-Local-Position"];
+$ownerkey   = $headers["X-Secondlife-Owner-Key"];
+$ownername  = $headers["X-Secondlife-Owner-Name"];
+$regiondata = $headers["X-Secondlife-Region"];
+$regiontmp  = explode ("(",$regiondata);            // cut coords off
+$regionname = substr($regiontmp[0],0,-1);           // cut last space from region name
+$regiontmp  = explode (")",$regiontmp[1]);
+$regionpos  = $regiontmp[0];
+
+// FETCH HEADERS END
+?>
+```
+
+## Caveats
+
+- Spaces, control characters, and other characters that are not allowed in URLs will cause a runtime error.
+- The corresponding `http_response` event will be triggered in all scripts in the prim, not just in the requesting script.
+- Requests must fully complete after 60 seconds, or else the response will be thrown away and the `http_response` status code will be 499.
+- The response body is limited to 2048 bytes by default. See `HTTP_BODY_MAXLENGTH` to increase it. If the response is longer, it will be truncated.
+- The request body size (e.g., of POST and PUT requests) is limited only by available script memory. Scripts can hold at most 32k characters in a string under Mono (as characters are two bytes each), so scripts cannot upload over 32k UTF-8 characters.
+- Cannot be used to load textures or images from the internet.
+- If the accessed site is relying on the LSL script to report L$ transactions, it **must** check the `X-SecondLife-Shard` header to see if the script is running on the beta grid.
+- Some servers will return a 405 error if you send POST to a file that can't accept metadata, such as a text or HTML file. Use the GET method to ensure success in any environment.
+- While the HTTP status code from the server is provided to the script, redirect codes such as 302 will result in the redirect being automatically and transparently followed **only if** the `HTTP_METHOD` is GET. For other methods, you'll get back an `http_response` with status code 302 but without access to headers to see where you were being redirected.
+- When appending a query string to a cap URL, there **must** be a trailing slash between the cap guid and the query string token `?`. For example: `https://sim.lindenlab.com:12043/cap/guid/?arg=value` (with slash) will succeed, while `https://sim.lindenlab.com:12043/cap/guid?arg=value` (without slash) will return a 500 error.
+- `X-SecondLife-Owner-Name` may return `"(Loading...)"` instead of the actual owner name.
+- Requests made at approximately 0625 SLT may fail with a 503 status code due to nightly maintenance and log rotation. This is expected behavior and the interruption is usually brief.
+- Use `HTTP_MIMETYPE` to set the `Content-Type` header. Attempts to use `HTTP_CUSTOM_HEADER` to set it will cause a runtime script error.
+- If the origin server does not include a content-type header in its response, LSL will attempt to treat the incoming data as `"text/plain; charset=utf-8"`.
+
+## Throttling
+
+`llHTTPRequest` is throttled in three ways: by object, by owner, and by HTTP error. All group-owned objects are considered together in the same throttle.
+
+**Current Limits:**
+
+- 25 requests in 20 seconds for each object
+- 1000 requests in 20 seconds for each owner (with higher limits for some regions)
+- Five HTTP errors (500 or higher) in 60 seconds for each script
+
+When a script calls `llHTTPRequest` with a throttle blocking the request, it will return `NULL_KEY`.
+
+**Best Practices for Throttle Management:**
+
+- Check for the `NULL_KEY` result and react properly for the script and object to function correctly.
+- Pause further requests until the throttle clears.
+- Do not make any additional `llHTTPRequest` calls until enough time has passed for the throttle to reset. They will fail and continue to return `NULL_KEY` otherwise.
+- Once reached, throttles will remain in effect as long as requests continue, but will clear if there is a silent period with no requests for at least twice the throttle interval (typically 40 seconds for the 20-second interval).
+- Consider how a group of objects behaves. When multiple objects will interact, determine how that will affect clearing the throttle.
+- With a large number of objects in a region making requests, broadcast a region-wide chat message to other objects when the throttle is encountered, informing them to stop their requests. Continuing to make requests will just prolong recovery.
+- If an object waits and still gets a failure, increase the time before the next request and/or add a small random value to the wait time. This helps prevent failures caused by large groups of objects acting nearly in unison.
+- Object requests are throttled at approximately 25 requests per 20 seconds, supporting a sustained rate of one per second or a maximum burst of up to 25 every 40 seconds.
+
+## Notes
+
+**User Agent Recognition:**
+
+You may find that some web servers return null or nonsensical results when `llHTTPRequest` is used, even though the same URL in a web browser returns the expected result. This may be because the `llHTTPRequest` User Agent string is not recognized by some web servers as it does not contain `"Mozilla"`, which would identify it as a web browser instead of a Shoutcast or RSS client. This is also true when a PHP script relies on `$_COOKIE` - neither can `llHTTPRequest` set a cookie nor can `http_request` retrieve them.
+
+**CGI and PHP Header Handling:**
+
+CGI environments may place headers into variables by capitalizing the entire name, replacing dashes with underscores, and prefixing the name with `HTTP_`, e.g. `HTTP_X_SECONDLIFE_OBJECT_NAME`. PHP `$_SERVER` variables do this as well, and so does PHP running inside PHP-FPM (as opposed to an Apache module), which is the standard way to configure PHP on non-Apache webservers such as nginx.
+
+Apache can include headers in its logs using the `CustomLog` and `LogFormat` directives. See the Apache documentation for details on the syntax.
+
+**Default Content-Type Handling:**
+
+If you're unable to parse a known good RSS feed or other web contents while using `llHTTPRequest` or `http_response`, you may need to work around it outside of Second Life. This is unlikely to change in the near future since checking headers requires more overhead at the simulator level.
+
+## See Also
+
+- `http_response` event
+- [`llEscapeURL()`](../llescapeurl/)
+- [`llHTTPResponse()`](../llhttpresponse/)
+- [`llUnescapeURL()`](../llunescapeurl/)
+
+<WikiAttribution />

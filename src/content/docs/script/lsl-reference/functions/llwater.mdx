@@ -1,0 +1,42 @@
+---
+title: llWater
+description: Returns the water height below the object position + Offset.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llWater" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Makes the object land on ground or on water
+FindGroundOrWater()
+{
+    vector vTarget = llGetPos();
+    vTarget.z = llGround( ZERO_VECTOR );
+    float fWaterLevel = llWater( ZERO_VECTOR );
+    if( vTarget.z < fWaterLevel )
+        vTarget.z = fWaterLevel;
+    llSetRegionPos(vTarget);
+}
+
+default
+{
+    touch_start(integer total_number)
+    {
+        FindGroundOrWater();
+    }
+}
+```
+
+## See Also
+
+- [llGround](../llground/)
+- [llWind](../llwind/)
+- [llCloud](../llcloud/)
+
+<WikiAttribution />

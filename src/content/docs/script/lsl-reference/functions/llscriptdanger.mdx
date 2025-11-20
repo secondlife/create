@@ -1,0 +1,26 @@
+---
+title: llScriptDanger
+description: >-
+  Returns TRUE if Position is over public land, sandbox land, land that doesn't
+  allow everyone to edit and build, or land that doesn't allow outside scripts.
+
+  Returns true if the position is over public land, land that doesn't allow
+  everyone to edit and build, or land that doesn't allow outside scripts.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llScriptDanger" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The usefulness of this function is limited as it does not give the reason why the script would be in danger. `llGetParcelFlags` on the other hand can be used in much the same way and gives more detailed information.
+
+## See Also
+
+- [llGetParcelFlags](../llgetparcelflags/)
+
+<WikiAttribution />

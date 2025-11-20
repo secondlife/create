@@ -1,0 +1,60 @@
+---
+title: llOrd
+description: Returns the unicode value of the indicated character in the string.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llOrd" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        string test_string = "The quick brown fox jumped over the lazy dog";
+        list test_list = [];
+        string test_string2 = "";
+
+        integer index;
+        integer ord;
+        for (index = 0; index < llStringLength(test_string); ++index)
+        {
+            ord = llOrd(test_string, index);
+            test_list = test_list + [ ord ];
+        }
+
+        string char;
+        for (index = 0; index < llGetListLength(test_list); ++index)
+        {
+            ord = llList2Integer(test_list, index);
+            char = llChar(ord);
+            test_string2 = test_string2 + char;
+        }
+
+        llSay(0, "\"" + test_string + "\" -> [" +
+            llDumpList2String(test_list, ", ") + "] -> \"" + test_string2 + "\"");
+    }
+}
+```
+
+This example demonstrates converting all characters in a string to their ordinal values, storing them in a list, then converting them back to characters to reconstruct the original string.
+
+## Notes
+
+- Returns the UTF-32 value of the character at the specified index
+- If the index is outside the bounds of the string, this function returns 0
+- This function is the inverse of `llChar`, which converts an ordinal value back to a character
+
+## See Also
+
+- [llChar](/script/reference/lsl/functions/llchar/) - Convert an ordinal into a character
+- [llHash](/script/reference/lsl/functions/llhash/) - Calculate a 32-bit hash for a string
+- [llStringLength](/script/reference/lsl/functions/llstringlength/) - Get the length of a string
+
+<WikiAttribution />

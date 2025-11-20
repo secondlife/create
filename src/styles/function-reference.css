@@ -1,0 +1,204 @@
+/**
+ * Shared styles for function reference components (LSL and Lua)
+ */
+
+.function-header {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.badge-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-info {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.function-signature {
+  border-left: 4px solid var(--sl-color-accent);
+  margin: 0.5rem 0;
+  border-radius: 0.25rem;
+  overflow-x: auto;
+}
+
+.function-signature :global(pre) {
+  margin: 0;
+  padding: 0.75rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.function-signature :global(code) {
+  font-size: 1rem;
+  font-family: var(--__sl-font-mono);
+  white-space: nowrap;
+}
+
+.function-description {
+  margin: 0.75rem 0;
+  line-height: 1.6;
+}
+
+.function-parameters dl {
+  margin: 0;
+}
+
+.function-parameters dt {
+  font-weight: 600;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.function-parameters dt:first-of-type {
+  margin-top: 0;
+}
+
+.param-type {
+  color: var(--sl-color-text-accent);
+  font-weight: normal;
+  font-size: 0.875rem;
+}
+
+.function-parameters dd {
+  margin: 0.25rem 0 0 1.5rem;
+  color: var(--sl-color-gray-2);
+}
+
+.function-metadata ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.function-metadata li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.function-metadata li:last-child {
+  border-bottom: none;
+}
+
+.function-metadata-details {
+  margin-top: 1rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.5rem;
+  padding: 0;
+}
+
+.function-metadata-details summary {
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+
+.function-metadata-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.function-metadata-details summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: transform 0.2s;
+  font-size: 0.875rem;
+}
+
+.function-metadata-details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.function-metadata-details summary:hover {
+  background-color: var(--sl-color-bg-sidebar);
+}
+
+.function-metadata-details .function-metadata {
+  padding: 0 0.75rem 0.75rem;
+}
+
+.function-parameters-details {
+  margin-top: 1rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.5rem;
+  padding: 0;
+}
+
+.function-parameters-details summary {
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+
+.function-parameters-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.function-parameters-details summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: transform 0.2s;
+  font-size: 0.875rem;
+}
+
+.function-parameters-details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.function-parameters-details summary:hover {
+  background-color: var(--sl-color-bg-sidebar);
+}
+
+.function-parameters-details .function-parameters {
+  padding: 0 0.75rem 0.75rem;
+}
+
+.content-attribution {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sl-color-hairline-light);
+  color: var(--sl-color-gray-3);
+  font-size: 0.875rem;
+}
+
+.content-attribution p {
+  margin: 0;
+}
+
+.content-attribution a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--sl-color-hairline);
+}
+
+.content-attribution a:hover {
+  color: var(--sl-color-text-accent);
+  text-decoration-color: var(--sl-color-text-accent);
+}

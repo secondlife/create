@@ -1,0 +1,24 @@
+---
+title: llSetVehicleVectorParam
+description: |-
+  Sets a vehicle vector parameter.
+  Valid parameters can be found in the wiki documentation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetVehicleVectorParam" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- `VEHICLE_ANGULAR_MOTOR_DIRECTION` may conflict with any active `llTargetOmega` set in the root prim and prevent vehicle turns. Call `llTargetOmega` with a gain of 0 to disable it.
+
+## See Also
+
+- [llSetVehicleFloatParam](../llsetvehiclefloatparam/)
+- [llSetVehicleRotationParam](../llsetvehiclerotationparam/)
+
+<WikiAttribution />

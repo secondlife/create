@@ -1,0 +1,222 @@
+---
+title: llLinksetDataFindKeys
+description: >-
+  Returns a list of keys from the linkset's data store matching the search
+  parameter.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLinksetDataFindKeys" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The `llLinksetDataFindKeys` function returns a list of up to `count` keys from the datastore that match the specified `pattern`, starting at the one indicated by `start`. If `count` is less than 1, all keys between `start` and the end which match the pattern are returned. If `count` minus `start` exceeds the number of matching keys, the returned list will be shorter than `count`, down to a zero-length list if `start` equals or exceeds the number of matching keys. The list is ordered alphabetically.
+
+The `pattern` parameter is a [regular expression](https://en.wikipedia.org/wiki/Regular_expression).
+
+## Examples
+
+### Basic Pagination Example
+
+When a pattern matches multiple keys, `start` can be used to skip over some of the first matches:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llLinksetDataWrite("ThingA_config", "value");
+        llLinksetDataWrite("ThingA_data",   "value");
+        llLinksetDataWrite("ThingB_config", "value");
+        llLinksetDataWrite("ThingB_data",   "value");
+        llLinksetDataWrite("ThingC_config", "value");
+        llLinksetDataWrite("ThingC_data",   "value");
+        list keys;
+
+        // Return 1 key starting from the first match.
+        keys = llLinksetDataFindKeys("Thing", 0, 1);
+        llOwnerSay(llList2CSV(keys)); // ThingA_config
+
+        // Return 1 key after skipping the first 3 matches.
+        keys = llLinksetDataFindKeys("Thing", 3, 1);
+        llOwnerSay(llList2CSV(keys)); // ThingB_data
+
+        // Return up to 10 keys after skipping the first match.
+        keys = llLinksetDataFindKeys("_data", 1, 10);
+        llOwnerSay(llList2CSV(keys)); // ThingB_data, ThingC_data
+    }
+}
+```
+
+### Finding UUID Keys
+
+The following regular expression can be used to find UUID keys (such as those used to identify user UUIDs):
+
+```lsl
+list keysFound = llLinksetDataFindKeys("(?i)^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$", 0, 0);
+```
+
+Alternative pattern for case-sensitive UUID matching:
+
+```lsl
+list keysFound = llLinksetDataFindKeys("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", 0, 0);
+```
+
+### Blacklist Management Example
+
+This script demonstrates using `llLinksetDataFindKeys` for managing a blacklist of blocked avatars:
+
+```lsl
+integer gDialogChannel;
+integer gDialogHandle;
+integer gManagingBlocks;
+
+startDialog(key person)
+{
+    gManagingBlocks = 0;
+    gDialogHandle = llListen(gDialogChannel, "", person, "");
+    llDialog(person, "\nSelect action", ["List blocks", "Add block", "Remove block"], gDialogChannel);
+    llSetTimerEvent(60);
+}
+
+stopDialog()
+{
+    llSetTimerEvent(0);
+    llListenRemove(gDialogHandle);
+}
+
+default
+{
+
+    on_rez(integer sp)
+    {
+        llResetScript();
+    }
+
+    state_entry()
+    {
+        gDialogChannel = (integer)(llFrand(-10000000)-10000000);
+        llListen(PUBLIC_CHANNEL, "", NULL_KEY, "");;
+    }
+
+    timer()
+    {
+        stopDialog();
+    }
+
+    touch_start(integer nd)
+    {
+        key toucherKey = llDetectedKey(0);
+        if (toucherKey == llGetOwner())
+        {
+            startDialog(toucherKey);
+        }
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+
+        if (llGetAgentSize(id) == ZERO_VECTOR)
+        {
+            return;
+        }
+
+        if (channel == gDialogChannel)
+        {
+            stopDialog();
+            if (gManagingBlocks)
+            {
+                message = llStringTrim(message, STRING_TRIM);
+                if ((key)message)
+                {
+                    if (gManagingBlocks == 1)
+                    {
+                        llOwnerSay("Addition request has been sent to the blacklist storage");
+                        llLinksetDataWrite("blocklist:" + message, "1");
+                    }
+                    else
+                    {
+                        llOwnerSay("Removal request has been sent to the blacklist storage.");
+                        llLinksetDataDelete("blocklist:" + message);
+                    }
+                }
+                else
+                {
+                    llOwnerSay("The UUID '" + message + "' appears to be invalid.");
+                }
+                startDialog(id);
+            }
+            else if (message == "List blocks")
+            {
+                list blocks = llLinksetDataFindKeys("^blocklist:", 0, 0);
+                integer listLength = llGetListLength(blocks);
+                llOwnerSay("Blacklist items: " + (string)listLength);
+                integer i;
+                while (i < listLength)
+                {
+                    string record = llGetSubString(llList2String(blocks, i), 10, -1);
+                    llOwnerSay("- secondlife:///app/agent/" + record + "/about" + " - " + record);
+                    ++i;
+                }
+                blocks = [];
+                startDialog(id);
+            }
+            else if (message == "Add block" || message == "Remove block")
+            {
+                string label = "add to";
+                gManagingBlocks = 1;
+                if (message == "Remove block")
+                {
+                    gManagingBlocks = 2;
+                    label = "remove from";
+                }
+                gDialogHandle = llListen(gDialogChannel, "", id, "");
+                llTextBox(id, "\nPlease specify one single avatar UUID you'd like to " + label + " the blacklist storage.", gDialogChannel);
+                llSetTimerEvent(60);
+            }
+            return;
+        }
+
+        if (llGetListLength(llLinksetDataFindKeys("blocklist:" + (string)id, 0, 1)) > 0)
+        {
+            llRegionSayTo(id, 0, "You're blacklisted.");
+            return;
+        }
+
+        llRegionSayTo(id, 0, "Hello there, secondlife:///app/agent/" + (string)id + "/about - your message: " + message);
+
+    }
+
+    linkset_data(integer action, string name, string value)
+    {
+        if (action == LINKSETDATA_RESET || action == LINKSETDATA_DELETE || action == LINKSETDATA_UPDATE)
+        {
+            llOwnerSay("Blacklist storage modified.");
+        }
+    }
+
+}
+```
+
+## Caveats
+
+- **Memory Warning**: Keep track of how many results will be returned, as too many can overwhelm script memory and cause a stack-heap crash. This is especially important when using patterns that match many keys or when requesting all results with `count < 1`.
+
+## See Also
+
+- [llLinksetDataAvailable](../lllinksetdataavailable/)
+- [llLinksetDataCountKeys](../lllinksetdatacountkeys/)
+- [llLinksetDataDelete](../lllinksetdatadelete/)
+- [llLinksetDataDeleteProtected](../lllinksetdatadeleteprotected/)
+- [llLinksetDataListKeys](../lllinksetdatalistkeys/)
+- [llLinksetDataRead](../lllinksetdataread/)
+- [llLinksetDataReadProtected](../lllinksetdatareadprotected/)
+- [llLinksetDataReset](../lllinksetdatareset/)
+- [llLinksetDataWrite](../lllinksetdatawrite/)
+- [llLinksetDataWriteProtected](../lllinksetdatawriteprotected/)
+
+<WikiAttribution />

@@ -1,0 +1,47 @@
+---
+title: llLoopSound
+description: >-
+  Plays specified Sound, looping indefinitely, at Volume (0.0 - 1.0).
+
+  Only one sound may be attached to an object at a time.
+
+  A second call to llLoopSound with the same key will not restart the sound, but
+  the new volume will be used. This allows control over the volume of already
+  playing sounds.
+
+  Setting the volume to 0 is not the same as calling llStopSound; a sound with 0
+  volume will continue to loop.
+
+  To restart the sound from the beginning, call llStopSound before calling
+  llLoopSound again.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLoopSound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+llLoopSound("ambient.wav", 0.5);
+```
+
+## Caveats
+
+- A call to `llLoopSound` replaces any other sound, so only one sound can be played at the same time from the same prim. Exception: sounds started with the deprecated `llSound` which always plays sound files to the end. An object can play 2 sounds with `llLoopSound` if the function is called from different prims.
+- If a second call to loop the same sound at a different volume is made from within the same script, no volume change is made. Call `llStopSound` just before the second call to enable a volume change with no discernible pause.
+- When called from a HUD attachment, the sound is only heard by the agent the task is attached to.
+
+## See Also
+
+- [llLoopSoundMaster](../llloopsoundmaster/)
+- [llLoopSoundSlave](../llloopsoundslave/)
+- [llStopSound](../llstopsound/)
+- [llPlaySound](../llplaysound/)
+- [llTriggerSound](../lltriggersound/)
+- [llTriggerSoundLimited](../lltriggersoundlimited/)
+
+<WikiAttribution />

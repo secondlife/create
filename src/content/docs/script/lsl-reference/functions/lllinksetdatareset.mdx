@@ -1,0 +1,52 @@
+---
+title: llLinksetDataReset
+description: Resets the linkset's data store, erasing all key-value pairs.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLinksetDataReset" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function erases all name-value pairs stored in the linkset's datastore. When called, it triggers the `linkset_data` event in all scripts running in the linkset with an action of `LINKSETDATA_RESET`.
+
+## Caveats
+
+- **Irreversible:** This will delete all keys, including those that were created by `llLinksetDataWriteProtected`. The deletion cannot be undone.
+- **Warning:** Use with caution, as this operation is permanent.
+
+## Examples
+
+The following code demonstrates how to delete all keys in linkset data:
+
+```lsl
+// Removes all the keys in linksetdata without a saving throw.
+// Warning: This will delete protected keys and is irreversible.
+// -- Madi Melodious --
+
+default
+{
+    state_entry()
+    {
+       llLinksetDataReset();
+    }
+}
+```
+
+## See Also
+
+- [llLinksetDataAvailable](../lllinksetdataavailable/)
+- [llLinksetDataCountKeys](../lllinksetdatacountkeys/)
+- [llLinksetDataDelete](../lllinksetdatadelete/)
+- [llLinksetDataDeleteFound](../lllinksetdatadeletefound/)
+- [llLinksetDataFindKeys](../lllinksetdatafindkeys/)
+- [llLinksetDataListKeys](../lllinksetdatalistkeys/)
+- [llLinksetDataRead](../lllinksetdataread/)
+- [llLinksetDataWrite](../lllinksetdatawrite/)
+- linkset_data event
+
+<WikiAttribution />

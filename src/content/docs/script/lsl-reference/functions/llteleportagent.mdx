@@ -1,0 +1,173 @@
+---
+title: llTeleportAgent
+description: >-
+  Requests a teleport of avatar to a landmark stored in the object's inventory.
+  If no landmark is provided (an empty string), the avatar is teleported to the
+  location position in the current region. In either case, the avatar is turned
+  to face the position given by look_at in local coordinates.
+
+  Requires the PERMISSION_TELEPORT permission. This function can only teleport
+  the owner of the object.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTeleportAgent" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- **This function can only teleport the owner of the object** (unless part of an Experience).
+- Teleports are throttled: no more than 10 teleports within 15 seconds.
+- Does not work in scripts within attached temporary objects. Error message: "Temporary attachments cannot request runtime permissions to teleport"
+- Sitting avatars cannot be teleported using this function. You must unsit them first.
+- This function does not override a parcel's teleport settings. If the parcel has a landing zone enabled, the avatar will be teleported there instead.
+- If the script is part of an experience that the avatar has granted permission to, this function may teleport them without being the owner and will override parcel teleport routing.
+- When `look_at` is treated as a direction (teleporting to another region), it should be a unit vector: `<llCos(angle), llSin(angle), 0.0>` where `angle` is the direction in radians from north.
+
+## Examples
+
+### Basic Example with Landmark
+
+This example teleports the owner to a landmark called "Destination" in the object's inventory:
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llRequestPermissions(llGetOwner(), PERMISSION_TELEPORT);
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if (PERMISSION_TELEPORT & perm)
+        {
+            llTeleportAgent(llGetPermissionsKey(), "Destination", ZERO_VECTOR, ZERO_VECTOR);
+        }
+    }
+}
+```
+
+### Basic Example Without Landmark
+
+This example teleports the owner to a specific position within the current region and faces them toward the center:
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llRequestPermissions(llGetOwner(), PERMISSION_TELEPORT);
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if (PERMISSION_TELEPORT & perm)
+        {
+            vector region_pos = <100, 130, 40>;
+            vector look_at = <128, 128, 40>;
+            llTeleportAgent(llGetPermissionsKey(), "", region_pos, look_at);
+        }
+    }
+}
+```
+
+### Using Experiences for Teleportation
+
+This example shows how to use an Experience to teleport avatars without requiring them to be the object owner. The script must be compiled with the "Use Experience" option enabled and an experience key you own selected. The prim must contain a landmark named "Landmark":
+
+```lsl
+default
+{
+    touch_start(integer n)
+    {
+        llRequestExperiencePermissions(llDetectedKey(0), "");
+    }
+
+    experience_permissions(key agent)
+    {
+        llTeleportAgent(agent, "Landmark", ZERO_VECTOR, ZERO_VECTOR);
+    }
+}
+```
+
+With an Experience, when a user without prior permissions touches the prim, they will be offered an invitation to join the experience. If accepted, they will be immediately teleported to the landmark destination.
+
+### Handling look_at for Cross-Region Teleports
+
+This example demonstrates proper handling of the `look_at` parameter based on whether the destination is in the current region or a different one. This ensures the avatar faces the same direction regardless of teleport type:
+
+```lsl
+string landmark;
+vector destination;
+
+default
+{
+    state_entry()
+    {
+        // Get data about the first landmark in object inventory when script starts.
+        if (llGetInventoryNumber(INVENTORY_LANDMARK) > 0) {
+            landmark = llGetInventoryName(INVENTORY_LANDMARK, 0);
+            llRequestInventoryData(landmark);
+        }
+    }
+
+    changed(integer change)
+    {
+        if (!(change & (CHANGED_INVENTORY|CHANGED_REGION))) return;
+
+        // Get data about the first landmark in object inventory when inventory changes.
+        if (llGetInventoryNumber(INVENTORY_LANDMARK) > 0) {
+            landmark = llGetInventoryName(INVENTORY_LANDMARK, 0);
+            llRequestInventoryData(landmark);
+        }
+    }
+
+    dataserver(key query, string data)
+    {
+        // Save llRequestInventoryData response.
+        destination = (vector)data;
+    }
+
+    touch_start(integer num_detected)
+    {
+        llRequestPermissions(llGetOwner(), PERMISSION_TELEPORT);
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if (!(PERMISSION_TELEPORT & perm)) return;
+
+        float angle = 45 * DEG_TO_RAD;
+
+        // When teleporting to another region, we need a direction vector.
+        vector look_at = <llCos(angle), llSin(angle), 0>;
+
+        float sim_size = llVecMag(<1,1,1>);
+        float distance = llVecDist(<1,1,1>, destination / 256);
+
+        if (distance < sim_size) {
+            // When teleporting within the current region, we should use a position within the region instead.
+            look_at = destination + look_at;
+        }
+
+        llTeleportAgent(llGetPermissionsKey(), landmark, ZERO_VECTOR, look_at);
+    }
+}
+```
+
+## Notes
+
+- The `look_at` parameter behaves differently depending on the teleport destination:
+  - **Same region**: Interpreted as a position within the region where the avatar should look.
+  - **Different region**: Interpreted as a unit direction vector indicating which way the avatar should face.
+- For regional teleports, ensure `look_at` is a proper unit vector to get consistent rotation behavior.
+
+## See Also
+
+- [llTeleportAgentGlobalCoords](../llteleportagentglobalcoords/)
+
+<WikiAttribution />

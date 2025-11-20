@@ -1,0 +1,163 @@
+---
+title: llGetListEntryType
+description: >-
+  Returns the type of the index entry in the list (TYPE_INTEGER, TYPE_FLOAT,
+  TYPE_STRING, TYPE_KEY, TYPE_VECTOR, TYPE_ROTATION, or TYPE_INVALID if index is
+  off list).
+
+  Returns the type of the variable at Index in ListVariable.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetListEntryType" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If a vector is stored in a list as `"<7,5,0>"` (as a string type, as opposed to `<7,5,0>` which is a vector type), its type will be returned as `TYPE_STRING`, not `TYPE_VECTOR`. The same applies for `"1"` being returned as a string instead of an integer, etc. There is no easy way to guess what the type should be from a string value.
+
+## Examples
+
+### Basic Usage
+
+```lsl
+string get_list_entry_type_info(integer inputInteger)
+{
+    if (inputInteger == TYPE_INTEGER)
+        return "integer";
+
+    else if (inputInteger == TYPE_FLOAT)
+        return "float";
+
+    else if (inputInteger == TYPE_STRING)
+        return "string";
+
+    else if (inputInteger == TYPE_KEY)
+        return "key";
+
+    else if (inputInteger == TYPE_VECTOR)
+        return "vector";
+
+    else if (inputInteger == TYPE_ROTATION)
+        return "rotation";
+
+    return "<!-- invalid type -->";
+}
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        list listOfStuff = [
+            <1.0, 2.0, 3.0, 4.0>,
+            <1.0, 2.0, 3.0>,
+            llGetKey(),
+            "some random text",
+            382.4,
+            1];
+
+        integer index = ~llGetListLength(listOfStuff);
+
+        // start with -length and end with -1
+        while (++index)
+        {
+            integer type = llGetListEntryType(listOfStuff, index);
+            string entry2string = llList2String(listOfStuff, index);
+
+            llSay(0, "'" + entry2string + "' has the list-entry-type: '" + get_list_entry_type_info(type) + "'");
+        }
+    }
+}
+```
+
+### List Serialization and Deserialization
+
+This function has two primary uses: serializing a list to a string and debugging.
+
+```lsl
+// A simple list serializer and deserializer.
+// This will round floats to 6 decimal places and not handle strings with embedded "|" characters
+
+string serialize(list input){
+    integer len = ~llGetListLength(input);
+    string build = (string)(~len);
+    while(++len)
+    {
+        build += "|" + (string) llGetListEntryType(input, len) +
+             "=" + llList2String(input, len);        //not safe if list item could contain "|" character
+    }
+    return build;
+}
+
+list deserialize(string input){
+    integer len = ~(integer)input;//the length is everything before the "|", which is where (integer) stops
+    list build = [];
+    list pair = llParseString2List(input, ["|"], []);
+    string value;
+    list replace;
+    while(++len)
+    {
+        integer type = (integer)(value = llList2String(pair, len));
+        value = llDeleteSubString(value, 0, llSubStringIndex(value, "="));
+        if (type == TYPE_INTEGER)
+            replace = [(integer)value];
+        else if (type == TYPE_FLOAT)
+            replace = [(float)value];
+        else if (type == TYPE_STRING )
+            replace = [value];
+        else if (type == TYPE_KEY)
+            replace = [(key)value];
+        else if (type == TYPE_VECTOR)
+            replace = [(vector)value];
+        else if (type == TYPE_ROTATION)
+            replace = [(rotation)value];
+        pair = llListReplaceList(pair, replace, len, len);
+    }
+    return pair;
+}
+```
+
+### List Dumper Utility
+
+The following snippet produces an LSL formatted dump of a list that can be pasted back into LSL:
+
+```lsl
+// A list dumper that produces an output suitable for pasting back into LSL as a variable initialization.
+string list_dump(list mylist)
+{
+    string output = "[";
+    integer i;
+    integer count = (mylist != [] );   // length of list (shorthand)
+    integer type;
+    for ( ; i < count; ++i)
+    {
+        if (i)
+            output += ",";
+        type = llGetListEntryType(mylist, i);
+        if (type == TYPE_KEY)
+            output += "(key)";
+        if (type == TYPE_STRING || type == TYPE_KEY)
+            output += "\"";
+        output += llList2String(mylist, i);
+        if (type == TYPE_STRING || type == TYPE_KEY)
+            output += "\"";
+    }
+    return (output + "]");
+}
+```
+
+For a more complex and robust list (de)serializer, see TightListType.
+
+## See Also
+
+- [llList2Float](../lllist2float/)
+- [llList2Integer](../lllist2integer/)
+- [llList2Key](../lllist2key/)
+- [llList2Rot](../lllist2rot/)
+- [llList2String](../lllist2string/)
+- [llList2Vector](../lllist2vector/)
+
+<WikiAttribution />

@@ -1,0 +1,67 @@
+---
+title: llGetLocalPos
+description: |-
+  Returns the position relative to the root.
+  Returns the local position of a child object relative to the root.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetLocalPos" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If called from the root prim, it returns the position in the region (unless the object is attached, in which case it returns the position relative to the attach point)
+- Returns the local position of a child prim relative to the root prim
+- There is no function to directly set the position of a prim local to itself
+
+## Examples
+
+### Basic Usage - Measuring Distance from Root
+
+```lsl
+default
+{
+    touch_start(integer vIntTouched)
+    {
+        string vStrMessage = "The touched prim is ";
+        if (llDetectedLinkNumber(0) > 1)
+        {
+            vStrMessage += (string)llVecMag(llGetLocalPos()) + "m from ";
+        }
+        llSay(0, vStrMessage + "the root prim");
+    }
+}
+```
+
+### Helper Function - Set Position Relative to Current Position
+
+If you need to set a prim's position relative to its current local position, you can use a helper function:
+
+```lsl
+SetPositionLocalToCurrentPosition(vector local_position)
+{
+    llSetPos(llGetLocalPos() + (local_position * llGetLocalRot()));
+}
+```
+
+Or alternatively using global position and rotation:
+
+```lsl
+SetPositionLocalToCurrentPosition(vector local_position)
+{
+    llSetPos(llGetPos() + (local_position * llGetRot()));
+}
+```
+
+## See Also
+
+- [llGetRootPosition](llGetRootPosition) - Gets the root prim's global position
+- [llGetPos](llGetPos) - Gets the prim's global position
+- [llSetPos](llSetPos) - Sets the prim's global position
+- [llGetLocalRot](llGetLocalRot) - Gets the prim's local rotation
+
+<WikiAttribution />

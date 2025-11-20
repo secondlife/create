@@ -1,0 +1,28 @@
+---
+title: llSetLinkCamera
+description: >-
+  Sets the camera eye offset, and the offset that camera is looking at, for
+  avatars that sit on the linked prim.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLinkCamera" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Setting this will not update the cameras of seated avatars; it will only affect avatars that subsequently sit down. The camera settings have to be prepared in advance.
+- The offsets `at` and `eye` are locally relative to the prim. If you want them relative to the seated avatar (which likely has a custom sit rotation and offset) or the region, you must do the computation yourself.
+- Camera position and focus set by this function is a **Prim Property**. It will survive the script and it will survive prim taking and prim rezzing.
+
+## See Also
+
+- [llSetCameraAtOffset](../llsetcameraatoffset/)
+- [llSetCameraEyeOffset](../llsetcameraeyeoffset/)
+- [llForceMouselook](../llforcemouselook/)
+- [llSetCameraParams](../llsetcameraparams/)
+
+<WikiAttribution />

@@ -1,0 +1,104 @@
+---
+title: llHTTPResponse
+description: >-
+  Responds to an incoming HTTP request which was triggerd by an http_request
+  event within the script. HTTPRequestID specifies the request to respond to
+  (this ID is supplied in the http_request event handler).  Status and Body
+  specify the status code and message to respond with.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llHTTPResponse" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+string url;
+
+default
+{
+    changed(integer change)
+    {
+        if (change & (CHANGED_REGION_START | CHANGED_REGION | CHANGED_TELEPORT))
+            llResetScript();
+    }
+
+    state_entry()
+    {
+        llRequestURL();
+    }
+
+    touch_start(integer num_detected)
+    {
+    //  PUBLIC_CHANNEL has the integer value 0
+        if (url != "")
+            llSay(PUBLIC_CHANNEL, "URL: " + url);
+    }
+
+    http_request(key id, string method, string body)
+    {
+    //  http://en.wikipedia.org/wiki/Create,_read,_update_and_delete
+        list CRUDmethods = ["GET", "POST", "PUT", "DELETE"];
+    //  it's bit-wise NOT ( ~ ) !!!
+        integer isAllowedMethod = ~llListFindList(CRUDmethods, [method]);
+
+        if (isAllowedMethod)
+        {
+            llHTTPResponse(id, 200, "Body of request below:\n" + body);
+        }
+        else if (method == URL_REQUEST_GRANTED)
+        {
+        //  don't forget the trailing slash
+            url = body + "/";
+
+            llOwnerSay("URL: " + url);
+        }
+        else if (method == URL_REQUEST_DENIED)
+        {
+            llOwnerSay("Something went wrong, no URL.\n" + body);
+        }
+        else
+        {
+            llOwnerSay("Ummm... I have no idea what SL just did. Method=\""+method+"\"\n" + body);
+        }
+    }
+}
+```
+
+## Caveats
+
+- This call must be made by the script containing the `http_request` event where the request ID was received.
+- There is no limit, other than script size, to the amount of data that can be sent by this function.
+  - `llHTTPRequest` can truncate the response length in receiving scripts. Be aware when using them together for prim-to-prim communications.
+- The response by default has `content-type: text/plain`. Use `llSetContentType` to optionally return a different type, like `text/html`.
+- The response need not be made inside the `http_request` event, but if it does not happen in a timely fashion the request will time out (within 25 seconds).
+
+## Content Types
+
+Common content type constants:
+- `CONTENT_TYPE_TEXT`
+- `CONTENT_TYPE_HTML`
+- `CONTENT_TYPE_XML`
+- `CONTENT_TYPE_XHTML`
+- `CONTENT_TYPE_ATOM`
+- `CONTENT_TYPE_JSON`
+- `CONTENT_TYPE_LLSD`
+- `CONTENT_TYPE_FORM`
+- `CONTENT_TYPE_RSS`
+
+## See Also
+
+- [llGetFreeURLs](../llgetfreeurls/)
+- [llRequestURL](../llrequesturl/)
+- [llRequestSecureURL](../llrequestsecureurl/)
+- [llReleaseURL](../llreleaseurl/)
+- [llGetHTTPHeader](../llgethttpheader/)
+- [llSetContentType](../llsetcontenttype/)
+- `http_request` event
+- `http_response` event
+
+<WikiAttribution />

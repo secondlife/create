@@ -1,0 +1,72 @@
+---
+title: llAttachToAvatar
+description: |-
+  Attach to avatar at point AttachmentPoint.
+  Requires the PERMISSION_ATTACH runtime permission.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAttachToAvatar" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+//-- rez object on ground, drop in this script, it will request permissions to attach,
+//-- and then attach to the left hand if permission is granted. if permission is denied,
+//-- then the script complains.
+default
+{
+    state_entry()
+    {
+        llRequestPermissions( llGetOwner(), PERMISSION_ATTACH );
+    }
+
+    run_time_permissions( integer vBitPermissions )
+    {
+        if ( vBitPermissions & PERMISSION_ATTACH )
+            llAttachToAvatar( ATTACH_LHAND );
+        else
+            llOwnerSay( "Permission to attach denied" );
+    }
+
+    on_rez(integer rez)
+    {
+        if (!llGetAttached() )        //reset the script if it's not attached.
+            llResetScript();
+    }
+
+    attach(key id)
+    {
+        // The attach event is called on both attach and detach, but 'id' is only valid on attach
+        if (id)
+            llOwnerSay( "The object is attached to " + llKey2Name(id) );
+        else
+            llOwnerSay( "The object is not attached");
+    }
+}
+```
+
+## Caveats
+
+- Attach points can be occupied by multiple attachments. This was not always the case; previously if an attach point was occupied, the existing object was detached and the new attachment took its place.
+- Objects attached to the head (and any attachment position within the head) will not be visible in First Person view (Mouselook) if "show attachments in mouselook" is disabled.
+- If the attach point is zero but the object was never previously attached, it defaults to the right hand (ATTACH_RHAND).
+- If the object is already attached, the function fails silently, regardless of whether the attach point is different from its current attach point.
+
+## Notes
+
+- If the attach point is zero, the object attaches to the attach point it was most recently attached to.
+- The attach event fires on both attachment and detachment; the avatar key is only valid during attachment.
+
+## See Also
+
+- [llAttachToAvatarTemp] - Attach an object to any avatar but only temporarily
+- [llDetachFromAvatar] - Detaches the object from the avatar
+- [llGetAttached] - Gets the attach point number that the object is attached to
+- [attach] - Event fired when an object is attached or detached
+
+<WikiAttribution />

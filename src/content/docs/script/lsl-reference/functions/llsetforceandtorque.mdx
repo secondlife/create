@@ -1,0 +1,38 @@
+---
+title: llSetForceAndTorque
+description: >-
+  Sets the Force and Torque of object, in object-local coordinates if Local ==
+  TRUE (otherwise, the region reference frame is used).
+
+  Only works on physical objects.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetForceAndTorque" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If either value is ZERO_VECTOR, the function eliminates both forces. Both values must be non-zero for this function to work. (The workaround to this is setting both separately.)
+
+## Examples
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        llSetForceAndTorque( <0.0,0.0,5.0>, <1.0,0.0,0.0>, FALSE );
+    }
+}
+```
+
+## See Also
+
+- [llSetForce](../llsetforce/)
+- [llSetTorque](../llsettorque/)
+
+<WikiAttribution />

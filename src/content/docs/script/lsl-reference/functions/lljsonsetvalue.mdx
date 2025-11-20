@@ -1,0 +1,153 @@
+---
+title: llJsonSetValue
+description: >-
+  Returns a new JSON string that is the JSON given with the Value indicated by
+  Specifiers set to Value.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llJsonSetValue" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function returns a new JSON string which is the source JSON data with the value indicated by the specifiers list set to the provided value. If unsuccessful (usually due to an out-of-bounds array index), it returns `JSON_INVALID`.
+
+An "out of bounds array index" is defined as any integer specifier greater than the length of an existing array at that level, or greater than 0 when an array doesn't exist at that level.
+
+## Key Concepts
+
+### JSON_APPEND
+A special specifier, `JSON_APPEND`, appends the value to the end of an array at the specifiers level. **Caution**: If that level is not an array, the existing value will be overwritten and replaced with an array containing the value at index 0.
+
+### Negative Indexing
+Unlike lists and strings, **negative indexing of JSON arrays is not supported**.
+
+### Deleting Values
+To delete an existing value, use `JSON_DELETE` as the value parameter. Note that this will not prune empty objects or arrays at higher levels.
+
+### Boolean and Null Values
+If the value is `JSON_TRUE`, `JSON_FALSE`, or `JSON_NULL`, the value set will be the bare words `true`, `false`, or `null` respectively at the specifiers location.
+
+## Examples
+
+### Basic Value Changes
+
+```lsl
+string TEST_STRING_JSON = "[9,\"<1,1,1>\",false,{\"A\":8,\"Z\":9}]";
+
+// Change the first value in the array to 10
+string output = llJsonSetValue(TEST_STRING_JSON, [0], "10");
+// Result: [10,"<1,1,1>",false,{"A":8,"Z":9}]
+
+// Change the third value in the array to 'true'
+output = llJsonSetValue(TEST_STRING_JSON, [2], JSON_TRUE);
+// Result: [9,"<1,1,1>",true,{"A":8,"Z":9}]
+
+// Change the value of "A" within the JSON object to 3
+output = llJsonSetValue(TEST_STRING_JSON, [3, "A"], "3");
+// Result: [9,"<1,1,1>",false,{"A":3,"Z":9}]
+```
+
+### Adding Values
+
+```lsl
+string input = "[9,\"<1,1,1>\",false,{\"A\":8,\"Z\":9}]";
+
+// Add the value "Hello" to the end of the array (JSON_APPEND is preferred for adding)
+string output = llJsonSetValue(input, [JSON_APPEND], "Hello");
+// Result: [9,"<1,1,1>",false,{"A":8,"Z":9},"Hello"]
+
+// Add a new key-value pair "B":10 to the object
+output = llJsonSetValue(input, [3, "B"], "10");
+// Result: [9,"<1,1,1>",false,{"A":8,"B":10,"Z":9}]
+```
+
+### Escaping Quotes in String Values
+
+Double-quotes in string values are escaped. The following script inserts literal `string \"with\" quotes` instead of `string "with" quotes` as the JSON value:
+
+```lsl
+default {
+    state_entry() {
+        string test = "[\"a\"]";
+        string add = "string \"with\" quotes";
+        llOwnerSay(llJsonSetValue(test, [JSON_APPEND], add));
+    }
+}
+```
+
+## Caveats
+
+### Out of Bounds Assignment
+
+**Be careful when using this function.** Attempting to add a value to a position greater than the length of the array (which may be 0) will return `JSON_INVALID`. `JSON_APPEND` is always the preferred way to add to an array.
+
+```lsl
+// This returns JSON_INVALID (out of bounds)
+string output = llJsonSetValue(input, [5], "10");
+
+// This works because position 4 is in bounds (equivalent to JSON_APPEND)
+output = llJsonSetValue(input, [4], "10");
+```
+
+### Unintended Array/Object Creation
+
+Careless formation of nested structures can create unexpected results:
+
+```lsl
+// This creates deeply nested arrays: [9,"<1,1,1>",false,{"A":8,"Z":9},[[[10]]]]
+output = llJsonSetValue(input, [4, 0, 0, 0], "10");
+```
+
+### Overwriting Objects with Arrays
+
+Using `JSON_APPEND` on an object will overwrite it with an array:
+
+```lsl
+// This overwrites the object at index 3 with an array
+// Result: [9,"<1,1,1>",false,[10]]
+output = llJsonSetValue(input, [3, JSON_APPEND], "10");
+```
+
+### Overwriting Arrays with Objects
+
+Using a key string on an array will convert it to an object:
+
+```lsl
+// Converts array to object: {"X":10}
+output = llJsonSetValue(input, ["X"], "10");
+```
+
+### Handling Duplicate Keys
+
+If a JSON object has duplicate keys (allowable but not recommended), any change to that object will correct the condition, with all but the last key being removed:
+
+```lsl
+output = llList2Json(JSON_OBJECT, ["A", 1, "A", 2, "A", 3, "B", 4, "B", 4]);
+// Result: {"A":1,"A":2,"A":3,"B":4,"B":4} (with duplicates)
+
+// Making a modification removes duplicates:
+output = llJsonSetValue(output, ["Z"], "5");
+// Result: {"A":3,"B":4,"Z":5} (only last value of each duplicate key remains)
+```
+
+## Performance Notes
+
+**Note**: The following performance claim is unverified on modern simulator versions and should not be assumed as fact. Always test execution speed claims for yourself.
+
+- `llListReplaceList()` is roughly 2.8x as fast in replacing a single value of a list than `llJsonSetValue()` is to replace a single value in a JSON string.
+- The length of the list/JSON string is irrelevant for this comparison.
+
+## See Also
+
+- [llList2Json](../lllist2json/)
+- [llJson2List](../lljson2list/)
+- [llJsonGetValue](../lljsongetvalue/)
+- [llJsonValueType](../lljsonvaluetype/)
+- `Typecast` - Type conversion information
+
+<WikiAttribution />

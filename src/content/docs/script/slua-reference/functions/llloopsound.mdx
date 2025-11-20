@@ -1,0 +1,38 @@
+---
+title: llLoopSound
+description: >-
+  Plays specified Sound, looping indefinitely, at Volume (0.0 - 1.0).
+
+  Only one sound may be attached to an object at a time.
+
+  A second call to llLoopSound with the same key will not restart the sound, but
+  the new volume will be used. This allows control over the volume of already
+  playing sounds.
+
+  Setting the volume to 0 is not the same as calling llStopSound; a sound with 0
+  volume will continue to loop.
+
+  To restart the sound from the beginning, call llStopSound before calling
+  llLoopSound again.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llLoopSound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.LoopSound()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llLoopSound](/script/reference/lsl/functions/llLoopSound/)
+
+

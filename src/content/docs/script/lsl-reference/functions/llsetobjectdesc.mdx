@@ -1,0 +1,57 @@
+---
+title: llSetObjectDesc
+description: |-
+  Sets the description of the prim to Description.
+  The description field is limited to 127 characters.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetObjectDesc" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Changing the object description does not trigger a `changed` event.
+
+## Examples
+
+### Set this prim's description
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetObjectDesc("NEW PRIM DESCRIPTION");
+    }
+}
+```
+
+### Set the root prim's description
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetLinkPrimitiveParamsFast(LINK_ROOT,
+            [PRIM_DESC, "NEW ROOT PRIM DESCRIPTION"]);
+    }
+}
+```
+
+## Notes
+
+- Object descriptions are often used to store data that needs to be protected from script resets (see, for example, Prim Attribute Overloading). However, descriptions are not immutable and can be tampered with by users or other scripts, either intentionally or accidentally, so this method should only be considered a last resort for data storage.
+- `llLinksetDataWrite` and associated functions are generally better suited for storing data, because they allow for significantly more data storage and are much more secure against tampering.
+
+## See Also
+
+- [llGetObjectDesc](../llgetobjectdesc/)
+- [llGetObjectName](../llgetobjectname/)
+- [llSetObjectName](../llsetobjectname/)
+
+<WikiAttribution />

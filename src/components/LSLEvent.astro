@@ -1,0 +1,40 @@
+---
+/**
+ * LSLEvent component - Displays LSL event documentation
+ *
+ * This component loads event data from lsl_definitions.yaml at build time.
+ * It only requires the event name as a prop.
+ */
+
+import EventReference from './EventReference.astro';
+import { type Argument, getEvent }  from '../utils/lsl-definitions';
+
+export interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+
+// Load event definition from YAML
+const eventDef = getEvent(name);
+
+if (!eventDef) {
+  throw new Error(`Event "${name}" not found in lsl_definitions.yaml`);
+}
+
+// Build LSL event signature
+const signature = `${name}(${Object.values(eventDef.arguments).map((arg: Argument) => `${arg.type} ${arg.name}`).join(', ')})`;
+---
+
+<EventReference
+  name={name}
+  arguments={eventDef.arguments}
+  signature={signature}
+  language="lsl"
+  className="event-reference lsl-event-reference"
+  tooltip={eventDef.tooltip}
+  deprecated={eventDef.deprecated}
+  experience={eventDef.experience}
+  lindenExperience={eventDef.lindenExperience}
+  godMode={eventDef.godMode}
+/>

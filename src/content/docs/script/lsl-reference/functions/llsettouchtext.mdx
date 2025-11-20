@@ -1,0 +1,43 @@
+---
+title: llSetTouchText
+description: Displays Text in the viewer context menu that acts on a touch.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetTouchText" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetTouchText("Touch me!");
+    }
+    touch_start(integer detected)
+    {
+        llSay(0, "you touched me!");
+    }
+}
+```
+
+## Caveats
+
+- The text will only be displayed if set by a script calling this function in the root prim. If text is set by a script in a child prim, it will only display after unlinking or relinking as the root. If either a child or root prim is selected individually and right-clicked, the default "Touch" text will display even if a script in the root has set custom text. The text property will always be that of the root prim unless right-clicking a prim under individual edit mode, in which case the default text always appears.
+- Like particles and other set text functions, all text set via llSetTouchText becomes a property of the prim, not the script. The text will remain if the script that set it is deactivated or removed.
+- You have no control over the face, size, or color of the displayed text.
+- Text is limited to 9 characters (UTF-8 character set may result in fewer than 9 displayed characters).
+- To restore the default "Touch" value, use an empty string for text.
+- To make it appear as if there is no text, use whitespace characters for text.
+
+## See Also
+
+- [llSetSitText](../llsetsittext/)
+- Touch
+
+<WikiAttribution />

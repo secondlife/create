@@ -1,0 +1,37 @@
+---
+title: llListen
+description: >-
+  Creates a listen callback for Text on Channel from SpeakersName and SpeakersID
+  (SpeakersName, SpeakersID, and/or Text can be empty) and returns an identifier
+  that can be used to deactivate or remove the listen.
+
+  Non-empty values for SpeakersName, SpeakersID, and Text will filter the
+  results accordingly, while empty strings and NULL_KEY will not filter the
+  results, for string and key parameters respectively.
+
+  PUBLIC_CHANNEL is the public chat channel that all avatars see as chat text.
+  DEBUG_CHANNEL is the script debug channel, and is also visible to nearby
+  avatars. All other channels are are not sent to avatars, but may be used to
+  communicate with scripts.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llListen" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.Listen()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llListen](/script/reference/lsl/functions/llListen/)
+
+

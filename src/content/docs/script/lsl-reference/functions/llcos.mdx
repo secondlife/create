@@ -1,0 +1,43 @@
+---
+title: llCos
+description: Returns the cosine of Theta (Theta in radians).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCos" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Touch the object with this script in it to see the cosine of random numbers!
+default
+{
+    touch_start(integer num)
+    {
+        float r = llFrand(TWO_PI);
+        llOwnerSay("The cosine of " + (string)r + " in radians or " + (string)(r * RAD_TO_DEG) + " in degrees is " + (string)llCos(r));
+    }
+}
+```
+
+## Caveats
+
+Due to IEEE754 single-precision floating-point limitations:
+- `llCos(PI_BY_TWO)` returns `-4.371139E-8` (hex: `0xB33BBD2E`) instead of `0`
+- `llCos(PI/3.0)` returns `0.49999997` (hex: `0x3EFFFFFF`) instead of `0.5`
+
+Be aware of these precision issues when comparing cosine results to exact values.
+
+## See Also
+
+- [llSin](../llsin/)
+- [llAsin](../llasin/)
+- [llAcos](../llacos/)
+- [llTan](../lltan/)
+- [llAtan2](../llatan2/)
+
+<WikiAttribution />

@@ -1,0 +1,39 @@
+---
+title: llAsin
+description: Returns the arc-sine, in radians, of Value.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAsin" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Touch the object with this script in it to see the arcsine of random numbers!
+default
+{
+    touch_start(integer num)
+    {
+        float r = llFrand(2) - 1.0;
+        llOwnerSay("The arcsine of " + (string)r + " is " + (string)llAsin(r));
+    }
+}
+```
+
+## Caveats
+
+- The input value must fall in the range [-1.0, 1.0]
+- The returned value is in the range [-PI_BY_TWO, PI_BY_TWO] radians, or NaN (not a number) if the parameter is out of range
+- Triggers a Math Error for complex results if not compiled in Mono
+
+## See Also
+
+- [llSin](../llsin/)
+- [llCos](../llcos/)
+- [llTan](../lltan/)
+
+<WikiAttribution />

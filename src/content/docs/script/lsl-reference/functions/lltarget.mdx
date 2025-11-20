@@ -1,0 +1,71 @@
+---
+title: llTarget
+description: >-
+  This function is to have the script know when it has reached a position.
+
+  It registers a Position with a Range that triggers at_target and not_at_target
+  events continuously until unregistered.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTarget" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+integer target_id;
+vector target_pos;
+
+default
+{
+    state_entry()
+    {
+        target_pos = llGetPos() + <1.0, 0.0, 0.0>;
+        target_id = llTarget(target_pos, 0.5);
+    }
+    at_target(integer tnum, vector targetpos, vector ourpos)
+    {
+        if (tnum == target_id)
+        {
+            llOwnerSay("object is within range of target");
+            llOwnerSay("target position: " + (string)targetpos + ", object is now at: " + (string)ourpos);
+            llOwnerSay("this is " + (string)llVecDist(targetpos, ourpos) + " meters from the target");
+            llTargetRemove(target_id);
+        }
+    }
+    not_at_target()
+    {
+        llOwnerSay(
+            "not there yet - object is at " + (string)llGetPos() +
+            ", which is " + (string)llVecDist(target_pos, llGetPos()) +
+            " meters from the target (" + (string)target_pos + ")"
+        );
+    }
+}
+```
+
+## Caveats
+
+- The position always references the current region. If you set llTarget to \<100, 100, 100\> while in Region A and then move the object to region B, the target automatically becomes \<100, 100, 100\> in Region B.
+- The position can be set outside the region boundaries, but at_target can only happen if the range extends into the current region. The part of the range outside the current region will not activate at_target.
+- Only 8 targets can be active to a script. Additional llTarget will remove the oldest target set.
+
+## Notes
+
+- To unregister the target, use llTargetRemove.
+- This function does not move the object; to do that use llSetPos or llMoveToTarget.
+- A similar function exists for rotations: llRotTarget.
+
+## See Also
+
+- [llTargetRemove](../lltargetremove/)
+- [llRotTarget](../llrottarget/)
+- [llRotTargetRemove](../llrottargetremove/)
+- at_target event - Triggered when object reaches target position
+- not_at_target event - Triggered when object leaves target range
+
+<WikiAttribution />

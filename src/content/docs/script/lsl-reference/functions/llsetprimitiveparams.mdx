@@ -1,0 +1,218 @@
+---
+title: llSetPrimitiveParams
+description: 'Deprecated: Use llSetLinkPrimitiveParamsFast instead.'
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetPrimitiveParams" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function sets the prim's parameters according to the provided rules list. These are powerful functions for configuring more than 50 different object parameters. Consider using `llSetLinkPrimitiveParamsFast` with `LINK_THIS` instead to avoid the 0.2 second sleep delay.
+
+## Variants
+
+There are three related functions with key differences:
+
+| Function | Sleep | Has link parameter |
+|----------|-------|-------------------|
+| `llSetPrimitiveParams` | 200 ms | No |
+| `llSetLinkPrimitiveParams` | 200 ms | Yes |
+| `llSetLinkPrimitiveParamsFast` | None | Yes |
+
+## Examples
+
+### Turn Prims On/Off with Touch
+
+A simple script to light up a prim in a linkset when touched, and unlight the others:
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llSetLinkPrimitiveParamsFast(LINK_SET, [
+            PRIM_FULLBRIGHT, ALL_SIDES, FALSE,
+            PRIM_LINK_TARGET, llDetectedLinkNumber(0),
+            PRIM_FULLBRIGHT, ALL_SIDES, TRUE]);
+    }
+}
+```
+
+### Move Child Prims Forward
+
+Move all child prims 0.25m forward on the root's Z axis when touched:
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        integer numberOfPrims = llGetNumberOfPrims();
+
+        if (numberOfPrims < 2) return;
+
+        vector  link_pos;
+        list    params;
+
+        integer link = 2;// start with first child prim
+        do
+        {
+            // get a child prim's local position (relative to root prim)
+            link_pos = llList2Vector(llGetLinkPrimitiveParams(link, [PRIM_POS_LOCAL]), 0);
+
+            link_pos.z += 0.25;// relative to root's local z-axis
+
+            params += [PRIM_LINK_TARGET, link,
+                            PRIM_POS_LOCAL, link_pos];
+        }
+        while (++link <= numberOfPrims);
+
+        if (!llGetListLength(params)) return;
+
+        llSetLinkPrimitiveParamsFast(2, params);
+    }
+}
+```
+
+### Multiple Prim Coloring with PRIM_LINK_TARGET
+
+Color the root prim red and the first linked prim green using one function call:
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llSetLinkPrimitiveParamsFast(LINK_ROOT, [
+            PRIM_COLOR, ALL_SIDES, <1.0, 0.0, 0.0>, 1.0,
+            PRIM_LINK_TARGET, 2,
+            PRIM_COLOR, ALL_SIDES, <0.0, 1.0, 0.0>, 1.0]);
+    }
+}
+```
+
+### Combined Operations
+
+Set colors, textures, and fullbright in a single call:
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        // Color prim faces, set texture and set fullbright
+        llSetPrimitiveParams([
+            PRIM_COLOR, ALL_SIDES, ZERO_VECTOR, 1.0,
+            PRIM_COLOR, 3, <1.0, 1.0, 1.0>, 1.0,
+            PRIM_TEXTURE, 3, "4d304955-2b01-c6c6-f545-c1ae1e618288", <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0,
+            PRIM_FULLBRIGHT, 3, TRUE]);
+    }
+}
+```
+
+### Creating a Picture Frame Effect (Taper)
+
+Maintain taper proportions when resizing:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        vector scale = llGetScale();
+        float  X     = scale.x;
+        float  Y     = scale.y;
+
+        llSetPrimitiveParams([
+            PRIM_SIZE, <X, Y, 0.1>, // keep the prim thin
+            PRIM_TYPE, PRIM_TYPE_BOX, 0, <0.0,1.0,0.0>, 0.0, ZERO_VECTOR,
+                <1.0 - (0.4 / X), 1.0 - (0.4 / Y), 0.0>, ZERO_VECTOR]);
+        // We used the equation "answer = 1 - desired_taper"
+        // The proportions will be maintained when the prim is resized
+    }
+
+    changed(integer change)
+    {
+        if(change & CHANGED_SCALE)
+        {
+            llResetScript();
+        }
+    }
+}
+```
+
+## Caveats
+
+- `PRIM_SIZE` has similar constraints to `llSetScale` and fails silently on physical prims/links. Workaround: set items to non-physical before changing size, then change back to physical using a single `llSetLinkPrimitiveParamsFast` command with `PRIM_LINK_TARGET`.
+
+- `PRIM_PHANTOM`, `PRIM_PHYSICS`, and `PRIM_TEMP_ON_REZ` apply to the entire object (linkset).
+
+- Values may drift, become truncated, or be range-limited. Some limits are applied by the client during deserialization and rendering, others by the simulator before storing values. When testing vectors and rotations, use `llVecDist` and `llAngleBetween` for fuzzy tests.
+
+- `PRIM_LINK_TARGET` is a special parameter that can be inserted to perform actions on multiple prims in the linkset with one call.
+
+- Scripts written before September 2004 using `PRIM_TYPE` depend on it having value 1. If recompiled, the new value will be used, causing runtime errors. Fix by replacing the `PRIM_TYPE` flag with value 1 or update to newer syntax.
+
+- `PRIM_ROTATION` is bugged in child prims. See the workaround below.
+
+- This function returns an error if given data of the wrong type. This is problematic with user input or notecard data. Use the List Cast function to remedy this.
+
+- Applying an operation to `LINK_SET` applies it first to the root prim, then to each child prim.
+
+- The sim clamps attributes before storing them; the client clamps attributes before rendering.
+
+- **Some prim properties are reset** by this function:
+  - A flexible prim will become not flexible
+  - A sliced prim will become unsliced
+  - To preserve properties, save and explicitly set them in the function call
+
+- Attempting to change `PRIM_TYPE` of a mesh object has no effect. Keeping `PRIM_TYPE_SCULPT` and trying to set a different sculpt map or flags on mesh also does nothing. A script in a mesh prim cannot change sculpt parameters of any prim in the linkset.
+
+- The caveats at `llSetClickAction` all apply to `PRIM_CLICK_ACTION`.
+
+- **Tip**: When changing the alpha value of a face, consider using `llSetLinkAlpha(integer link, float alpha, integer face)` instead of `llSetLinkPrimitiveParamsFast` with `PRIM_COLOR`. This way you don't have to manage color settings. Also, `llSetLinkPrimitiveParamsFast` is not faster than `llSetText` when setting float text properties in loops (e.g., "% loading" status bars). Measurements show `llSetText` being 3-4 times faster.
+
+## PRIM_ROTATION Workaround for Child Prims
+
+Child prims have a bug with `PRIM_ROTATION`. Use one of these workarounds:
+
+```lsl
+// Workaround for unattached objects only
+llSetLinkPrimitiveParamsFast(linknumber, [
+    PRIM_ROT_LOCAL, rot*llGetRootRotation()]);
+
+// Workaround for linked objects only
+llSetLinkPrimitiveParamsFast(linknumber, [
+    PRIM_ROT_LOCAL, rot*llList2Rot(llGetLinkPrimitiveParams(LINK_ROOT, [PRIM_ROT_LOCAL]), 0)]);
+
+// Workaround for all scenarios
+llSetLinkPrimitiveParamsFast(linknumber, [
+    PRIM_ROT_LOCAL, rot*llList2Rot(llGetLinkPrimitiveParams(!!llGetLinkNumber(), [PRIM_ROT_LOCAL]), 0)]);
+```
+
+## Performance Notes
+
+- `llSetLinkPrimitiveParamsFast` is fast compared to the other variants, but sometimes it's **too fast**. The function returns and the next line executes before updates are processed, resulting in out-of-order updates. In those cases, use `llSetPrimitiveParams` or `llSetLinkPrimitiveParams`.
+
+- This occurs because `llSetLinkPrimitiveParamsFast` executes asynchronously, while the other variants execute synchronously (or appear to due to the delay).
+
+- Using one function call with `PRIM_LINK_TARGET` is more efficient than making multiple separate calls.
+
+## See Also
+
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- [llGetLinkPrimitiveParams](../llgetlinkprimitiveparams/)
+- [llSetLinkPrimitiveParamsFast](../llsetlinkprimitiveparamsfast/)
+- [llSetAlpha](../llsetalpha/)
+- [llSetTexture](../llsettexture/)
+- [llSetColor](../llsetcolor/)
+- [llSetScale](../llsetscale/)
+- [llSetStatus](../llsetstatus/)
+
+<WikiAttribution />

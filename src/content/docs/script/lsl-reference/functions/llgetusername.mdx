@@ -1,0 +1,52 @@
+---
+title: llGetUsername
+description: >-
+  Returns the username of an avatar, if the avatar is connected to the current
+  region, or if the name has been cached.  Otherwise, returns an empty string.
+  Use llRequestUsername if the avatar may be absent from the region.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetUsername" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Best viewed in Chat History (ctrl-h)
+default
+{
+    collision_start(integer a) // Announce who collided
+    {
+        llSay(0, "llGetDisplayName: " + llGetDisplayName(llDetectedKey(0)) +
+               "\nllGetUsername: " + llGetUsername(llDetectedKey(0)));
+    }
+    touch_start(integer a)
+    {
+        llSay(0, "llGetDisplayName: " + llGetDisplayName(llDetectedKey(0)) +
+               "\nllGetUsername: " + llGetUsername(llDetectedKey(0)));
+    }
+}
+```
+
+## Caveats
+
+- To get around the "avatar must be present" limitation, you can use the `llRequestUsername` function and the `dataserver` event to obtain the avatar's username from a key.
+- There is no opposite function (`llUsername2Key`) available. For Name2Key services see `llKey2Name`.
+- An empty string can be returned if the region is unable to resolve the username. This can happen even if the avatar is present and display names are enabled on the region. Do not rely on this function to verify avatar presence.
+- If you merely wish to show the agent username in the viewer window, it may be more straightforward to use Viewer URI Name Space, e.g.:
+
+```lsl
+llSay(0, "secondlife:///app/agent/" + (string)id + "/username");
+```
+
+## See Also
+
+- [llGetDisplayName](../llgetdisplayname/)
+- [llRequestUsername](../llrequestusername/)
+- [llKey2Name](../llkey2name/)
+
+<WikiAttribution />

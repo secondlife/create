@@ -1,0 +1,145 @@
+---
+title: llAvatarOnSitTarget
+description: >-
+  If an avatar is seated on the sit target, returns the avatar's key, otherwise
+  NULL_KEY.
+
+  This only will detect avatars sitting on sit targets defined with llSitTarget.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAvatarOnSitTarget" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- A prim does not have a sit target unless `llSitTarget` has been called with a **nonzero** vector as the first argument.
+- If the prim lacks a sit target or the avatar is seated upon a different prim, the only way to determine how many and which avatars are seated upon the object is to scan the link set (see `llGetNumberOfPrims` for an example).
+
+## Examples
+
+### Basic Sit Target Detection
+
+```lsl
+default
+{
+    state_entry()
+    {
+        // set sit target, otherwise this will not work
+        llSitTarget(<0.0, 0.0, 0.1>, ZERO_ROTATION);
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK)
+        {
+            key av = llAvatarOnSitTarget();
+            if (av) // evaluated as true if key is valid and not NULL_KEY
+            {
+                llSay(0, "Hello " + llKey2Name(av) + ", thank you for sitting down");
+            }
+        }
+    }
+}
+```
+
+### State-Based Sit Handling
+
+```lsl
+//It's sometimes useful to use a state change
+//useful when the prim is linked to an other prim
+//and useful with a dialog box
+default
+{
+    state_entry()
+    {
+        //"Sit target is a prim property."
+        llSitTarget(<0.0, 0.0, 0.1>, ZERO_ROTATION);
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK)
+        {
+            key av_sit = llAvatarOnSitTarget();
+            if (av_sit)
+            {
+                //Someone is on the sit target.
+                state sitting;
+            }
+        }
+    }
+}
+
+state sitting
+{
+    state_entry()
+    {
+        //Open a dialog box when an avatar is sitting on the prim
+        key av_menu = llAvatarOnSitTarget();
+        llListen(-99, "", av_menu, "Yes");
+        llDialog(av_menu, "\nDo you like this example?", ["Yes", "No" ] , -99);
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK)
+        {
+            key av_unsit = llAvatarOnSitTarget();
+            if (av_unsit == NULL_KEY)
+            {
+                //No one is on the sit target.
+                //"On state change all listens are removed automatically."
+                state default;
+            }
+        }
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        // If the user clicked the "Yes" button
+        llWhisper(0, "Thank you");
+    }
+}
+```
+
+## Helper Functions
+
+### Get Seated Avatar's Link Number
+
+```lsl
+//Gets the link number of a seated avatar
+integer GetAgentLinkNumber(key avatar)
+{
+    integer link_num = llGetNumberOfPrims();
+    while (link_num > 1) // Check only child prims.
+    {
+        if (llGetLinkKey(link_num) == avatar) // If it is the avatar we want
+        {
+            return link_num; // then return the link number
+        }
+        --link_num; // else go on with next child.
+    }
+    // Avatar wasn't found
+    return FALSE; // 0 (zero) for easy testing.
+}
+```
+
+## Notes
+
+- The position of an avatar on a sit target can be determined using `llGetObjectDetails` (see `llSitTarget` for an example).
+- The `changed` event with the `CHANGED_LINK` flag is triggered when an avatar sits on or gets up from the sit target.
+
+## See Also
+
+- `changed` - Event triggered when link configuration changes
+- [llAvatarOnLinkSitTarget](../llavataronlinksittarget/)
+- [llSitTarget](../llsittarget/)
+- [llLinkSitTarget](../lllinksittarget/)
+- [llGetLinkKey](../llgetlinkkey/)
+- `CHANGED_LINK` - Change event constant
+
+<WikiAttribution />

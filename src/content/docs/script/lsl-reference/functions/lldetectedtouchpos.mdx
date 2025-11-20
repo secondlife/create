@@ -1,0 +1,83 @@
+---
+title: llDetectedTouchPos
+description: >-
+  Returns the position, in region coordinates, where the object was touched in a
+  triggered touch event.
+
+  Unless it is a HUD, in which case it returns the position relative to the
+  attach point.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedTouchPos" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- `TOUCH_INVALID_VECTOR` (same as `ZERO_VECTOR`: `<0.0, 0.0, 0.0>`) is returned when:
+  - The avatar's viewer does not support face touch detection. To check if face touch detection is supported, check the return of `llDetectedTouchFace`.
+  - The touch has moved off the surface of the prim.
+  - The event triggered is not a touch event.
+
+## Examples
+
+### Basic Example
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llWhisper(0, "Pos clicked: " + (string)llDetectedTouchPos(0));
+    }
+}
+```
+
+### HUD Touch Position Helper
+
+This function, contributed by Ariu Arai, converts a HUD touch position to a usable coordinate:
+
+```lsl
+vector GetRealTouchPos(vector pos)
+{
+    // Returns a useful HUD Position Vector from the llDetectedTouchPos() function
+    // USE: vector pos = GetRealTouchPos(llDetectedTouchPos(0)); .. Etc.
+    // This function is intended to be used to move child prims to where the user clicks.
+    // This does not work on the root prim.
+
+    integer point = llGetAttached();
+    vector offset;
+
+    if      (point == ATTACH_HUD_TOP_RIGHT)    offset = <1.0, 0.933,-0.5>;
+    else if (point == ATTACH_HUD_TOP_CENTER)   offset = <1.0, 0.000,-0.5>;
+    else if (point == ATTACH_HUD_TOP_LEFT)     offset = <1.0,-0.933,-0.5>;
+    else if (point == ATTACH_HUD_BOTTOM_LEFT)  offset = <1.0,-0.933, 0.5>;
+    else if (point == ATTACH_HUD_BOTTOM)       offset = <1.0, 0.000, 0.5>;
+    else if (point == ATTACH_HUD_BOTTOM_RIGHT) offset = <1.0, 0.933, 0.5>;
+
+    return ((offset - llGetLocalPos()) + pos) / llGetLocalRot();
+}
+```
+
+## Notes
+
+- This function is for the touch category of events only.
+- The prim that was touched may not be the prim receiving the event. Use `llDetectedLinkNumber` to check for this.
+- Use `llDetectedTouchFace` to determine which face was touched.
+
+## See Also
+
+- [llDetectedLinkNumber](../lldetectedlinknumber/)
+- [llDetectedTouchFace](../lldetectedtouchface/)
+- [llDetectedTouchST](../lldetectedtouchst/)
+- [llDetectedTouchUV](../lldetectedtouchuv/)
+- [llDetectedTouchNormal](../lldetectedtouchnormal/)
+- [llDetectedTouchBinormal](../lldetectedtouchbinormal/)
+- `touch_start` event
+- `touch` event
+- `touch_end` event
+
+<WikiAttribution />

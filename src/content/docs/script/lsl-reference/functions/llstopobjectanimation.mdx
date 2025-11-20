@@ -1,0 +1,53 @@
+---
+title: llStopObjectAnimation
+description: >
+  This function stops the specified animation on the rigged mesh object
+  associated with the current script.
+
+  Animation may be an animation in task inventory, a built-in animation, or the
+  uuid of an animation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStopObjectAnimation" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+    }
+
+    // This assumes that an animation called "MyFancyWalk" is present in the inventory of the current object.
+    touch_start(integer total_number)
+    {
+        llSay(0, "Starting animation");
+        llStartObjectAnimation("MyFancyWalk");
+    }
+
+    touch_end(integer total_number)
+    {
+        llSay(0, "Stopping animation");
+        llStopObjectAnimation("MyFancyWalk");
+    }
+}
+```
+
+## Notes
+
+Animated objects work by associating a skeleton with a linkset containing one or more rigged mesh primitives. When animations are played by a script in any of the prims in the linkset, the skeleton will animate and any rigged meshes in the linkset will move accordingly. A script running in any prim of the linkset can start, stop or query animations using these commands.
+
+The typical usage of these functions is to do all object animation scripting in the root prim of the linkset; in this scenario, the animations and scripts would all be part of the inventory of this prim, and so of the object as a whole. However, if scripts and animations are present in multiple prims of a linkset, it is important to understand that animations are started, stopped and tracked independently in each prim.
+
+## See Also
+
+- [llStartObjectAnimation](../llstartobjectanimation/)
+- [llGetObjectAnimationNames](../llgetobjectanimationnames/)
+
+<WikiAttribution />

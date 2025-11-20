@@ -1,0 +1,42 @@
+---
+title: llAgentInExperience
+description: |2-
+
+                     Returns TRUE if the agent is in the Experience and the Experience can run in the current location.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAgentInExperience" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+  touch_start(integer total_number)
+  {
+    if(llAgentInExperience(llDetectedKey(0)))
+    {
+      llOwnerSay(llDetectedName(0)+ " is in my experience");
+    }
+    else
+    {
+      llOwnerSay(llDetectedName(0)+ " is not in my experience");
+    }
+  }
+}
+```
+
+## Notes
+
+- Agent must be over a parcel that has the Experience allowed or FALSE is returned with Land Scope Experience compiled scripts.
+
+## See Also
+
+- [llGetExperienceDetails](../llgetexperiencedetails/)
+
+<WikiAttribution />

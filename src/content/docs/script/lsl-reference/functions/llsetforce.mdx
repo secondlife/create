@@ -1,0 +1,42 @@
+---
+title: llSetForce
+description: >-
+  Sets Force on object, in object-local coordinates if Local == TRUE (otherwise,
+  the region reference frame is used).
+
+  Only works on physical objects.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetForce" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Only works on physical objects and attachments (non-physical as well as physical)
+- When used on an attachment, it will apply the force to the avatar
+- This applies continuous force; use llApplyImpulse for instantaneous push
+
+## Examples
+
+```lsl
+// A simple rocket script. Launches object up when touched.
+// Sit on it for an interesting ride!
+default {
+    touch_start(integer i) {
+        llSetStatus(STATUS_PHYSICS, TRUE);
+        llSetForce(<0, 0, 0x7FFFFFFF>, 0);  // FLY!
+    }
+}
+```
+
+## See Also
+
+- [llSetForceAndTorque](../llsetforceandtorque/)
+- [llSetTorque](../llsettorque/)
+- [llApplyImpulse](../llapplyimpulse/)
+
+<WikiAttribution />

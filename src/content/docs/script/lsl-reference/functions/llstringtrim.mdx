@@ -1,0 +1,118 @@
+---
+title: llStringTrim
+description: >-
+  Outputs a string, eliminating white-space from the start and/or end of the
+  input string Text.
+
+  Valid options for TrimType:
+
+  STRING_TRIM_HEAD: trim all leading spaces in Text
+
+  STRING_TRIM_TAIL: trim all trailing spaces in Text
+
+  STRING_TRIM: trim all leading and trailing spaces in Text.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStringTrim" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Usage
+
+When accepting unstructured input from a user — whether via chat or notecard — always trim it:
+
+```lsl
+llStringTrim("User input", STRING_TRIM);
+```
+
+### Counting Trimmed Characters
+
+This example shows how to track the number of leading and trailing whitespace characters removed:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llListen(4, "", llGetOwner(), "");
+    }
+
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        //track the length
+        integer length = llStringLength(message);
+
+        //trim message (not necessary to store these to variables but makes reading easier)
+        string trim_left  = llStringTrim(message, STRING_TRIM_HEAD);
+        string trim_right = llStringTrim(message, STRING_TRIM_TAIL);
+        string trim_both  = llStringTrim(message, STRING_TRIM);
+
+        //output the results
+        llOwnerSay("Initial length  = " + (string)length +
+                 "\nLeading Spaces  = " + (string)(length - llStringLength(trim_left))+
+                 "\nTrailing Spaces = " + (string)(length - llStringLength(trim_right))+
+                 "\nTrimmed Message = \"" + trim_both + "\"");
+    }
+}
+```
+
+## Notes
+
+### Whitespace Characters
+
+The exact set of characters stripped are:
+- 0x09 (tab)
+- 0x0a (line feed, `\n`)
+- 0x0b (vertical tab)
+- 0x0c (form feed)
+- 0x0d (carriage return)
+- 0x20 (space, ` `)
+
+Important caveats:
+- Only line feed and space function as true whitespace in SL; the others produce printable characters
+- The `\t` escape code doesn't represent the tab character, but several spaces instead
+- Other Unicode whitespace (non-breaking space 0xa0, specific-width spaces 0x2000 range, etc.) are NOT stripped
+
+### Internal Spaces
+
+`llStringTrim` only removes whitespace at the beginning and/or end of the string. Extraneous spaces within the string (like double-spaces) are unaffected.
+
+### Related Techniques
+
+**Remove all doubled (or further multiplied) spaces with iteration:**
+
+```lsl
+while(llStringLength(s) != llStringLength(s = llReplaceSubString(s, "  ", " ", 0)));
+s = llStringTrim(s, STRING_TRIM);
+```
+
+**Remove all spaces from a string:**
+
+```lsl
+llReplaceSubString("some words to remove the spaces from", " ", "", 0);
+```
+
+**Trim an entire list of strings:**
+
+```lsl
+list l = ["  a  ", " b", "c ", " d "];
+list trimmedList = llJson2List(llList2Json(JSON_ARRAY, l));
+```
+
+## See Also
+
+- [llReplaceSubString](../llreplacesubstring/)
+- [llStringLength](../llstringlength/)
+- [llList2Json](../lllist2json/)
+
+<WikiAttribution />

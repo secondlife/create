@@ -1,0 +1,54 @@
+---
+title: llAxes2Rot
+description: Returns the rotation represented by coordinate axes Forward, Left, and Up.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAxes2Rot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+All three vectors must be mutually orthogonal unit vectors. Technically, only the first two vectors are needed to define the rotation, which can be computed by calling any of these alternatives:
+
+```lsl
+llAxes2Rot(fwd, left, fwd % left);
+llAxes2Rot(left % up, left, up);
+llAxes2Rot(fwd, up % fwd, up);
+```
+
+## Examples
+
+```lsl
+default
+{
+    state_entry()
+    {
+        vector i = < 1.0, 0.0, 0.0>;
+        vector j = < 0.0, 1.0, 0.0>;
+        vector k = < 0.0, 0.0, 1.0>;
+
+        rotation rot = llAxes2Rot( j, -i, k );
+
+        llSay(0, (string) (llRot2Euler(rot) * RAD_TO_DEG) );
+    }
+}
+```
+
+This script displays:
+```
+Object: <-0.00000, 0.00000, 90.00000>
+```
+
+This shows that **(j, -i, k)** is obtained by rotating **(i, j, k)** 90 degrees around the z direction.
+
+## See Also
+
+- [llRot2Euler](../llrot2euler/)
+- [llEuler2Rot](../lleuler2rot/)
+- [llRotBetween](../llrotbetween/)
+
+<WikiAttribution />

@@ -1,0 +1,72 @@
+---
+title: llScaleTexture
+description: >-
+  Sets the diffuse texture Horizontal and Vertical repeats on Face of the prim
+  the script is attached to.
+
+  If Face == ALL_SIDES, all sides are set in one call.
+
+  Negative values for horizontal and vertical will flip the texture.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llScaleTexture" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+**Performance Warning:** `llScaleTexture` has a 0.2 second delay. Every function call takes 0.2 seconds, which can significantly slow down scripts if called repeatedly. For example, calling it 6 times sequentially would take about 1.2 seconds.
+
+**Workaround:** For better performance, use `llSetLinkPrimitiveParamsFast` instead:
+
+```lsl
+llSetLinkPrimitiveParamsFast(integer link,
+    [PRIM_TEXTURE, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians]);
+```
+
+## Technical Notes
+
+In the default texture mapping mode, scale units are in texture repeats per face. In planar texture mapping mode, scale units are in texture repeats per half meter. This differs from the in-world editing tool, where planar texture scaling uses repeats per meter.
+
+Negative values for horizontal and vertical scales will flip the texture.
+
+## Examples
+
+Scale textures on all 6 sides of a prim with incrementally larger scales:
+
+```lsl
+float scale;
+
+default
+{
+    state_entry()
+    {
+        integer index;
+        while (index < 7)
+        {
+            scale += 0.1;
+            llScaleTexture((float)scale, (float)scale, index);
+            ++index;
+        }
+    }
+}
+```
+
+This results in:
+- Face 0: 0.1x scale
+- Face 1: 0.2x scale
+- Face 2: 0.3x scale
+- Face 3: 0.4x scale
+- Face 4: 0.5x scale
+- Face 5: 0.6x scale
+- Face 6: 0.7x scale
+
+## See Also
+
+- [llGetTextureScale](../llgettexturescale/)
+- [llSetLinkPrimitiveParamsFast](../llsetlinkprimitiveparamsfast/)
+
+<WikiAttribution />

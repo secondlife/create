@@ -1,0 +1,73 @@
+---
+title: llGetLocalRot
+description: |-
+  Returns the rotation local to the root.
+  Returns the local rotation of a child object relative to the root.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetLocalRot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Door Script
+
+A practical example showing how to use `llGetLocalRot()` in a door script that works at any angle:
+
+```lsl
+//--// Door Script - Works At ANY Angle //--//
+
+//-- works in ANY single prim door, linked or un-linked
+//-- works in muti prim doors NOT linked to a larger structure
+//-- REQUIREMENTS: a cut root prim. Suggest cube, pathcut start=.125, end=.625
+//-- CAVEAT: single prim doors are limited to 5m width
+
+//--// USERS MODIFY HERE v
+integer vgIntDoorSwing = 90;
+//-- use -# to reverse the direction of swing, eg. -90;
+
+rotation gRotDoorSwing;
+
+default{
+  state_entry(){
+    gRotDoorSwing = llEuler2Rot( <0.0, 0.0, vgIntDoorSwing> * DEG_TO_RAD );
+  }
+
+  touch_start( integer vIntTouched ){
+    llSetLocalRot( (gRotDoorSwing = ZERO_ROTATION / gRotDoorSwing) * llGetLocalRot() );
+  }
+}
+```
+
+### Helper Function
+
+An equivalent way to get the local rotation of any prim in the link set:
+
+```lsl
+//-- this is an equivalent call from any prim in the same link set
+llList2Rot( llGetLinkPrimitiveParams( target_prim, [PRIM_ROT_LOCAL] ), 0 )
+//-- where "target_prim" is the link number of the prim you want to get the local rotation of
+```
+
+## Notes
+
+- If called from the root prim, it returns the region-relative rotation of the object
+- Returns the rotation relative to the root for child prims in a linkset
+
+## See Also
+
+- [llGetRot](../llgetrot/)
+- [llGetRootRotation](../llgetrootrotation/)
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+- [llGetLinkPrimitiveParams](../llgetlinkprimitiveparams/)
+- [llSetRot](../llsetrot/)
+- [llSetLocalRot](../llsetlocalrot/)
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- [llSetLinkPrimitiveParamsFast](../llsetlinkprimitiveparamsfast/)
+
+<WikiAttribution />

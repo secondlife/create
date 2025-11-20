@@ -1,0 +1,128 @@
+---
+title: llGetWallclock
+description: >-
+  Returns the time in seconds since midnight California Pacific time (PST/PDT).
+
+  Returns the time in seconds since simulator's time-zone midnight (Pacific
+  Time).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetWallclock" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Real World Sun
+
+Track the sun position using wallclock time:
+
+```lsl
+integer Flag;
+
+default
+{
+    state_entry()
+    {
+        Flag = -1;
+        llSetTimerEvent(0.1);
+    }
+
+    timer()
+    {
+        float time = llGetWallclock();
+        if (Flag == -1)
+        {
+            llSetTimerEvent(60.0);
+        }
+        if (time < 21600)
+        {
+            if (Flag)
+            {
+                llSetText("The Sun is coming! :)", <1,1,0>, 1.0);
+                Flag = 0;
+            }
+        }
+        else if (time < 64800)
+        {
+            if (Flag != 1)
+            {
+                llSetText("Sun has risen. :(", <1,0,0>, 1.0);
+                Flag = 1;
+            }
+        }
+        else if (Flag != 2)
+        {
+            llSetText("Goodbye Sun. :(", <1,0,0>, 1.0);
+            Flag = 2;
+        }
+    }
+}
+```
+
+### Convert to 24-Hour Format
+
+Convert wallclock time to human-readable HH:MM:SS format:
+
+```lsl
+string ConvertWallclockToTime()
+{
+    integer now = (integer)llGetWallclock();
+    integer seconds = now % 60;
+    integer minutes = (now / 60) % 60;
+    integer hours = now / 3600;
+    return llGetSubString("0" + (string)hours, -2, -1) + ":"
+        + llGetSubString("0" + (string)minutes, -2, -1) + ":"
+        + llGetSubString("0" + (string)seconds, -2, -1);
+}
+
+default
+{
+    touch_start(integer total_number)
+    {
+        llSay(0, ConvertWallclockToTime());
+    }
+}
+```
+
+### Convert to 12-Hour Format
+
+Convert wallclock time to human-readable 12-hour HH:MM:SS (AM/PM) format:
+
+```lsl
+string ConvertWallclockToTime()
+{
+    integer now = (integer)llGetWallclock();
+    integer seconds = now % 60;
+    integer minutes = (now / 60) % 60;
+    integer hours = now / 3600;
+
+    return llGetSubString("0" + (string)(hours % 12), -2, -1) + ":"
+           + llGetSubString("0" + (string)minutes, -2, -1) + ":"
+           + llGetSubString("0" + (string)seconds, -2, -1) + " "
+           + llList2String(["AM", "PM"], (hours > hours % 12));
+}
+
+default
+{
+    touch_start(integer total_number)
+    {
+        llSay(0, ConvertWallclockToTime());
+    }
+}
+```
+
+## Notes
+
+To determine if the current time returned by this function is PST or PDT, compare it with `llGetGMTclock()`. The difference will be:
+- **PST**: 8 hours (28800 seconds) or -16 hours (-57600 seconds)
+- **PDT**: 7 hours (25200 seconds) or -17 hours (-61200 seconds)
+
+## See Also
+
+- [`llGetGMTclock()`](../llgetgmtclock/) - Returns seconds since midnight GMT
+
+<WikiAttribution />

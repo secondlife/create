@@ -1,0 +1,33 @@
+---
+title: llStringToBase64
+description: Returns the string Base64 representation of the input string.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStringToBase64" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If extra bits are needed to complete the last base64 symbol, those extra bits will be zero
+- To convert in the other direction, use `llBase64ToString`
+
+## Examples
+
+```lsl
+integer getStringBytes(string msg) {
+    return (llStringLength((string)llParseString2List(llStringToBase64(msg), ["="], [])) * 3) >> 2;
+}
+```
+
+## See Also
+
+- [llBase64ToString](../llbase64tostring/)
+- [llBase64ToInteger](../llbase64tointeger/)
+- [llIntegerToBase64](../llintegertobase64/)
+- [llXorBase64](../llxorbase64/)
+
+<WikiAttribution />

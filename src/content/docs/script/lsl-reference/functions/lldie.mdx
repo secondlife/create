@@ -1,0 +1,86 @@
+---
+title: llDie
+description: Delete the object which holds the script.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDie" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+**This permanently deletes your whole object (root prim and all linked prims).** The deleted object WILL NOT appear in your lost-and-found folder. The deleted object WILL NOT appear in your trash folder. It will be gone, lost forever. There will be NO WAY WHATSOEVER to get it back. Use with caution!
+
+## Examples
+
+### Example 1: Touch-activated deletion
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetText("<!-- touch to kill -->", <1.0, 0.0, 0.0>, 1.0);
+    }
+
+    touch_start(integer num_detected)
+    {
+        llSay(0, "Good bye, cruel world!");
+        llDie();
+    }
+}
+```
+
+### Example 2: Countdown before deletion
+
+```lsl
+default
+{
+    state_entry()
+    {
+        integer index = 5;
+        while (index)
+        {
+            llSleep(1.0);
+            llSay(0, (string)index);
+            --index;
+        }
+        llDie();
+    }
+}
+```
+
+## Notes and Caveats
+
+- If called in any prim in the link set, the result will be the deletion of the entire object. To remove a single prim from an object, use `llBreakLink` first.
+- The script may not stop executing immediately after this function is called (see SVC-7421).
+- After this function is called, there is no way to undo the deletion of the object.
+- Has no effect if called from within an attachment—there is no way to delete an attachment from within itself.
+  - To detach an object from the avatar, call `llDetachFromAvatar`.
+  - Detaching a temporary attachment will cause the attachment to be deleted.
+
+## Alternative: Delete Just the Script
+
+`llRemoveInventory` of `llGetScriptName` deletes just the calling script, rather than the entire object. This is useful for scripts that add themselves to an object and then remove themselves:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llOwnerSay("Script removing itself...");
+        llRemoveInventory(llGetScriptName());
+    }
+}
+```
+
+## See Also
+
+- [llBreakLink](../llbreaklink/)
+- [llDetachFromAvatar](../lldetachfromavatar/)
+- [llRemoveInventory](../llremoveinventory/)
+
+<WikiAttribution />

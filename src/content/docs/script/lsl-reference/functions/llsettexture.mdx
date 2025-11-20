@@ -1,0 +1,44 @@
+---
+title: llSetTexture
+description: |-
+  Applies Texture to Face of prim.
+  Texture may be a UUID or name of a texture in prim inventory.
+  If Face is ALL_SIDES, set the texture on all faces.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetTexture" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        // the first texture alphabetically inside the same prim's inventory
+        string texture = llGetInventoryName(INVENTORY_TEXTURE, 0);
+
+        // set it on all sides of the prim containing the script
+        llSetTexture(texture, ALL_SIDES);
+    }
+}
+```
+
+## Caveats
+
+- Inspect does not show texture information (unlike some other properties like creator)
+
+## See Also
+
+- [llSetLinkTexture](../llsetlinktexture/)
+- [llGetTexture](../llgettexture/)
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- Internal Textures
+
+<WikiAttribution />

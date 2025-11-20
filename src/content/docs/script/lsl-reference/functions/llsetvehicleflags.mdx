@@ -1,0 +1,25 @@
+---
+title: llSetVehicleFlags
+description: |-
+  Enables the vehicle flags specified in the Flags bitmask.
+  Valid parameters can be found in the wiki documentation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetVehicleFlags" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Some vehicle flags may remain enabled after script reset. Use `llRemoveVehicleFlags` to disable any flags that would interfere with the correct functioning of your vehicle.
+- `VEHICLE_FLAG_MOUSELOOK_STEER` and `VEHICLE_FLAG_MOUSELOOK_BANK` only turn the vehicle up to the current `VEHICLE_ANGULAR_MOTOR_DIRECTION`. If `VEHICLE_ANGULAR_MOTOR_DIRECTION` is set to `ZERO_VECTOR`, then the vehicle will not turn.
+
+## See Also
+
+- [llRemoveVehicleFlags](../llremovevehicleflags/)
+- Linden Vehicle Tutorial
+
+<WikiAttribution />

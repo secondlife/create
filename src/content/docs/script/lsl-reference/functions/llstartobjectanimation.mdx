@@ -1,0 +1,92 @@
+---
+title: llStartObjectAnimation
+description: >
+  This function plays the specified animation on the rigged mesh object
+  associated with the current script.
+
+  Animation may be an animation in task inventory or a built-in animation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStartObjectAnimation" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Animation Control
+
+```lsl
+//This script animates the object for as long as it is touched.
+default
+{
+    state_entry()
+    {
+    }
+
+    // This assumes that an animation called "MyFancyWalk" is present in the inventory of the current object.
+    touch_start(integer total_number)
+    {
+        llSay(0, "Starting animation");
+        llStartObjectAnimation("MyFancyWalk");
+    }
+
+    touch_end(integer total_number)
+    {
+        llSay(0, "Stopping animation");
+        llStopObjectAnimation("MyFancyWalk");
+    }
+}
+```
+
+### Animation Menu
+
+```lsl
+//This script creates a menu of animations to play for your Animesh.
+list animations = ["*STOP*", "Running Man", "Guitar Dance", "YMCA Dance"]; //list of up to 11 animations (inside the contents of the Animesh) w/ the stop button.
+integer dialogChannel = -100; //Choose a more "random" if you want.
+
+string latestAnimation = ""; //used to stop animation when selecting new one
+integer listenHandler; //Always create your listener when needed and remove when done
+default
+{
+    touch_start(integer total_number)
+    {
+        key owner = llGetOwner(); //initialize the variable owner storing llGetOwner because we use it 3 times within this event
+        if(llDetectedKey(0) == owner)
+        {
+            llListenRemove(listenHandler);  //If having touched the object but not select a dialog option the listener will still be active, so remove just in case
+            listenHandler = llListen(dialogChannel, "", owner, ""); //Listen to the owner on the dialog channel selected on line 1
+            llDialog(owner, "Select an animation.", animations, dialogChannel); //Show a dialog menu to the owner with the animations list (line 0) as the buttons
+                                                                                //Only 12 buttons can fit one menu, to do more buttons look into DialogPlus on the wiki
+        }
+    }
+
+    listen(integer channel, string name, key id, string text)
+    {
+        //Typically you add checks to make sure the right id or channel is used but we clear out any existing ghost listeners prior to listening which prevents us from having to
+
+        if(latestAnimation != "" && latestAnimation != "*STOP*") llStopObjectAnimation(latestAnimation); //If latestAnimation isn't blank AND isn't *STOP*, stop the latestAnimation
+        if(text != "*STOP*") llStartObjectAnimation(text); //If the button pressed was not *STOP*, play the animation selected
+        latestAnimation = text; //Set the latestAnimation to the button pressed so when this event is ran again we can stop the animation
+        llListenRemove(listenHandler); //Remove the listener since we are done
+    }
+}
+```
+
+## Caveats
+
+- Unlike with `llStartAnimation`, Animesh non-looping animations must explicitly be removed from the `llGetObjectAnimationNames` list with `llStopObjectAnimation`, and cannot be started again until they are removed. This persists through script resets. [See BUG-215954](https://jira.secondlife.com/browse/BUG-215954)
+
+## Notes
+
+Animated objects work by associating a skeleton with a linkset containing one or more rigged mesh primitives. When animations are played by a script in any of the prims in the linkset, the skeleton will animate and any rigged meshes in the linkset will move accordingly. A script running in any prim of the linkset can start, stop or query animations using these commands. The typical usage of these functions is to do all object animation scripting in the root prim of the linkset; in this scenario, the animations and scripts would all be part of the inventory of this prim, and so of the object as a whole. However, if scripts and animations are present in multiple prims of a linkset, it is important to understand that animations are started, stopped and tracked independently in each prim.
+
+## See Also
+
+- [llStopObjectAnimation](../llstopobjectanimation/)
+- [llGetObjectAnimationNames](../llgetobjectanimationnames/)
+
+<WikiAttribution />

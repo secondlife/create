@@ -1,0 +1,65 @@
+---
+title: llSetLinkMedia
+description: >-
+  Set the media parameters for a particular face on linked prim, specified by
+  Link. Returns an integer that is a STATUS_* flag which details the
+  success/failure of the operation(s).
+
+  MediaParameters is a set of name/value pairs in no particular order.
+  Parameters not specified are unchanged, or if new media is added then set to
+  the default specified.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLinkMedia" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If prim media is not already on this object, it will be added.
+- If prim media is newly added to this object, params not specified take their default value.
+- If prim media is already on this object, params not specified are unchanged.
+
+### Media Pixel Dimensions
+
+About `PRIM_MEDIA_WIDTH_PIXELS` (width) and `PRIM_MEDIA_HEIGHT_PIXELS` (height):
+
+- Both width and height must be specified for either to work. They narrow the texture space while inversely widening the aperture, i.e., smaller values "zoom in."
+  - If width and height are not specified, the function assumes 1024 for each.
+- When `PRIM_MEDIA_AUTO_SCALE` is `TRUE`, any value for width and height that is not precisely 2^n (where 0 ≤ n < 12) will be "rounded up" to the next value. For example, setting `PRIM_MEDIA_WIDTH_PIXELS` to 257 has the same effect as setting it to 512. Any value outside the range [0, 2048] will cause the function to shout a message to `DEBUG_CHANNEL` and fail. Using 0 results in the default value (1024) being used.
+- Width and height scaled larger than 1024 pixels will require the texture backdrop to be resized to fit.
+  - If resized to fit, the resulting view will cut off scrolled content outside the bounds, making it impossible to view.
+
+## Helpful Snippet
+
+Here's a utility function to expand media textures greater than 1024 pixels to fit the media face (does exactly what the "align" button does in the edit window):
+
+```lsl
+uExpandMediaTexture(integer vIntWidth, integer vIntHeight, integer vIntFace) {
+    integer vIntTemp;
+    vector vSizScale;
+
+    while (vIntWidth >> ++vIntTemp);
+    vSizScale.x = vIntWidth / (float)(1 << vIntTemp);
+    vIntTemp = 0;
+    while (vIntHeight >> ++vIntTemp);
+    vSizScale.y = vIntHeight / (float)(1 << vIntTemp);
+    llSetLinkPrimitiveParamsFast(LINK_THIS,
+                                  [PRIM_TEXTURE, vIntFace] +
+                                  llListReplaceList(llGetLinkPrimitiveParams(LINK_THIS, [PRIM_TEXTURE, vIntFace]),
+                                                    [vSizScale, ((vSizScale - <1.0, 1.0, 0.0>) / 2.0)],
+                                                    1,
+                                                    2));
+}
+```
+
+## See Also
+
+- [llSetPrimMediaParams](../llsetprimmediaparams/)
+- [llGetLinkMedia](../llgetlinkmedia/)
+- [llClearLinkMedia](../llclearlinkmedia/)
+
+<WikiAttribution />

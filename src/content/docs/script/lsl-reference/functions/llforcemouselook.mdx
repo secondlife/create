@@ -1,0 +1,54 @@
+---
+title: llForceMouselook
+description: >-
+  If Enable is TRUE any avatar that sits on this object is forced into
+  mouse-look mode.
+
+  After calling this function with Enable set to TRUE, any agent sitting down on
+  the prim will be forced into mouse-look.
+
+  Just like llSitTarget, this changes a permanent property of the prim (not the
+  object) and needs to be reset by calling this function with Enable set to
+  FALSE in order to disable it.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llForceMouselook" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    state_entry() {
+        llForceMouselook(TRUE); // Forces sitting avatars into mouselook.
+
+        llForceMouselook(FALSE); // Reverts the setting to the default...
+                                 // ...as with a newly created prim.
+    }
+}
+```
+
+## Caveats
+
+- This function has no effect on avatars already seated.
+- The user may exit mouselook mode at any time.
+  - This can be detected by polling `llGetAgentInfo`.
+- There is nothing stopping someone from modifying or making a client that ignores this.
+
+## Notes
+
+- A sit target is not necessary for this function to work.
+
+## See Also
+
+- [llAvatarOnSitTarget](../llavataronsittarget/)
+- [llGetAgentInfo](../llgetagentinfo/)
+- [llGetCameraRot](../llgetcamerarot/)
+- [llSetCameraAtOffset](../llsetcameraatoffset/)
+- [llSetCameraEyeOffset](../llsetcameraeyeoffset/)
+
+<WikiAttribution />

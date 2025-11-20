@@ -1,0 +1,117 @@
+---
+title: llGetAnimation
+description: >-
+  Returns the name of the currently playing locomotion animation for the avatar
+  id.
+
+  Returns the currently playing animation for the specified avatar ID.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAnimation" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- This function can return an empty string while the avatar is logging out.
+- New return values could conceivably be added at any time and this list may not in-fact be complete. Scripts should be written under the assumption that they may receive a value they won't recognize.
+- `llGetAgentInfo` provides information on some animation states not covered by this function (typing, away, busy).
+- `llGetAnimationList` provides more detailed information about the running animations, but may not reflect avatar state as accurately as `llGetAnimation`.
+
+## Animation States
+
+The function returns one of these animation state strings:
+
+### Common/Active Values
+- `""` - During logout
+- `"Init"` - At login and after teleports
+
+### Standard Animation States
+- `"Crouch"`, `"Uncrouch"` - Crouching and uncrouching
+- `"Fall Down Land"`, `"Soft Land"`, `"Medium Land"`, `"Hard Land"` - Landing from different fall heights
+- `"Fly"`, `"FlySlow"`, `"PreFlying"`, `"Hover"`, `"Hover Up"`, `"Hover Down"`, `"Take Off"` - Flying and hovering
+- `"Walk"`, `"Run"`, `"Stride"` - Ground movement
+- `"Stand"` - Standing
+- `"Sit"`, `"Sit on Ground"` - Sitting
+- `"Turn Left"`, `"Turn Right"`, `"Turn Done"` - Turning
+- `"PreJump"`, `"Jumping"` - Jump states
+- `"Prep For Teleport"` - Preparing to teleport
+- `"Epsilon"`, `"Finish Animation"` - Other states
+
+## Examples
+
+This example overrides the jump animation to play a run animation instead, making the avatar appear to run in mid-air while jumping:
+
+```lsl
+// Animation override example
+// Make the avatar run in mid-air when jumping
+
+key gOwner;           // the wearer's key
+string gLastAnimation; // last llGetAnimation value seen
+
+Initialize(key id) {
+    if (id == NULL_KEY) { // detaching
+        llSetTimerEvent(0.0); // stop the timer
+    }
+    else { // attached, or reset while worn
+        llRequestPermissions(id, PERMISSION_TRIGGER_ANIMATION);
+        gOwner = id;
+    }
+}
+
+default
+{
+    state_entry() {
+        // in case the script was reset while already attached
+        if (llGetAttached() != 0) {
+            Initialize(llGetOwner());
+        }
+    }
+
+    attach(key id) {
+        Initialize(id);
+    }
+
+    run_time_permissions(integer perm) {
+        if (perm & PERMISSION_TRIGGER_ANIMATION) {
+            llSetTimerEvent(0.25); // start polling
+        }
+    }
+
+    timer() {
+        string newAnimation = llGetAnimation(gOwner);
+
+        if (gLastAnimation != newAnimation) { // any change?
+            if (newAnimation == "Jumping") {
+                // You can stop the built-in animation if you like, if
+                // it might interfere with your own. Be aware that an
+                // avatar can become stuck, and some llGetAgentInfo results
+                // can be inaccurate, if you stop built-ins indiscriminately.
+                // Always test.
+                //
+                // llStopAnimation("jump");
+
+                llStartAnimation("run");
+            }
+            else if (gLastAnimation == "Jumping")  { // just finished jumping
+                // "run" is looped, so we have to stop it when we are done.
+                llStopAnimation("run");
+            }
+
+            gLastAnimation = newAnimation; // store away for next time
+        }
+    }
+}
+```
+
+## See Also
+
+- [llGetAgentInfo](../llgetagentinfo/)
+- [llGetAnimationList](../llgetanimationlist/)
+- [llStartAnimation](../llstartanimation/)
+- [llStopAnimation](../llstopanimation/)
+
+<WikiAttribution />

@@ -1,0 +1,86 @@
+---
+title: llGetLinkKey
+description: |-
+  Returns the key of the linked prim LinkNumber.
+  Returns the key of LinkNumber in the link set.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetLinkKey" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This script demonstrates how `llGetLinkKey` relates to other link-related functions like `llGetKey`, `llGetLinkNumber`, and `llGetNumberOfPrims`. Drag it onto linked and unlinked prims, with avatars sitting or not, to see the relationships:
+
+```lsl
+// Return the name of a link num else the empty string.
+string getLinkNumName(integer link)
+{
+    if (LINK_THIS == link) return "LINK_THIS";
+    if (LINK_ALL_CHILDREN == link) return "LINK_ALL_CHILDREN";
+    if (LINK_ALL_OTHERS == link) return "LINK_ALL_OTHERS";
+    if (LINK_SET == link) return "LINK_SET";
+    if (LINK_ROOT == link) return "LINK_ROOT";
+    return "";
+}
+
+// Say the key of each linked prim.
+default
+{
+    state_entry()
+    {
+        integer theLink = llGetLinkNumber();
+
+        key theLinkKey = llGetKey();
+        key owner = llGetOwner();
+        key creator = llGetCreator();
+
+        // Visit each link num.
+
+        integer link;
+        integer primmed = llGetNumberOfPrims();
+        for (link = -5; link <= (primmed + 5); ++link)
+        {
+            key linkKey = llGetLinkKey(link);
+
+            // Detail the key at the link num.
+
+            string line = (string) linkKey; // large constant width
+
+            if (linkKey == owner) line += " llGetOwner";
+            if (linkKey == creator) line += " llGetCreator";
+            if (linkKey == theLinkKey) line += " llGetKey";
+
+            // Detail the link num.
+
+            line += " @ " + (string) link;
+            line += " " + getLinkNumName(link);
+            if (link == theLink) line += " llGetLinkNumber";
+            if (link == primmed) line += " llGetNumberOfPrims";
+
+            // Say the detail if fun.
+
+            if (linkKey != NULL_KEY)
+            {
+                llOwnerSay(line);
+            }
+        }
+
+        // Always count the linked prims.
+
+        llOwnerSay((string) primmed + " llGetNumberOfPrims");
+        llOwnerSay("OK");
+    }
+}
+```
+
+## See Also
+
+- [llGetKey](../llgetkey/)
+- [llGetLinkName](../llgetlinkname/)
+
+<WikiAttribution />

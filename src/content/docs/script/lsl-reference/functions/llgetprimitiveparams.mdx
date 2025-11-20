@@ -1,0 +1,171 @@
+---
+title: llGetPrimitiveParams
+description: |-
+  Returns the primitive parameters specified in the parameters list.
+  Returns primitive parameters specified in the Parameters list.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetPrimitiveParams" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- `PRIM_LINK_TARGET` is a special parameter which can be inserted to perform actions on multiple prims in the linkset with one call.
+  - Passing 0 (zero) as the link number in the formal link parameter on a linked object will return an empty list.
+- The legacy value of `PRIM_TYPE_LEGACY` is not supported by this function as a flag (llGetPrimitiveParams came after PRIM_TYPE_LEGACY was deprecated).
+- `llGetLinkPrimitiveParams` is similar but takes a link parameter and does not cause the script to sleep.
+
+## Examples
+
+### Testing for a Point Light Source
+
+```lsl
+default
+{
+    state_entry()
+    {
+        list    params  = llGetPrimitiveParams([PRIM_POINT_LIGHT]);
+        integer isLight = llList2Integer(params, 0);
+
+        string msg = "Object is ";
+
+        if (!isLight) // read as "not isLight"
+            msg += "not a light source.";
+        else
+        {
+            msg += "a point light source.";
+
+        //  llList2String will automatically typecast
+
+            msg += "\n\tColour    = " + llList2String(params, 1);
+            msg += "\n\tIntensity = " + llList2String(params, 2);
+            msg += "\n\tRadius    = " + llList2String(params, 3);
+            msg += "\n\tFalloff   = " + llList2String(params, 4);
+        }
+
+        llSay(0, msg);
+    }
+}
+```
+
+### Checking if All Prims are Glowing
+
+```lsl
+integer AreAllPrimsAreGlowing()
+{
+    //The root prim is either link number is 0 or 1
+    //It is only zero if it is a single prim object with no avatars sitting on it.
+    //llGetNumberOfPrims() returns the number of prims and seated avatars.
+    integer link = llGetNumberOfPrims() > 1;
+
+    //We want to loop over all prims but not avatars, so we need to know how many prims there are.
+    //Fortunately the avatars are added to the end of the link set, their link numbers always come after the last prim.
+    //llGetObjectPrimCount(llGetKey()) only returns only the number of prims, it doesn't count avatars.
+    //To determine the upper bound, we need to take into consideration the link number of the root prim.
+    integer end = link + llGetObjectPrimCount(llGetKey());
+
+    for(;link < end; ++link)//loop through all prims
+    {
+        if( llListStatistics(LIST_STAT_MAX, llGetLinkPrimitiveParams(link, [PRIM_GLOW, ALL_SIDES])) <= 0.0)
+        {//we can exit early because we know that if this value is less than or equal to zero, so will the minimum
+            return FALSE;
+        }
+    }
+    //we didn't find a single value that was less than or equal to zero, QED, they are all greater than zero.
+    return TRUE;
+}
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        if(AreAllPrimsAreGlowing())
+            llSay(0, "All prims glowing.");
+        else
+            llSay(0, "Not all prims glowing.");
+    }
+}
+```
+
+## Helper Functions
+
+### GetPrimitiveParams Wrapper
+
+This helper function returns a list that can be fed to `llSetPrimitiveParams`:
+
+```lsl
+list GetPrimitiveParams(list input)
+{//Returns a list that can be fed to llSetPrimitiveParams
+    integer link = LINK_THIS;
+    list output;
+    integer c = ~llGetListLength(input);
+    while(0x80000000 & (c = - ~c))
+    {
+        integer f = llList2Integer(input, c);
+        list flag = (list)f;
+        if(~llListFindList([PRIM_BUMP_SHINY, PRIM_COLOR, PRIM_TEXTURE,
+                            PRIM_FULLBRIGHT, PRIM_TEXGEN, PRIM_GLOW], flag ))
+        {
+            integer side = llList2Integer(input, (c = - ~c));
+            if(~side)//pop the stack
+                output += flag + side + llGetLinkPrimitiveParams(link, flag + side );
+            else
+                for(side = llGetLinkNumberOfSides(link); side; ) //we return the sides in reverse order, easier to code; runs faster.
+                    output += flag + side + llGetLinkPrimitiveParams(link, flag + (side = ~ -side) );
+        }
+        else if(PRIM_LINK_TARGET ^ f)
+            output += flag + (link = llList2Integer(input, (c = - ~c)));
+        else
+            output += flag + llGetLinkPrimitiveParams(link, flag );
+    }
+    return output;
+}
+//Contributed by Strife Onizuka
+```
+
+### GetLinkPrimitiveParams Wrapper
+
+This helper function returns a list that can be fed to `llSetPrimitiveParams` for a specific link:
+
+```lsl
+list GetLinkPrimitiveParams(integer link, list input)
+{//Returns a list that can be fed to llSetPrimitiveParams
+    list output;
+    integer c = ~llGetListLength(input);
+    while(0x80000000 & (c = - ~c))
+    {
+        integer f = llList2Integer(input, c);
+        list flag = (list)f;
+        if(~llListFindList([PRIM_BUMP_SHINY, PRIM_COLOR, PRIM_TEXTURE,
+                            PRIM_FULLBRIGHT, PRIM_TEXGEN, PRIM_GLOW], flag ))
+        {
+            integer side = llList2Integer(input, (c = - ~c));
+            if(~side)//pop the stack
+                output += flag + side + llGetLinkPrimitiveParams(link, flag + side );
+            else
+                for(side = llGetLinkNumberOfSides(link); side; ) //we return the sides in reverse order, easier to code; runs faster.
+                    output += flag + side + llGetLinkPrimitiveParams(link, flag + (side = ~ -side) );
+        }
+        else if(PRIM_LINK_TARGET ^ f)
+            output += flag + (link = llList2Integer(input, (c = - ~c)));
+        else
+            output += flag + llGetLinkPrimitiveParams(link, flag );
+    }
+    return output;
+}
+//Contributed by Strife Onizuka
+```
+
+## See Also
+
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- [llSetLinkPrimitiveParamsFast](../llsetlinkprimitiveparamsfast/)
+- [llGetObjectDetails](../llgetobjectdetails/)
+- [llGetLinkPrimitiveParams](../llgetlinkprimitiveparams/)
+
+<WikiAttribution />

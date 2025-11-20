@@ -1,0 +1,75 @@
+---
+title: llSetLinkColor
+description: |-
+  If a task exists in the link chain at LinkNumber, set the Face to color.
+  Sets the color of the linked child's side, specified by LinkNumber.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLinkColor" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Turn a link set green:
+
+```lsl
+default
+{
+    touch_start(integer detected)
+    {
+        llSetLinkColor(LINK_SET, <0.0, 1.0, 0.0>, ALL_SIDES);
+    }
+}
+```
+
+## Caveats
+
+- `llSetLinkColor` will have no visible effect on faces with a PBR material. To work on faces both with and without a PBR material, use this snippet:
+
+```lsl
+llSetLinkColor(LINK_THIS, color, ALL_SIDES);
+llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_GLTF_BASE_COLOR, ALL_SIDES, "", "", "", "", llsRGB2Linear(color), "", "", "", ""]);
+```
+
+## Color Reference
+
+Common LSL color representations in RGB format:
+
+| Color | Hex | LSL Vector |
+|-------|-----|-----------|
+| Navy | #001f3f | `<0.000, 0.122, 0.247>` |
+| Blue | #0074d9 | `<0.000, 0.455, 0.851>` |
+| Aqua | #7fdbff | `<0.498, 0.859, 1.000>` |
+| Teal | #39cccc | `<0.224, 0.800, 0.800>` |
+| Olive | #3d9970 | `<0.239, 0.600, 0.439>` |
+| Green | #2ecc40 | `<0.180, 0.800, 0.251>` |
+| Lime | #01ff70 | `<0.004, 1.000, 0.439>` |
+| Yellow | #ffdc00 | `<1.000, 0.863, 0.000>` |
+| Orange | #ff851b | `<1.000, 0.522, 0.106>` |
+| Red | #ff4136 | `<1.000, 0.255, 0.212>` |
+| Maroon | #85144b | `<0.522, 0.078, 0.294>` |
+| Fuchsia | #f012be | `<0.941, 0.071, 0.745>` |
+| Purple | #b10dc9 | `<0.694, 0.051, 0.788>` |
+| White | #ffffff | `<1.000, 1.000, 1.000>` |
+| Silver | #dddddd | `<0.867, 0.867, 0.867>` |
+| Gray | #aaaaaa | `<0.667, 0.667, 0.667>` |
+| Black | #111111 | `<0.067, 0.067, 0.067>` |
+
+## See Also
+
+- [llGetAlpha](../llgetalpha/)
+- [llSetAlpha](../llsetalpha/)
+- [llGetColor](../llgetcolor/)
+- [llSetColor](../llsetcolor/)
+- [llSetLinkAlpha](../llsetlinkalpha/)
+- [llSetLinkTexture](../llsetlinktexture/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- PRIM_COLOR - The equivalent parameter for llSetPrimitiveParams
+- PRIM_GLTF_BASE_COLOR - The equivalent PBR parameter for llSetPrimitiveParams
+- changed event with CHANGED_COLOR
+
+<WikiAttribution />

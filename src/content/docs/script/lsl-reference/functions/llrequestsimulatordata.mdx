@@ -1,0 +1,82 @@
+---
+title: llRequestSimulatorData
+description: >-
+  Requests the specified Data about RegionName. When the specified data is
+  available, the dataserver event is raised.
+
+  Data should use one of the DATA_SIM_* constants.
+
+  Returns a dataserver query ID and triggers the dataserver event when data is
+  found.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRequestSimulatorData" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- There is no `DATA_SIM_MAXPRIMS` flag (but `llGetEnv("region_product_name")` returns the region type). [SVC-4921](https://jira.secondlife.com/browse/SVC-4921)
+
+## Examples
+
+### Hide Objects in PG or Unknown Regions
+
+This example requests the region's rating and shows or hides objects based on whether the region is mature/adult or PG/unknown.
+
+```lsl
+key gRateingQuery = NULL_KEY;
+
+show()
+{
+    llSetLinkAlpha(LINK_SET, 1.0, ALL_SIDES);
+}
+
+hide()
+{
+    llSetLinkAlpha(LINK_SET, 0.0, ALL_SIDES);
+}
+
+default
+{
+    on_rez(integer Setting)
+    {
+        llResetScript();
+    }
+
+    state_entry()
+    {
+        gRateingQuery = llRequestSimulatorData(llGetRegionName(), DATA_SIM_RATING);
+    }
+
+    changed(integer ItChanged)
+    {
+        if (ItChanged & CHANGED_OWNER)      llResetScript();
+        if (ItChanged & CHANGED_REGION)     llResetScript();
+    }
+
+    dataserver(key query_id, string data)
+    {
+        if (query_id == gRateingQuery)
+        {
+            if (data == "MATURE" || data == "ADULT")
+                show();
+            else if (data == "UNKNOWN" || data == "PG")
+                hide();
+        }
+    }
+}
+```
+
+## See Also
+
+- [llGetEnv](../llgetenv/)
+- [llGetParcelDetails](../llgetparceldetails/)
+- [llGetParcelFlags](../llgetparcelflags/)
+- [llGetParcelMaxPrims](../llgetparcelmaxprims/)
+- [llGetParcelPrimCount](../llgetparcelprimcount/)
+
+<WikiAttribution />

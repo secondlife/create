@@ -1,0 +1,131 @@
+---
+title: llListSort
+description: >-
+  Returns the specified list, sorted into blocks of stride in ascending order
+  (if Ascending is TRUE, otherwise descending). Note that sort only works if the
+  first entry of each block is the same datatype.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListSort" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Sorting with Stride
+
+```lsl
+list numbers = [3, "three", 2, "two", 1, "one"];
+default
+{
+    state_entry()
+    {
+        llOwnerSay(llDumpList2String(numbers, ","));
+        // Object: 3,three,2,two,1,one
+        numbers = llListSort(numbers, 2, TRUE);
+        llOwnerSay(llDumpList2String(numbers, ","));
+        // Object: 1,one,2,two,3,three
+    }
+}
+```
+
+### Sorting with Different Data Types
+
+```lsl
+list mylist = ["brown", <0.000000, 0.000000, 0.000000>, "house", 17.005, 100, "cat", <3.000000, 3.000000, 3.000000>, 39];
+list tmplist = llListSort(mylist, 1, TRUE);
+llSay(0, llList2CSV(tmplist));
+// Ascending: brown, <0.000000, 0.000000, 0.000000>, cat, 17.004999, 39, house, <3.000000, 3.000000, 3.000000>, 100
+
+tmplist = llListSort(mylist, 1, FALSE);
+llSay(0, llList2CSV(tmplist));
+// Descending: 39, <3.000000, 3.000000, 3.000000>, cat, 100, 17.004999, house, <0.000000, 0.000000, 0.000000>, brown
+```
+
+### Unicode Sorting (Case Sensitive)
+
+```lsl
+llListSort(["a", "á", "B", "C", "d", "e"], 1, TRUE)
+// returns ["B", "C", "a", "d", "e", "á"] - sorted by Unicode character code
+```
+
+### Sorting Strided Lists
+
+When working with strided lists (related data grouped together), set stride to match your grouping size:
+
+```lsl
+list demographics = ["John Adams", "male", "2007-06-22", "Shirley Bassey", "female", "2005-11-02", "Matt Damon", "male", "2008-05-19"];
+
+// Bad: stride = 1 destroys the data grouping
+list tmplist_1 = llListSort(demographics, 1, TRUE);
+// Result: ["2005-11-02", "2007-06-22", "2008-05-19", "John Adams", "Matt Damon", "Shirley Bassey", "female", "male", "male"]
+
+// Good: stride = 3 preserves grouping
+list tmplist_2 = llListSort(demographics, 3, TRUE);
+// Result: ["John Adams", "male", "2007-06-22", "Matt Damon", "male", "2008-05-19", "Shirley Bassey", "female", "2005-11-02"]
+```
+
+## Caveats
+
+- **Performance**: Uses an unoptimized selection sort algorithm with O(N²) complexity. See [SVC-2988](https://jira.secondlife.com/browse/SVC-2988) for an open improvement request.
+- **Ascending Parameter**: The value must be exactly `TRUE` (or 1) for ascending sort. Non-zero values do NOT guarantee ascending order.
+- **Vectors**: Sorted by magnitude. See [SVC-5643](https://jira.secondlife.com/browse/SVC-5643).
+- **Rotations**: Not sorted in any meaningful order. A list containing only rotations sorted in ascending order will be returned unchanged.
+- **Mixed Types Descending**: When sorting mixed types in descending order, results are deterministic but often meaningless. Descending sort works correctly only with homogeneous types.
+- **Non-Multiple Stride**: If list length is not a multiple of the stride, the list is returned unchanged.
+- **String Number Sorting**: Numbers in strings are sorted left-to-right like any other character, not in numeric order. This differs from inventory item ordering (which uses "natural order"):
+  ```lsl
+  llListSort(["127", "3", "25"], 1, TRUE)
+  // returns ["127", "25", "3"] because "1" < "2" < "3" alphabetically
+
+  // To sort numerically, pad with zeros:
+  llListSort(["127", "003", "025"], 1, TRUE)
+  // returns ["003", "025", "127"]
+  ```
+
+## Notes
+
+### Important: Capture the Results
+
+The source list remains unchanged. A new sorted list is produced, so you must capture the result:
+
+```lsl
+llListSort(myList, 1, TRUE); // WRONG: result is discarded
+
+list newlist = llListSort(myList, 1, TRUE); // RIGHT: result is captured
+
+llSay(0, llList2CSV(llListSort(myList, 1, TRUE))); // RIGHT: using result directly
+```
+
+### Sort Order
+
+- **Ascending** (`TRUE`): Returns sorted list from lowest to highest (e.g., ["Apples", "Bananas", "Oranges"])
+- **Descending** (`FALSE`): Returns sorted list from highest to lowest (e.g., ["Oranges", "Bananas", "Apples"])
+
+### Type Sorting
+
+The sort order is affected by type. For strings and keys, it is **case sensitive** and sorts by Unicode character code. When sorting mixed types in ascending order, each type is sorted individually and then "feathered" to have the same order of types:
+
+```lsl
+llListSort([1, "C", 3, "A", 2, "B"], 1, TRUE)
+// returns [1, "A", 2, "B", 3, "C"] - numbers first (sorted), then strings (sorted)
+
+llListSort([1, 3, 2, "C", "A", "B"], 1, TRUE)
+// returns [1, 2, 3, "A", "B", "C"] - preserves type grouping
+
+llListSort([1, "C", 3, "A", 2, "B"], 2, TRUE)
+// returns [1, "C", 2, "B", 3, "A"] - each pair sorted independently
+```
+
+### Stride Parameter Design
+
+When designing strided lists, plan ahead for how you'll sort them. You can only sort on the first element of each group. If you need to sort by a specific field (e.g., gender instead of name), make that field first in your data grouping.
+
+## See Also
+
+- [llListRandomize](/script/reference/lsl/functions/lllistrandomize) - Shuffles the elements of a list
+
+<WikiAttribution />

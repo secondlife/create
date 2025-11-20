@@ -1,0 +1,77 @@
+---
+title: llStopMoveToTarget
+description: Stops critically damped motion (due to llMoveToTarget()).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStopMoveToTarget" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Stops the critically damped motion caused by llMoveToTarget(). Use this function to halt smooth positional movement of a physical object.
+
+## Examples
+
+```lsl
+integer gLockPrimInPlace;
+
+default
+{
+    on_rez(integer sp)
+    {
+        llResetScript();
+    }
+
+    state_entry()
+    {
+        llStopMoveToTarget();
+        llSetStatus(STATUS_PHYSICS, TRUE);
+    }
+
+    touch_start(integer total_number)
+    {
+        if (llDetectedKey(0) != llGetOwner())
+        {
+            return;
+        }
+
+        if (!llGetStatus(STATUS_PHYSICS))
+        {
+            llOwnerSay("Locking or unlocking position works only for physical objects.");
+            return;
+        }
+
+        gLockPrimInPlace = !gLockPrimInPlace;
+        if (gLockPrimInPlace)
+        {
+            llMoveToTarget(llGetPos(), 0.05);
+            llOwnerSay("Locked in place.");
+        }
+        else
+        {
+            llStopMoveToTarget();
+            llOwnerSay("Unlocked.");
+        }
+    }
+}
+```
+
+This example demonstrates a toggle script that uses llMoveToTarget() to lock an object in place and llStopMoveToTarget() to unlock it. Only the owner can toggle the lock state, and it only works on physical objects.
+
+## Notes
+
+- This function only affects motion started by llMoveToTarget()
+- To stop rotation movement, use llStopLookAt()
+- The function works only on physical objects with STATUS_PHYSICS enabled
+- There is no return value; the function always succeeds if called
+
+## See Also
+
+- [llMoveToTarget](../llmovetotarget/)
+- [llStopLookAt](../llstoplookat/)
+
+<WikiAttribution />

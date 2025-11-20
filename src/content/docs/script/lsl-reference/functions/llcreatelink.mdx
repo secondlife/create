@@ -1,0 +1,115 @@
+---
+title: llCreateLink
+description: >-
+  Attempt to link the object the script is in, to target (requires permission
+  PERMISSION_CHANGE_LINKS be set).
+
+  Requires permission PERMISSION_CHANGE_LINKS be set.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCreateLink" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The prims for the child object (TargetPrim if Parent is TRUE, script's object if Parent is FALSE) are inserted into the parent object's link set starting at link number 2. For example, if the link order for the parent object is A1, A2, A3 and the link order of the child object is B1, B2, B3, then the link order of the resulting object will be A1, B1, B2, B3, A2, A3.
+
+## Examples
+
+### Example 1: Rez and Link Object
+
+This example demonstrates rezzing an object and linking it as a child prim. It requests the necessary PERMISSION_CHANGE_LINKS permission before attempting to link.
+
+```lsl
+// Rez an object and link it as a child prim.
+string ObjectName = "Object Name Here";
+// NOTE: must be a name of an object in this object's inventory.
+
+default
+{
+    touch_start(integer count)
+    {
+        // When the object is touched, make sure we can do this before trying.
+        llRequestPermissions(llGetOwner(), PERMISSION_CHANGE_LINKS);
+    }
+    run_time_permissions(integer perm)
+    {
+        // Only bother rezzing the object if will be able to link it.
+        if (perm & PERMISSION_CHANGE_LINKS)
+            llRezObject(ObjectName, llGetPos() + <0,0,0.5>, ZERO_VECTOR, llGetRot(), 0);
+        else
+            llOwnerSay("Sorry, we can't link.");
+    }
+    object_rez(key id)
+    {
+        // NOTE: under some conditions, this could fail to work.
+        // This is the parent object.  Create a link to the newly-created child.
+        llCreateLink(id, TRUE);
+    }
+}
+```
+
+### Example 2: Toggle Link State
+
+This helper script demonstrates toggling between linked and unlinked states using llCreateLink and llBreakAllLinks.
+
+```lsl
+// child prim key
+key kChild = NULL_KEY;
+integer bLink = TRUE;       // we suppose this script is on a linked object
+default
+{
+    state_entry()
+    {
+        // get the permission to change the link
+        llRequestPermissions(llGetOwner(), PERMISSION_CHANGE_LINKS);
+
+        // get the child key
+        kChild = llGetLinkKey(2);
+    }
+
+    touch_start(integer nTotalCliquor)
+    {
+        if (bLink)
+        {
+            // break all my links, wait 1.5 sec
+            llBreakAllLinks();
+            llSleep(1.5);
+
+            // i'm unlinked
+            llSay(0, "Unlinked, click to link");
+            bLink = FALSE;
+        }
+        else
+        {
+            // redo my link
+            llCreateLink(kChild, TRUE);
+            llSleep(1.5);
+
+            // i'm linked
+            llSay(0, "Linked, click to unlink");
+            bLink = TRUE;
+        }
+    }
+}
+```
+
+## Caveats
+
+- If TargetPrim is not in the region, not a prim, or is attached to an avatar, an error is shouted on DEBUG_CHANNEL
+- If either the object or TargetPrim are not modifiable or of different owners, then an error is shouted on DEBUG_CHANNEL
+- If the parent object and TargetPrim are too far apart they will fail to link
+- The maximum distance is further explained in the Linkability Rules documentation
+- This function silently fails if called from a script inside an attachment
+
+## See Also
+
+- [llBreakLink](../llbreaklink/)
+- [llBreakAllLinks](../llbreakalllinks/)
+- changed event with CHANGED_LINK flag
+
+<WikiAttribution />

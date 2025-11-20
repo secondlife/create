@@ -1,0 +1,33 @@
+---
+/**
+ * LSLConstant component - Displays LSL constant documentation
+ *
+ * This component loads constant data from lsl_definitions.yaml at build time.
+ * It only requires the constant name as a prop.
+ */
+
+import ConstantReference from './ConstantReference.astro';
+import { getConstant } from '../utils/lsl-definitions';
+
+export interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+
+// Load constant definition from YAML
+const constantDef = getConstant(name);
+
+if (!constantDef) {
+  throw new Error(`Constant "${name}" not found in lsl_definitions.yaml`);
+}
+---
+
+<ConstantReference
+  name={name}
+  type={constantDef.type}
+  value={constantDef.value}
+  tooltip={constantDef.tooltip}
+  language="lsl"
+  className="constant-reference lsl-constant-reference"
+/>

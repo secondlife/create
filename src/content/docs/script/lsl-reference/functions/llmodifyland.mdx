@@ -1,0 +1,59 @@
+---
+title: llModifyLand
+description: >-
+  Modify land with action (LAND_LEVEL, LAND_RAISE, LAND_LOWER, LAND_SMOOTH,
+  LAND_NOISE, LAND_REVERT) on size (0, 1, 2, corresponding to 2m x 2m, 4m x 4m,
+  8m x 8m).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llModifyLand" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetTimerEvent(0.1);
+    }
+
+    timer()
+    {
+        llModifyLand(LAND_LEVEL, 0);
+    }
+}
+```
+
+## Caveats and Warnings
+
+- This function has no effect if the script's owner is offline or not in the same sim as the scripted object.
+- Uncontrolled use of llModifyLand in scripted objects may force the region's navmesh to rebake continually and cause Memory Allocated for the region to exceed its limit, making it impossible to rez objects.
+- This function has no effect if the scripted object is deeded to a group.
+- If the script is in a prim that is attached to an avatar or is in a child prim of a linkset, then the local position relative to its attachment point or root prim is used rather than the position within the region.
+- If land is not owned by script owner or the owner doesn't have terraform permissions, the script will silently fail.
+- You cannot change altitude beyond land terraform limits for the specified parcel.
+
+## Brush Sizes
+
+Note: The constant values in the compiler are incorrect. Use the numeric values instead:
+
+| Brush | Numeric Value | Size |
+|-------|---|---|
+| LAND_SMALL_BRUSH | 0 | 2m x 2m |
+| LAND_MEDIUM_BRUSH | 1 | 4m x 4m |
+| LAND_LARGE_BRUSH | 2 | 8m x 8m |
+
+Previously documented constant values (1, 2, 3) do not correspond to the correct brush sizes.
+
+## Notes
+
+- The position of the prim is used to determine the input for various flags
+- This function requires the script owner to have terraform permissions on the land
+
+<WikiAttribution />

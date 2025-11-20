@@ -1,0 +1,108 @@
+---
+title: llParseString2List
+description: >-
+  Converts Text into a list, discarding Separators, keeping Spacers (Separators
+  and Spacers must be lists of strings, maximum of 8 each).
+
+  Separators and Spacers are lists of strings with a maximum of 8 entries each.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llParseString2List" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Separator and Spacer Usage
+
+```lsl
+default
+{
+    state_entry()
+    {
+        // Using separators (discarded) and spacers (kept)
+        string my_string = "A crazy fox.  Saw the moon..";
+        list my_list = llParseString2List(my_string, [" "], ["."]);
+        llOwnerSay("<" + llDumpList2String(my_list, "><") + ">");
+        // Output: <A><crazy><fox><.><Saw><the><moon><.><.>
+
+        // Compare with llParseStringKeepNulls to keep empty strings
+        my_list = llParseStringKeepNulls(my_string, [" "], ["."]);
+        llOwnerSay("<" + llDumpList2String(my_list, "><") + ">");
+        // Output: <A><crazy><fox><.><><><Saw><the><moon><.><><.><>
+    }
+}
+```
+
+### Nested List Parsing (Lists-in-Lists Emulation)
+
+```lsl
+string shoppinglist = "macaroni::pepperoni::bread#wheat::sausage#italian::coffee::syrup::apple::ice cream#strawberry#chocolate#vanilla";
+
+default
+{
+    state_entry()
+    {
+        list items = llParseString2List(shoppinglist, ["::"], []);
+        integer i = 0;
+        integer j = llGetListLength(items);
+        for(; i < j; ++i)
+        {
+            list desc = llParseString2List(llList2String(items, i), ["#"], []);
+            if(llGetListLength(desc) > 1)
+            {
+                list types = llDeleteSubList(desc, 0, 0);
+                llOwnerSay("Item: " + llList2String(desc, 0) + "  Type: " + llList2CSV(llDeleteSubList(types, -2, -1) + llDumpList2String(llList2List(types, -2, -1), " & ")));
+            } else {
+                llOwnerSay("Item: " + (string)desc);
+            }
+        }
+    }
+}
+```
+
+### Separators vs Spacers
+
+```lsl
+string myString = "What Are You Looking At?";
+
+// Using separators (removes them from output)
+llSay(0, llList2CSV(llParseString2List(myString, ["W", "A", "Y", "L"], [])));
+// Returns: hat , re , ou , ooking , t?
+
+// Using spacers (keeps them in output)
+llSay(0, llList2CSV(llParseString2List(myString, [], ["W", "A", "Y", "L"])));
+// Returns: W, hat , A, re , Y, ou , L, ooking , A, t?
+```
+
+## Caveats
+
+- All empty strings (from adjacent separators/spacers or at string ends) are removed automatically. Use `llParseStringKeepNulls` if you need to preserve empty strings and maintain list order.
+- Only the first 8 separators and first 8 spacers are used; any beyond are ignored. To work around this, use nested calls or JSON for complex parsing.
+- All separators and spacers must be strings; other types are silently ignored.
+- Separators take precedence over spacers. The string is parsed left to right, checking separators first at each position.
+- All returned list elements are strings and must be explicitly typecast if used as other types. Do not rely on implicit typecasting.
+- Empty strings used as separators or spacers have no effect.
+
+## Notes
+
+- **Separators** remove the matched text from the result (split and discard)
+- **Spacers** keep the matched text in the result as separate list entries (split but keep)
+- Using `" "` (space) as a separator effectively splits a sentence into words
+- An empty string used as a separator or spacer has no effect
+- If there is no spacer you care about, just use an empty list `[]` as the spacer parameter
+- Remember to capture the result in a variable unless you're using it directly
+- While LSL doesn't support lists-in-lists natively, you can emulate them using successive calls or JSON
+- For more complex parsing with more than 8 delimiters, consider using JSON or nested parse calls
+
+## See Also
+
+- [llParseStringKeepNulls](../llparsestringkeepnulls/)
+- [llDumpList2String](../lldumplist2string/)
+- [llCSV2List](../llcsv2list/)
+- [llList2CSV](../lllist2csv/)
+
+<WikiAttribution />

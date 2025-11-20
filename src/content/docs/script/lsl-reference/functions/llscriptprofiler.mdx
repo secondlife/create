@@ -1,0 +1,84 @@
+---
+title: llScriptProfiler
+description: >-
+  Enables or disables script profiling options. Currently only supports
+  PROFILE_SCRIPT_MEMORY (Mono only) and PROFILE_NONE.
+
+  May significantly reduce script performance.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llScriptProfiler" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function's behavior is dependent upon the VM the script is using. Mono is the new VM, LSO is the old VM. The big difference between Mono and LSO is that Mono scripts run faster and can utilize four times more memory.
+
+### Mono
+
+Use this function with `PROFILE_SCRIPT_MEMORY` to enable memory profiling at a severe script performance penalty. Use it with `PROFILE_NONE` to disable profiling. During and after a profiling run, `llGetSPMaxMemory()` will return the most memory used at any one time.
+
+### LSO
+
+This function has no effect for scripts not compiled to Mono.
+
+## Examples
+
+Basic profiling usage:
+
+```lsl
+llScriptProfiler(PROFILE_SCRIPT_MEMORY);
+my_func();
+llScriptProfiler(PROFILE_NONE);
+llOwnerSay("This script used at most " + (string)llGetSPMaxMemory() + " bytes of memory during my_func.");
+```
+
+Complete example with memory limit:
+
+```lsl
+workerMethod()
+{
+    float mathNumber = 3 * PI + 3 * llSin( PI );
+    llSetText( "Answer: " + (string)mathNumber, <1, 0, 0>, 1.0 );
+}
+
+default
+{
+    state_entry()
+    {
+        llSetMemoryLimit( 5000 ); // set the memory limit
+
+        // call up the profiler, execute a method, stop profiler
+        llScriptProfiler( PROFILE_SCRIPT_MEMORY );
+        workerMethod();
+        llScriptProfiler( PROFILE_NONE );
+
+        // display memory usage...
+        llSay(0, "Memory used: " + (string)llGetSPMaxMemory() + " bytes, total memory: " +
+            (string)llGetMemoryLimit() + " bytes." );
+    }
+}
+
+// Output: Memory used: 4968 bytes, total memory: 5000 bytes.
+```
+
+## Caveats
+
+- Scripts compiled to LSO cannot be profiled for memory use.
+- The profile state will reset to `PROFILE_NONE` if:
+  - The object the script is in is de-rezzed, rezzed, or changes regions (via region cross or teleport)
+  - The region containing the object with the script shuts down or restarts
+  - The script is reset or taken to or from inventory
+- There is up to 100x performance penalty to the script being profiled (but not the region).
+
+## See Also
+
+- [`llGetSPMaxMemory()`](../llgetspmaxmemory/) - Returns the most memory used during profiling
+- [`llGetMemoryLimit()`](../llgetmemorylimit/) - Gets the current memory limit
+- [`llSetMemoryLimit()`](../llsetmemorylimit/) - Sets the maximum memory available to the script
+
+<WikiAttribution />

@@ -1,0 +1,58 @@
+---
+title: llSetPrimMediaParams
+description: >-
+  Sets the MediaParameters for a particular Face on the prim. Returns an integer
+  that is a STATUS_* flag which details the success/failure of the operation(s).
+
+  MediaParameters is a set of name/value pairs in no particular order.
+  Parameters not specified are unchanged, or if new media is added then set to
+  the default specified.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetPrimMediaParams" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If prim-media is not already on this object, it will be added
+- Parameters not specified are unchanged, or if new media is added they are set to the default specified
+- Both width and height must be specified together to work, and they narrow the texture space while inversely widening the aperture
+  - Width and height scaled larger than 1024 pixels will require the texture backdrop to be resized to fit (see Useful Snippets below)
+  - If resized to fit, the resulting view will cut off scrolled content outside the bounds making it impossible to be viewed
+- Face must be a single face. If you want media on multiple faces (e.g., opposing sides of an object), call the function multiple times with different face numbers. Bitwise AND for face numbers does not work
+
+## Useful Snippets
+
+This helper function expands media textures greater than 1024 pixels in a direction to fit the media face. It does exactly what the "align" button does in the edit window (width and height are in pixels):
+
+```lsl
+uExpandMediaTexture( integer vIntWidth, integer vIntHeight, integer vIntFace ){
+    integer vIntTemp;
+    vector  vSizScale;
+
+    while (vIntWidth >> ++vIntTemp);
+    vSizScale.x = vIntWidth / (float)(1 << vIntTemp);
+    vIntTemp = 0;
+    while (vIntHeight >> ++vIntTemp);
+    vSizScale.y = vIntHeight / (float)(1 << vIntTemp);
+    llSetPrimitiveParams( [PRIM_TEXTURE, vIntFace] +
+                          llListReplaceList( llGetPrimitiveParams( [PRIM_TEXTURE, vIntFace] ),
+                                             [vSizScale, ((vSizScale - <1.0, 1.0, 0.0>) / 2.0)],
+                                             1,
+                                             2 ) );
+}
+```
+
+Original source: How to Align a Shared Media Texture from Linden Script
+
+## See Also
+
+- [llSetLinkMedia](../llsetlinkmedia/)
+- [llGetPrimMediaParams](../llgetprimmediaparams/)
+- [llClearPrimMedia](../llclearprimmedia/)
+
+<WikiAttribution />

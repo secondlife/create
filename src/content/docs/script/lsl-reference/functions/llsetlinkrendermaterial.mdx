@@ -1,0 +1,41 @@
+---
+title: llSetLinkRenderMaterial
+description: >-
+  Sets the Render Material of Face on a linked prim, specified by LinkNumber.
+  Render Material may be a UUID or name of a material in prim inventory.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLinkRenderMaterial" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Cover a link set in the material my_material:
+
+```lsl
+default
+{
+    touch_start(integer detected)
+    {
+        llSetLinkRenderMaterial(LINK_SET, my_material, ALL_SIDES);
+    }
+}
+```
+
+## Caveats
+
+- If `material` is provided as `NULL_KEY`, the glTF Material is removed from the face, reverting back to any underlying Blinn-Phong materials.
+- This function will clear most PRIM_GLTF_* properties on the face, with the exceptions of repeats, offsets, and rotation_in_radians.
+
+## See Also
+
+- [llSetLinkAlpha](../llsetlinkalpha/)
+- [llSetLinkColor](../llsetlinkcolor/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- Internal Materials
+
+<WikiAttribution />

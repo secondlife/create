@@ -1,0 +1,43 @@
+---
+title: llSensorRemove
+description: |-
+  removes sensor.
+  Removes the sensor set by llSensorRepeat.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSensorRemove" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The following example shows an object that when touched starts scanning for avatars in 10m every 30 seconds. When an avatar is detected, it displays their name and stops the sensor.
+
+```lsl
+default {
+    touch_start(integer x) {
+        llSensorRepeat("", NULL_KEY, AGENT, 10.0, PI, 30.0);
+    }
+
+    sensor(integer x) {
+        llSay(0, llDetectedName(0) + " was found first!");
+        llSensorRemove();
+    }
+}
+```
+
+## Caveats
+
+- If called within the `sensor` event, `llSensorRemove()` also removes all of the sensor data that is accessed by the detection functions (such as `llDetectedName()`, `llDetectedPos()`, etc.). This means you should retrieve any needed detection data before calling this function within the sensor event handler.
+
+## See Also
+
+- [`llSensorRepeat()`](../llsensorrepeat/) - Scans for agents or objects at regular intervals
+- [`llSensor()`](../llsensor/) - Runs a sensor scan once
+- `sensor` event - Triggered when a sensor detects something
+- `no_sensor` event - Triggered when a sensor detects nothing
+
+<WikiAttribution />

@@ -1,0 +1,199 @@
+---
+title: llSetKeyframedMotion
+description: >-
+  Requests that a non-physical object be key-framed according to key-frame list.
+
+  Specify a list of times, positions, and orientations to be followed by an
+  object. The object will be smoothly moved between key-frames by the simulator.
+  Collisions with other non-physical or key-framed objects will be ignored (no
+  script events will fire and collision processing will not occur). Collisions
+  with physical objects will be computed and reported, but the key-framed object
+  will be unaffected by those collisions.
+
+  Keyframes is a strided list containing positional, rotational, and time data
+  for each step in the motion.  Options is a list containing optional arguments
+  and parameters (specified by KFM_* constants).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetKeyframedMotion" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Each keyframe is interpreted **relative** to the previous transform of the object. Time values must be 1/9s (0.1111...) or greater. For example:
+
+```lsl
+[<0, 0, 10>, ZERO_ROTATION, 5, <0, 0, 0>, ZERO_ROTATION, 5, <0, 0, -10>, ZERO_ROTATION, 5]
+```
+
+This would cause the object to move up 10m over 5 seconds, remain at location for 5 seconds, then move down 10m over another 5 seconds.
+
+An empty list will terminate any keyframed animation currently playing.
+
+## Mode and Data Options
+
+- **KFM_MODE** followed by one of: `KFM_LOOP`, `KFM_REVERSE`, `KFM_FORWARD`, or `KFM_PING_PONG` specifies playback mode. Defaults to `KFM_FORWARD`. Must be specified when the keyframe list is provided.
+- **KFM_DATA** followed by a bitwise combination of: `KFM_TRANSLATION` and `KFM_ROTATION`. By default both rotations and translations must be provided. If you specify one or the other, only include translations or rotations in your keyframe list.
+- **KFM_COMMAND** followed by one of: `KFM_CMD_STOP`, `KFM_CMD_PLAY`, `KFM_CMD_PAUSE`. STOP pauses and resets to the beginning. PAUSE pauses without resetting. PLAY resumes a paused or stopped animation. If `KFM_COMMAND` is provided, it must be the only option and cannot be specified in the same call that sets the keyframes list.
+
+## Inter-Region Movement
+
+Inter-region movement is supported; simply specify a target keyframe that places the object outside sim boundaries and it will cross over. However, there will be a pause effect during crossing, and the time between waypoints increases. Factor this into your system design.
+
+Since keyframed motion is a prim property, multiple scripts can control the same keyframed motion without the original keyframe list. Just pass an empty list for keyframes and use `KFM_COMMAND` in the options.
+
+## Examples
+
+### Setup: Prim Equivalency
+
+A KFM object must use the new Prim Equivalency system. One way to ensure this is to set the physics shape to Convex Hull:
+
+```lsl
+llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_PHYSICS_SHAPE_TYPE, PRIM_PHYSICS_SHAPE_CONVEX]);
+```
+
+### Simple Ping-Pong Motion (Position Only)
+
+```lsl
+llSetKeyframedMotion([<0.0, 0.0, 10.0>, 5, <0.0, 0.0, -10.0>, 5],
+                     [KFM_DATA, KFM_TRANSLATION, KFM_MODE, KFM_PING_PONG]);
+```
+
+### Motion with Position and Rotation
+
+```lsl
+llSetKeyframedMotion(
+    [<0.0, 0.0, 10.0>, llEuler2Rot(<90, 45, 180> * DEG_TO_RAD), 5,
+     <0.0, 0.0, -10.0>, llEuler2Rot(<270, 225, 360> * DEG_TO_RAD), 5],
+    [KFM_MODE, KFM_REVERSE]);
+```
+
+### Pause and Resume Motion
+
+If you need to update a KFM object's position, pause KFM and resume it afterwards:
+
+```lsl
+llSetKeyframedMotion([], [KFM_COMMAND, KFM_CMD_PAUSE]);
+// Modify prim positions here
+llSetKeyframedMotion([], [KFM_COMMAND, KFM_CMD_PLAY]);
+```
+
+### Continuous Spin
+
+The following example makes a prim rotate continuously around its Z-axis (equivalent to `llTargetOmega`):
+
+```lsl
+integer gON;
+
+default
+{
+    touch_end(integer total_number)
+    {
+        if (gON = !gON)
+        {
+            // Make repeated rotations of PI radians, each taking 1 second
+            rotation r = llEuler2Rot(<0.0, 0.0, PI>);
+            llSetKeyframedMotion(
+                [
+                    r, 1,
+                    r, 1
+                ],
+                [KFM_DATA, KFM_ROTATION, KFM_MODE, KFM_LOOP]
+            );
+            return;
+        }
+
+        llSetKeyframedMotion([], []);
+    }
+}
+```
+
+### Key Framed Follower
+
+Demonstrates using normalized rotation to create a follower object:
+
+```lsl
+key scriptedObjectToFollow = "daf4847b-967d-bff6-69c0-fd7022241be7";
+integer isSensorRepeatOn;
+
+rotation NormalizeRotation(rotation Q)
+{
+    float MagQ = llSqrt(Q.x*Q.x + Q.y*Q.y +Q.z*Q.z + Q.s*Q.s);
+    return <Q.x/MagQ, Q.y/MagQ, Q.z/MagQ, Q.s/MagQ>;
+}
+
+default
+{
+    state_entry()
+    {
+        llSetLinkPrimitiveParamsFast(LINK_ROOT, [
+            PRIM_PHYSICS_SHAPE_TYPE, PRIM_PHYSICS_SHAPE_CONVEX,
+            PRIM_LINK_TARGET, LINK_ALL_CHILDREN,
+            PRIM_PHYSICS_SHAPE_TYPE, PRIM_PHYSICS_SHAPE_NONE
+        ]);
+    }
+
+    touch_start(integer total_number)
+    {
+        isSensorRepeatOn = !isSensorRepeatOn;
+
+        if (isSensorRepeatOn)
+        {
+            llSay(PUBLIC_CHANNEL, "Sensor repeat switched on!");
+            llSensorRepeat("", scriptedObjectToFollow, SCRIPTED, 10.0, PI, 0.3);
+        }
+        else
+        {
+            llSensorRemove();
+        }
+    }
+
+    sensor(integer num_detected)
+    {
+        vector ownPosition = llGetPos();
+        rotation ownRotation = llGetRot();
+        vector detectedPosition = llDetectedPos(0);
+        rotation detectedRotation = llDetectedRot(0);
+
+        vector kfmPosition = (detectedPosition - ownPosition) + <-1.0, 0.0, 0.2> * detectedRotation;
+        rotation kfmRotation = NormalizeRotation(detectedRotation / ownRotation);
+        llSetKeyframedMotion([kfmPosition, kfmRotation, 0.15], []);
+    }
+}
+```
+
+## Caveats
+
+- **Attachments**: This function does not work on attachments.
+- **Physical Objects**: This function only works on non-physical objects. In the future it could support physical objects, but collisions could prevent reaching goal positions on time.
+- **Script Movement Restrictions**: You cannot use scripts to move any prim in the linkset while keyframed motion is active. If you must, first pause with `KFM_CMD_PAUSE`, modify, then resume with `KFM_CMD_PLAY`.
+- **Avatar Collisions**: Collisions with avatars affect angular movement; the object may not reach the final rotation.
+- **Root Prim Only**: This function can only be called on the root prim of a linkset.
+- **Prim Equivalency Required**: This function requires the linkset to use the Prim Equivalency system. Keyframed objects do not receive the dynamics penalty and can have a physics weight of up to 64.
+- **Maximum Velocity**: Linear velocity greater than 250 meters per second will produce an error on DEBUG_CHANNEL.
+- **Timing Precision**: llSetKeyframedMotion is implemented in terms of frames (45 fps), not real time. To avoid drift from expected positions and rotations, use times that are integer multiples of 1/45 (e.g., 20.0/45.0, 40.0/45.0, 90.0/45.0). Minimum delta time is approximately 6/45 (0.1333) seconds. Natural drift can still occur; use `moving_end`, `at_target`, or `at_rot_target` to verify completion and confirm positions if needed.
+- **Avatar Animation Issues**: Standing on a moving platform may produce strange avatar animations (walking in place, feet-at-pelvis). These are known bugs in the avatar system, not KFM.
+- **Selection Pauses Motion**: Objects moving using this function are paused when selected by an avatar with adequate permissions. Motion resumes when deselected, even if it had been paused using `KFM_CMD_PAUSE`.
+- **Prim Property Persistence**: Keyframed motion is a prim property. When `KFM_LOOP` or `KFM_PING_PONG` is initiated, the motion is preserved after the script is removed. It survives take, copy, and server restart.
+- **Inter-Region Limitations**: Inter-region movement on curved paths with numerous frames can pick up conspicuous errors at crossings. When reversed with `KFM_REVERSE`, the object may stay in the destination sim and not return.
+
+## Potential Use Cases
+
+- Elevators
+- Moving platforms
+- Trains and fixed-track vehicles
+- Moving doors, walls, and gates
+- Windmills and other machinery
+
+## Coordinate System Notes
+
+Translation uses global coordinates; rotation uses local coordinates:
+- A move on the X-axis moves the object along the global region X-axis, regardless of object rotation
+- A rotation around the X-axis rotates the object around its local prim X-axis, regardless of object rotation
+- When the object is not rotated in the global system, the difference is not noticeable
+
+<WikiAttribution />

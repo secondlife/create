@@ -1,0 +1,40 @@
+---
+title: llSetLinkGLTFOverrides
+description: Sets or changes GLTF Overrides set on the selected faces.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLinkGLTFOverrides" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Toggle alpha on/off:
+
+```lsl
+integer toggle;
+default
+{
+    touch_start(integer num_detected)
+    {
+        toggle=!toggle;
+        llSetLinkGLTFOverrides( LINK_THIS, 0, [
+            OVERRIDE_GLTF_BASE_ALPHA_MODE, PRIM_GLTF_ALPHA_MODE_BLEND,
+            OVERRIDE_GLTF_BASE_ALPHA, toggle]);
+    }
+}
+```
+
+## Caveats
+
+- `OVERRIDE_GLTF_BASE_COLOR_FACTOR` and `OVERRIDE_GLTF_BASE_ALPHA` parameters are coupled. If an override is set for one parameter, then the other is automatically given an override. The default `OVERRIDE_GLTF_BASE_COLOR_FACTOR` is \<1,1,1\>, and the default `OVERRIDE_GLTF_BASE_ALPHA` is 1.0.
+
+## See Also
+
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+
+<WikiAttribution />

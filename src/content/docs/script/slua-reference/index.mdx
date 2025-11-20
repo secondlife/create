@@ -1,0 +1,73 @@
+---
+title: SLua Reference
+description: Complete reference for SLua (Second Life Luau) scripting
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Complete reference documentation for SLua (Second Life Luau), the modern scripting language for Second Life. This section provides detailed specifications for all functions, events, constants, and language features.
+
+## Reference Sections
+
+<CardGrid>
+  <Card title="Functions" icon="puzzle">
+    Complete library of SLua functions for controlling objects, communication, math, and more.
+
+    [Browse all SLua functions →](/script/slua-reference/functions/)
+  </Card>
+
+  <Card title="Events" icon="setting">
+    Event handlers that respond to touches, collisions, timers, messages, and world changes.
+
+    [Browse all SLua events →](/script/slua-reference/events/)
+  </Card>
+
+  <Card title="Constants" icon="approve-check">
+    Predefined constants for vectors, rotations, permissions, and system values.
+
+    [Browse all SLua constants →](/script/slua-reference/constants/)
+  </Card>
+</CardGrid>
+
+## Function Categories
+
+:::note[Help Wanted]
+Function category links are not yet implemented. This requires adding category tags to `lsl_definitions.yaml` and building category index pages. Contributions welcome!
+:::
+
+Functions are organized by purpose for easier navigation:
+
+### Object & Prim Control
+- **Appearance** - Colors, textures, transparency, glow
+- **Movement** - Position, rotation, physics, forces
+- **Properties** - Name, description, scale, shape
+
+### Communication
+- **Chat** - Local chat, shout, whisper, region say
+- **Dialog** - Menus, text boxes, notifications
+- **HTTP** - Web requests, webhooks, external services
+- **Email** - Send and receive email
+
+### Avatar Interaction
+- **Sensors** - Detect nearby avatars and objects
+- **Permissions** - Request and check permissions
+- **Animation** - Start and stop avatar animations
+- **Attachments** - Work with worn items
+
+### Data & Math
+- **Math** - Trigonometry, random numbers, rounding
+- **String** - Text manipulation and parsing
+- **Table** - Table operations and utilities
+- **Type Conversion** - Convert between types
+
+### Effects & Media
+- **Particles** - Particle systems and effects
+- **Sound** - Play sounds and music
+- **Light** - Point lights and projection
+- **Media** - Web media on a prim
+
+### Advanced Features
+- **Experience** - Experience tools and permissions
+- **Inventory** - Access object inventory
+- **Notecard** - Read notecard contents
+- **Region** - Query region and parcel info

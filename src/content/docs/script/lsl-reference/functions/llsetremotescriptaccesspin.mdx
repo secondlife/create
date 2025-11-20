@@ -1,0 +1,28 @@
+---
+title: llSetRemoteScriptAccessPin
+description: >-
+  If PIN is set to a non-zero number, the task will accept remote script loads
+  via llRemoteLoadScriptPin() if it passes in the correct PIN. Othersise,
+  llRemoteLoadScriptPin() is ignored.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetRemoteScriptAccessPin" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- A prim has only one pin for remotely loading scripts
+- By changing the pin, a script can deny other scripts the ability to load scripts into the prim
+  - This could result in unintentionally breaking a product's ability to be updated by an upstream creator
+  - This can be used to intentionally stop an upstream creator from updating a product
+- There is no way to find out whether a script pin has been set by another script in the prim. If the prim contains scripts from other developers, the safe approach is to assume a script pin has been set by an upstream creator
+
+## See Also
+
+- [llRemoteLoadScriptPin] - Used to load a script into a remote prim
+
+<WikiAttribution />

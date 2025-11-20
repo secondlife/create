@@ -1,0 +1,76 @@
+---
+title: llReplaceSubString
+description: >-
+  Searches InitialString and replaces instances of SubString with NewSubString.
+  Zero Count means "replace all". Positive Count moves left to right. Negative
+  moves right to left.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llReplaceSubString" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Replace first N matches from the left
+
+```lsl
+default
+{
+    state_entry()
+    {
+        string ex = "red foxes, red hens, red turnips";
+        // Replace first 2 matches, starting from the left side
+        ex = llReplaceSubString(ex, "red", "blue", 2);
+        llSay(0, ex); // Should say "blue foxes, blue hens, red turnips"
+    }
+}
+```
+
+### Replace first match from the right
+
+```lsl
+default
+{
+    state_entry()
+    {
+        string ex = "red foxes, red hens, red turnips";
+        // Replace first match, starting from the right side
+        ex = llReplaceSubString(ex, "red", "green", -1);
+        llSay(0, ex); // Should say "red foxes, red hens, green turnips"
+    }
+}
+```
+
+### Replace all matches
+
+```lsl
+default
+{
+    state_entry()
+    {
+        string ex = "red foxes, red hens, red turnips";
+        // Replace all matches
+        ex = llReplaceSubString(ex, "red", "yellow", 0);
+        llSay(0, ex); // Should say "yellow foxes, yellow hens, yellow turnips"
+    }
+}
+```
+
+## Notes
+
+- If `count` = 0, all matching substrings are replaced
+- If `count` > 0, substrings are replaced starting from the left/beginning of the source string
+- If `count` < 0, substrings are replaced starting from the right/end of the source string
+
+## See Also
+
+- [llGetSubString](../llgetsubstring/)
+- [llDeleteSubString](../lldeletesubstring/)
+- [llInsertString](../llinsertstring/)
+- [llDeleteSubList](../lldeletesublist/)
+
+<WikiAttribution />

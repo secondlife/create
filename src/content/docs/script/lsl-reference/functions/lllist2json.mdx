@@ -1,0 +1,91 @@
+---
+title: llList2Json
+description: >-
+  Converts either a strided list of key:value pairs to a JSON_OBJECT, or a list
+  of values to a JSON_ARRAY.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llList2Json" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Usage
+
+```lsl
+default
+{
+    state_entry()
+    {
+        list items;
+        string json;
+
+        items = ["89556747-24cb-43ed-920b-47caed15465f"];
+        json = llList2Json(JSON_ARRAY, items);
+        // ["89556747-24cb-43ed-920b-47caed15465f"]
+
+        items = ["pi", 3.14, "set", "[1,2,3]", "status", "ok"];
+        json = llList2Json(JSON_OBJECT, items);
+        // {"pi":3.140000,"set":[1,2,3],"status":"ok"}
+
+        items = [0, 3.14, "[1,2,3]", "{}"];
+        json = llList2Json(JSON_ARRAY, items);
+        // [0,3.140000,[1,2,3],{}]
+    }
+}
+```
+
+### Convert CSV to JSON
+
+```lsl
+string CSV2Json(string csv)
+{
+    list li = llCSV2List(csv);
+    return llList2Json(JSON_ARRAY, li);
+}
+// This function converts a comma separated values string to a Json array string.
+// CSV strings are often used for link-messages, notecards and they are easier to type as input commands.
+// A Json-Array can store multiple of those as a nested list within the same Json-string via JSON_APPEND.
+```
+
+## Usage Patterns
+
+- You could store multiple lists that set different particle effects in the same string. Use `llList2Json()` to write the string and `llJson2List()` to read the particle system defining lists from it. The loss in float-accuracy (JSON has limited float-to-string conversion) does not matter as much for particle effects.
+
+- You could store multiple lists that set different `llSetPrimitiveParamsFast()` values for different situations (like different animation key frames) in the same JSON string.
+
+## Type Conversion
+
+The function infers JSON types from LSL data types:
+
+- Integer and float types are encoded as JSON_NUMBER
+- `"true"` and `"false"` are encoded as JSON_TRUE and JSON_FALSE, respectively
+- `"null"` is encoded as JSON_NULL
+- Properly-formatted JSON strings in the input are kept as-is (will either be JSON_STRING, JSON_OBJECT, or JSON_ARRAY)
+- All other strings are encoded as JSON_STRING. Strings are trimmed of whitespace at the beginning and end, as if passed through `llStringTrim`
+- Note: strings containing valid JSON numbers are converted to JSON strings, not left as JSON numbers. This differs from the treatment that `llJsonSetValue` gives to strings containing JSON numbers, which leaves them as numbers.
+
+## Caveats
+
+- If `type` is `JSON_OBJECT`, the list must be a strided list of key, value pairs and a string representing a JSON object will be returned.
+- If `type` is `JSON_ARRAY`, then a string representing a JSON array will be returned.
+- If `type` is any other string, `JSON_INVALID` will be returned.
+- String values are interpreted as JSON, not LSL strings. Quotation marks, if required, must be added explicitly. For example:
+  - `llJson2List(llList2Json(JSON_ARRAY, ["bacon", "true", "false", "null"]))` returns the LSL list `["bacon", JSON_TRUE, JSON_FALSE, JSON_NULL]`
+  - `llJson2List(llList2Json(JSON_ARRAY, ["\"bacon\"", "\"true\"", "\"false\"", "\"null\""]))` returns the LSL list `["bacon", "true", "false", "null"]`
+
+## See Also
+
+- [llJson2List](llJson2List) - Convert JSON strings back to lists
+- [llJsonGetValue](llJsonGetValue)
+- [llJsonSetValue](llJsonSetValue)
+- [llJsonValueType](llJsonValueType)
+- [JSON_ARRAY](JSON_ARRAY)
+- [JSON_OBJECT](JSON_OBJECT)
+- [JSON_INVALID](JSON_INVALID)
+
+<WikiAttribution />

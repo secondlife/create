@@ -1,0 +1,76 @@
+---
+title: llMinEventDelay
+description: Set the minimum time between events being handled.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llMinEventDelay" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Usage
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llMinEventDelay(5.0);
+    }
+    touch(integer detected)
+    {
+        llSay(0, "Touched.");
+        // Without the event delay set, touch events would cause the screen to fill
+        // with "Touched" if you held down the mouse button continuously.
+    }
+}
+```
+
+### Multi-Object Communication Example
+
+Script in "Sandy Powell" object:
+
+```lsl
+default
+{
+    touch(integer detected)
+    {
+        llSay(0, "Can you hear me mother?");
+    }
+}
+```
+
+Script in "Mother" object:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llMinEventDelay(5.0);
+        llListen(0, "Sandy Powell", "", "");
+    }
+    listen(integer chan, string name, key id, string msg)
+    {
+        llSay(0, "Eh?");
+    }
+}
+```
+
+This demonstrates event throttling in action. The `llMinEventDelay(5.0)` call on the listener means it will only process listen events once every 5 seconds. This results in fewer "Eh?" responses and can cause event loss if rapid events are triggered.
+
+## Caveats
+
+- **Minimum delay is maintained between state changes.** The delay applies to all events, even during state transitions.
+- **Events can be lost.** If events are triggered more frequently than the minimum delay allows, some events will be discarded. Be careful when setting delays that could cause important events to be missed.
+- **Event-specific defaults vary.** Different event types have different default delays and minimum values. See LSL Delay for more information.
+
+## See Also
+
+- LSL Delay (for default values and minimums by event type)
+
+<WikiAttribution />

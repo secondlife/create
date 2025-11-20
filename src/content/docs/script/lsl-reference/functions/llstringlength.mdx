@@ -1,0 +1,49 @@
+---
+title: llStringLength
+description: >-
+  Returns an integer that is the number of characters in Text (not counting the
+  null).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStringLength" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- The index of the last character is not equal to the string length.
+  - Character indexes start at zero (the index of the first character is zero).
+- Returns the number of characters - not bytes - in the string.
+  - Some functions that accept strings are limited to bytes, not characters.
+  - LSL-2 uses UTF-8 strings and Mono uses UTF-16; both support multibyte characters.
+  - To get the number of bytes in a string instead, use the example snippet on llStringToBase64 (there is no native LSL function to do this).
+
+## Examples
+
+```lsl
+// assumptions:
+//    object name: LSLWiki
+//    script name: _lslwiki
+
+default
+{
+    state_entry()
+    {
+        string HowLongAmI = "123";
+        integer strlen = llStringLength(HowLongAmI);
+        llOwnerSay( "'" + HowLongAmI + "' has " +(string) strlen + " characters.");
+        // The owner of object LSLWiki will hear
+        // LSLWiki: '123' has 3 characters.
+    }
+}
+```
+
+## See Also
+
+- [llGetListLength]
+- [llStringToBase64]
+
+<WikiAttribution />

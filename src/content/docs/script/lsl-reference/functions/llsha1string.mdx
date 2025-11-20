@@ -1,0 +1,45 @@
+---
+title: llSHA1String
+description: Returns a string of 40 hex characters that is the SHA1 security hash of text.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSHA1String" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The SHA-1 hashing algorithm is considered broken but the attacks are largely still theoretical and not very practical. Consider using the more secure `llSHA256String` instead.
+
+## Examples
+
+```lsl
+llSay(0, llSHA1String("Hello, Avatar!")); // returns 2E73318E547AF1B28CC0C96F95DDC9B1EE906B8D
+```
+
+### Linux Verification
+
+You can verify the hash output using OpenSSL:
+
+```bash
+$ echo -n 'Hello, Avatar!' | openssl sha1
+2E73318E547AF1B28CC0C96F95DDC9B1EE906B8D
+```
+
+## Caveats
+
+- There's no way to input a zero-byte value into this function, nor any byte value from 128-255, which makes it broken for many purposes like HMAC-SHA1
+- LSL strings cannot have a unicode null character (U+0000), and LSL has no escape code for the null character (unlike most programming languages that use `\0`)
+- Characters with Unicode integer value over U+0127 (007F) are handled in UTF-8 fashion: 0xC2 is appended to the byte value (so 0x0080-0x00FF become 0xC280-0xC2FF inside the function)
+- Before this function was available, the only way to get SHA-1 hashes was to use the LSL SHA-1 script port
+
+## See Also
+
+- [llMD5String](../llmd5string/)
+- [llSHA256String](../llsha256string/)
+- `SHA-1` - LSL script implementation
+
+<WikiAttribution />

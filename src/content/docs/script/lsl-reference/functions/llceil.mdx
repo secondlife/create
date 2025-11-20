@@ -1,0 +1,50 @@
+---
+title: llCeil
+description: Returns smallest integer value >= Value.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCeil" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+   state_entry()
+   {
+       llSay(0, "The ceil value of -4.5 is: " + (string)llCeil(-4.5));
+//              "The ceil value of -4.5 is: -4"
+
+       llSay(0, "The ceil value of -4.9 is: " + (string)llCeil(-4.9));
+//              "The ceil value of -4.9 is: -4"
+
+       llSay(0, "The ceil value of -4.1 is: " + (string)llCeil(-4.1));
+//              "The ceil value of -4.1 is: -4"
+
+       llSay(0, "The ceil value of 4.5 is: " + (string)llCeil(4.5));
+//              "The ceil value of 4.5 is: 5"
+
+       llSay(0, "The ceil value of 4.9 is: " + (string)llCeil(4.9));
+//              "The ceil value of 4.9 is: 5"
+
+       llSay(0, "The ceil value of 4.1 is: " + (string)llCeil(4.1));
+//              "The ceil value of 4.1 is: 5"
+    }
+}
+```
+
+## Caveats
+
+- The returned value is -2147483648 (0x80000000) if the arithmetic result is outside of the range of valid integers (-2147483648 to 2147483647)
+
+## See Also
+
+- [llRound](/script/reference/lsl/functions/llround/) - Rounds the float to an integer towards the closest integer
+- [llFloor](/script/reference/lsl/functions/llfloor/) - Rounds the float to an integer towards negative infinity
+
+<WikiAttribution />

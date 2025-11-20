@@ -1,0 +1,70 @@
+---
+title: llTargetedEmail
+description: Sends an email with Subject and Message to the owner or creator of an object.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTargetedEmail" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The message is automatically prefixed with object and location information:
+
+```
+Object-Name: *prim*
+Region: *simname* (*simpos.x*, *simpos.y*)
+Local-Position: (*primpos.x*, *primpos.y*, *primpos.z*)
+
+*message*
+```
+
+Example output:
+```
+Object-Name: Object
+Region: Gibson (254976, 256000)
+Local-Position: (117, 129, 50)
+
+The real message starts here.
+```
+
+## Examples
+
+```lsl
+string emailSubject = "Someone touched me!";
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        // llSay(PUBLIC_CHANNEL, "Sending eMail report now, this will take ~20 seconds.");
+
+        key id = llDetectedKey(0);
+        string name = llDetectedName(0);
+
+        llTargetedEmail(TARGETED_EMAIL_OBJECT_OWNER, emailSubject,
+            "I was touched by: '" + name + "' (" + (string)id + ").");
+
+        // llSay(PUBLIC_CHANNEL, "Email has been sent.");
+    }
+}
+```
+
+## Caveats
+
+- Originally this function was intended to enable sending email to either the object owner or creator; however, the ability to email creators was removed to avoid abuse scenarios.
+- There is a limit to the number of email messages an object can send in a given amount of time.
+- There is a limit of 500 messages from a single agent's objects in a one hour period.
+- The 4096 byte size limit includes the subject line and automatically added text. The practical maximum body size is approximately 3600 bytes.
+- Email throttling is applied per user when the destination is outside of Second Life. Messages within the same region bypass region-level throttling (beyond the 20-second delay), and messages between different sims are not throttled beyond the 20-second delay.
+- Due to bug SVC-23 (present since 2005), objects may stop receiving emails completely until either the region is restarted or the object crosses a region boundary. Emails sent may eventually be received after a restart/region-cross. Don't rely on this function for reliable inter-region messaging.
+- Due to bug SVC-391, llEmail will silently fail (no mail will arrive) when non-ASCII characters are present in the subject. Non-ASCII characters in the message body will be replaced by "?".
+
+## See Also
+
+- [llEmail](../llemail/)
+
+<WikiAttribution />

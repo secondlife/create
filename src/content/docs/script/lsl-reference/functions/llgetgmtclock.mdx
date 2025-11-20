@@ -1,0 +1,88 @@
+---
+title: llGetGMTclock
+description: |-
+  Returns the time in seconds since midnight GMT.
+  Gets the time in seconds since midnight in GMT/UTC.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetGMTclock" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- For Second Life time (California time), use `llGetWallclock` instead
+- The return value appears to be truncated to the second
+
+## Examples
+
+### GMT Time with Local Offsets
+
+This example demonstrates converting GMT to a local timezone using a 12-hour format:
+
+```lsl
+integer gIntMinute = 60;    //-- 1 minute in seconds
+integer gIntHour   = 3600;  //-- 1 hour in seconds
+integer gInt12Hr   = 43200; //-- 12hrs in seconds
+integer gIntDay    = 86400; //-- 1 day in seconds
+
+string fStrGMTwOffset( integer vIntLocalOffset ){
+   //-- get the correct time in seconds for the given offset
+  integer vIntBaseTime = ((integer)llGetGMTclock() + gIntDay + vIntLocalOffset * gIntHour) % gIntDay;
+  string vStrReturn;
+
+   //-- store morning or night and reduce to 12hour format if needed
+  if (vIntBaseTime < gInt12Hr){
+    vStrReturn = " AM";
+  }else{
+    vStrReturn = " PM";
+    vIntBaseTime = vIntBaseTime % gInt12Hr;
+  }
+
+   //-- get and format minutes
+  integer vIntMinutes = (vIntBaseTime % gIntHour) / gIntMinute;
+  vStrReturn = (string)vIntMinutes + vStrReturn;
+  if (10 > vIntMinutes){
+    vStrReturn = "0" + vStrReturn;
+  }
+
+   //-- add in the correct hour, force 0 to 12
+  if (vIntBaseTime < gIntHour){
+    vStrReturn = "12:" + vStrReturn;
+  }else{
+    vStrReturn = (string)(vIntBaseTime / gIntHour) + ":" + vStrReturn;
+  }
+  return vStrReturn;
+}
+
+default{
+  touch_start( integer vIntTouched ){
+     //-- '-8' is california time, no adjustment for DST
+    llSay( 0, "The time is now " + fStrGMTwOffset( -8 ) );
+  }
+}
+```
+
+### Getting Millisecond Precision
+
+If you need millisecond precision instead of seconds, you can extract the fractional time from `llGetTimestamp`:
+
+```lsl
+integer GetGMTmsclock()
+{
+    string stamp = llGetTimestamp();
+    return
+        (integer) llGetSubString(stamp, 11, 12) * 3600000 +
+        (integer) llGetSubString(stamp, 14, 15) * 60000 +
+        llRound((float) llGetSubString(stamp, 17, -2) * 1000.0);
+}
+```
+
+## See Also
+
+- [llGetWallclock](../llgetwallclock/)
+
+<WikiAttribution />

@@ -1,0 +1,169 @@
+---
+title: llSetLinkPrimitiveParams
+description: 'Deprecated: Use llSetLinkPrimitiveParamsFast instead.'
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLinkPrimitiveParams" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+`llSetLinkPrimitiveParams` sets primitive parameters on other prims in a linkset. This is a powerful but complex function that allows configuring over 50 different object parameters.
+
+**Deprecation Notice:** Please consider using `llSetLinkPrimitiveParamsFast` instead to avoid the 0.2 second sleep delay.
+
+## Key Differences Between Variants
+
+There are three related functions with different performance characteristics:
+
+| Function | Sleep | Link Parameter | Use Case |
+|----------|-------|---|---|
+| `llSetPrimitiveParams` | 200 ms | No | Set parameters on self |
+| `llSetLinkPrimitiveParams` | 200 ms | Yes | Set parameters on linked prims |
+| `llSetLinkPrimitiveParamsFast` | 0 ms | Yes | Fast parameter updates (preferred) |
+
+## Examples
+
+### Example 1: Toggle Fullbright on Touched Prim
+
+Turn all prims in a linkset off and turn on the one that was touched:
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llSetLinkPrimitiveParamsFast(LINK_SET, [
+            PRIM_FULLBRIGHT, ALL_SIDES, FALSE,
+            PRIM_LINK_TARGET, llDetectedLinkNumber(0),
+            PRIM_FULLBRIGHT, ALL_SIDES, TRUE
+        ]);
+    }
+}
+```
+
+### Example 2: Move Child Prims
+
+Move all child prims 0.25 meters forward along the root's Z-axis:
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        integer numberOfPrims = llGetNumberOfPrims();
+        if (numberOfPrims < 2) return;
+
+        vector link_pos;
+        list params;
+        integer link = 2; // start with first child prim
+
+        do
+        {
+            // Get child prim's local position (relative to root)
+            link_pos = llList2Vector(llGetLinkPrimitiveParams(link, [PRIM_POS_LOCAL]), 0);
+            link_pos.z += 0.25; // relative to root's local z-axis
+
+            params += [PRIM_LINK_TARGET, link, PRIM_POS_LOCAL, link_pos];
+        }
+        while (++link <= numberOfPrims);
+
+        if (!llGetListLength(params)) return;
+
+        llSetLinkPrimitiveParamsFast(2, params);
+    }
+}
+```
+
+### Example 3: Multiple Modifications with PRIM_LINK_TARGET
+
+Color the root prim red and the first linked prim green in a single call:
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llSetLinkPrimitiveParamsFast(LINK_ROOT, [
+            PRIM_COLOR, ALL_SIDES, <1.0, 0.0, 0.0>, 1.0,
+            PRIM_LINK_TARGET, 2,
+            PRIM_COLOR, ALL_SIDES, <0.0, 1.0, 0.0>, 1.0
+        ]);
+    }
+}
+```
+
+## Important Caveats
+
+- **PRIM_SIZE limitations:** `PRIM_SIZE` fails silently on physical prims/links. Workaround: set items to non-physical before resizing, then back to physical. This can be done in a single call using `PRIM_LINK_TARGET`.
+
+- **Object-wide properties:** `PRIM_PHANTOM`, `PRIM_PHYSICS`, and `PRIM_TEMP_ON_REZ` apply to the entire linkset, not individual prims.
+
+- **Value drift and truncation:** Values may drift, become truncated, or be range-limited. The client applies limits during deserialization and rendering, while the simulator applies limits before storing values. For testing vectors and rotations, use `llVecDist` and `llAngleBetween` for fuzzy comparisons.
+
+- **PRIM_LINK_TARGET:** This is a special parameter that can be inserted to perform actions on multiple prims in a linkset with one call.
+
+- **Type validation:** The function will return an error if given data of the wrong type. This is problematic when providing data from user input or notecards. Consider using a list cast function to remedy this.
+
+- **LINK_SET application order:** Applying an operation to `LINK_SET` applies it first to the root prim, then to each child prim.
+
+- **Attribute clamping:** The simulator clamps attributes before storing them, and the client clamps them before rendering.
+
+- **Property loss:** Some prim properties are reset by this function:
+  - A flexible prim will become non-flexible
+  - A sliced prim will become unsliced
+  - To preserve properties, they must be saved and explicitly set in the function call
+
+- **PRIM_ROTATION bug:** `PRIM_ROTATION` is bugged in child prims. See workarounds below.
+
+- **Mesh prim limitations:** Attempting to change `PRIM_TYPE` of a mesh object has no effect. Keeping `PRIM_TYPE` as `PRIM_TYPE_SCULPT` and trying to set a different sculpt map on a mesh also does nothing. Additionally, a script inside a mesh prim cannot change sculpt parameters of any prim in the linkset.
+
+- **PRIM_CLICK_ACTION:** All caveats from `llSetClickAction` apply to `PRIM_CLICK_ACTION`.
+
+## Performance Tips
+
+The wiki provides this helpful tip: When changing alpha values of a face, consider using `llSetLinkAlpha(integer link, float alpha, integer face)` instead of `llSetLinkPrimitiveParamsFast` with `PRIM_COLOR`. This avoids having to manipulate color settings. Measurements show `llSetText` being 3-4 times faster than `llSetLinkPrimitiveParamsFast` when setting float text properties in loops (like loading bars).
+
+## PRIM_ROTATION Workaround for Child Prims
+
+Since `PRIM_ROTATION` is bugged in child prims, use one of these workarounds:
+
+### Works in unattached objects only:
+```lsl
+llSetLinkPrimitiveParamsFast(linknumber, [
+    PRIM_ROT_LOCAL, rot * llGetRootRotation()
+]);
+```
+
+### Works in linked objects only:
+```lsl
+llSetLinkPrimitiveParamsFast(linknumber, [
+    PRIM_ROT_LOCAL, rot * llList2Rot(llGetLinkPrimitiveParams(LINK_ROOT, [PRIM_ROT_LOCAL]), 0)
+]);
+```
+
+### Works in all scenarios:
+```lsl
+llSetLinkPrimitiveParamsFast(linknumber, [
+    PRIM_ROT_LOCAL, rot * llList2Rot(llGetLinkPrimitiveParams(!!llGetLinkNumber(), [PRIM_ROT_LOCAL]), 0)
+]);
+```
+
+## See Also
+
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+- [llGetLinkPrimitiveParams](../llgetlinkprimitiveparams/)
+- [llSetLinkPrimitiveParamsFast](../llsetlinkprimitiveparamsfast/)
+- [llSetAlpha](../llsetalpha/)
+- [llSetTexture](../llsettexture/)
+- [llSetColor](../llsetcolor/)
+- [llSetScale](../llsetscale/)
+- [llSetStatus](../llsetstatus/)
+- [llSetLinkAlpha](../llsetlinkalpha/)
+
+<WikiAttribution />

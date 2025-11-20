@@ -1,0 +1,79 @@
+---
+title: llLog
+description: |-
+  Returns the natural logarithm of Value. Returns zero if Value <= 0.
+  Returns the base e (natural) logarithm of the specified Value.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLog" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Basic usage to calculate natural logarithm:
+
+```lsl
+default
+{
+  state_entry()
+  {
+    float num1 = llFrand(100.0);
+
+    llOwnerSay("The natural logarithm of " + (string)num1 + " is " + (string)llLog(num1));
+  }
+}
+```
+
+Converting to arbitrary logarithm base:
+
+```lsl
+float findexp(float result, float base)
+{
+    return llLog(result)/llLog(base);
+}
+
+default
+{
+    touch_start(integer total_number)
+    {
+        llSay(0, (string)findexp(8.0, 2.0));
+        // returns 3.0
+    }
+}
+```
+
+## Notes
+
+There are only two logarithm functions: `llLog` and `llLog10`. When converting the base of the logarithm, use `llLog` rather than `llLog10` as it introduces fewer errors. The general formula for converting to an arbitrary base is:
+
+```lsl
+float LogBaseN = llLog(value) / llLog(Base);
+```
+
+Note that this technique inherently introduces errors due to floating-point arithmetic, which are most noticeable when working with logarithms. If the base is a constant, your script will run faster if you pre-calculate its logarithm and divide by that constant instead.
+
+## Useful Natural Logarithm Values
+
+| Number | ln(Number) |
+|--------|-----------|
+| 2 | 0.693147 |
+| 4 | 1.386294 |
+| 8 | 2.079442 |
+| 10 | 2.302585 |
+| 16 | 2.772589 |
+| 32 | 3.465736 |
+| 64 | 4.158883 |
+| 128 | 4.852030 |
+| 256 | 5.545177 |
+
+## See Also
+
+- [llLog10](../lllog10/)
+- [llPow](../llpow/)
+- [llSqrt](../llsqrt/)
+
+<WikiAttribution />

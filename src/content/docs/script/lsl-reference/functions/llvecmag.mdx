@@ -1,0 +1,38 @@
+---
+title: llVecMag
+description: Returns the magnitude of the vector.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llVecMag" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    state_entry()
+    {
+        vector input = <1.0,2.0,3.0>;
+        llSay(0,"The magnitude of "+(string)input+" is "+(string)llVecMag(input) + ".");
+    }
+}
+```
+
+## Notes
+
+- Mathematically the formula for vector magnitude is: `llSqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z)`
+- Knowing this, there are ways to circumvent llVecMag for more efficient code:
+  - `vec*vec < 16.0` is over twice as fast as `llVecMag(vec) < 4.0`
+  - `vec*vec < (dist*dist)` is about twice as fast as `llVecMag(vec) < dist`
+  - This can work in many other ways, too, with other comparisons
+
+## See Also
+
+- [llVecNorm] - The vector normal
+- [llVecDist] - The distance between two vectors
+
+<WikiAttribution />

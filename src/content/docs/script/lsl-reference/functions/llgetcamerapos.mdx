@@ -1,0 +1,93 @@
+---
+title: llGetCameraPos
+description: >-
+  Returns the current camera position for the agent the task has permissions
+  for.
+
+  Returns the position of the camera, of the user that granted the script
+  PERMISSION_TRACK_CAMERA. If no user has granted the permission, it returns
+  ZERO_VECTOR.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetCameraPos" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This example demonstrates a camera follower script that uses `llGetCameraPos` to track the agent's camera position and adjust the object's position accordingly.
+
+```lsl
+//Camera Follower Script
+//llGetCameraPos & llGetCameraRot Example
+//By Nika Rugani
+
+integer perm_track = 0x400;
+float second_check = 0.1;
+
+vector object_offset = <2,0,0>; //Offset of the cameras position where the object will set itself
+
+integer die_channel = 0;
+string die_command = "/die";
+
+quickPosRot(vector pos, rotation rot)
+{//This way you don't have the 0.2 second sleeps from llSetPos and llSetRot
+    llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_POSITION, pos, PRIM_ROTATION, rot]);
+}
+
+default
+{
+    on_rez(integer a)
+    {
+        llResetScript();
+    }
+    state_entry()
+    {
+        llRequestPermissions(llGetOwner(), perm_track);
+    }
+    run_time_permissions(integer permission)
+    {
+        if(permission == perm_track)
+        {
+            llSetTimerEvent(second_check);
+            llListen(die_channel, "", llGetOwner(), "");
+        }
+        else
+        {
+            //llResetScript(); //Remove comment to loop the process of requesting permissions if user deny's permission
+            //llDie(); //Remove comment to kill the object if user deny's it
+        }
+    }
+    listen(integer channel, string name, key id, string str)
+    {
+        str = llToLower(str);
+        if(str == die_command)
+        {
+            llDie();
+        }
+    }
+    timer()
+    {
+        vector c_pos = llGetCameraPos(); //Get Users Camera Position
+        rotation c_rot = llGetCameraRot(); //Get Users Camera Rotation
+        c_pos = (c_pos+object_offset*c_rot); //Apply the offset to the position
+        quickPosRot(c_pos, c_rot); //EXECUTE ORDER!
+    }
+}
+```
+
+## Caveats
+
+- This function may exhibit unexpected behavior when the camera is positioned too far from the agent.
+
+## See Also
+
+- [llGetCameraRot](./llgetcamerarot/)
+- [llSetCameraParams](./llsetcameraparams/)
+- [llSetCameraAtOffset](./llsetcameraatoffset/)
+- [llSetCameraEyeOffset](./llsetcameraeyeoffset/)
+
+<WikiAttribution />

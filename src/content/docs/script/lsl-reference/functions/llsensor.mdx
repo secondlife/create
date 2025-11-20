@@ -1,0 +1,93 @@
+---
+title: llSensor
+description: >-
+  Performs a single scan for Name and ID with Type (AGENT, ACTIVE, PASSIVE,
+  and/or SCRIPTED) within Range meters and Arc radians of forward vector.
+
+  Specifying a blank Name, 0 Type, or NULL_KEY ID will prevent filtering results
+  based on that parameter. A range of 0.0 does not perform a scan.
+
+  Results are returned in the sensor and no_sensor events.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSensor" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Agent Detection
+
+This example scans a 45 degree cone about the x-axis and matches an agent with the legacy name "Governor Linden":
+
+```lsl
+llSensor("Governor Linden", NULL_KEY, AGENT_BY_LEGACY_NAME, 96.0, PI/4);
+```
+
+Note: A PI/2 scan creates a hemisphere, and PI creates a spherical scan around the object.
+
+### Detect Multiple Object and Agent Types
+
+This sensor detects all prims and agents with a given name within 15m of the sensor. AGENT, PASSIVE, and ACTIVE behave inclusively. SCRIPTED is not inclusive and will exclude non-scripted targets (like avatars) from the detected set:
+
+```lsl
+llSensor("", NULL_KEY, (AGENT | PASSIVE | ACTIVE), 15.0, PI);
+```
+
+### Touch-Triggered Agent Scan
+
+This basic example script detects agents when touched and outputs each detected agent's name to the owner:
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        llSensor("", NULL_KEY, AGENT, 30.0, PI);
+    }
+
+    sensor(integer detected)
+    {
+        while(detected--)
+        {
+            llOwnerSay(llDetectedName(detected));
+        }
+    }
+}
+```
+
+## Caveats
+
+- Objects do not detect themselves, and attachments cannot detect their wearers (this includes HUD attachments).
+- Attachments cannot be detected by llSensor.
+- For an object to be detected, the center of its root prim (the same point it would report with `llGetRootPosition`) must be within the sensor beam.
+- For an agent to be detected, a point near the pelvis must be inside the sensor beam (the same as `llGetRootPosition` would report in a script attached to that avatar). This point is indicated by red crosshairs when **Advanced > Character > Display Agent Target** is enabled.
+  - If the agent is sitting on an object, the root prim of that object becomes a second sensor target for the agent (but not if the avatar is outside the sensor arc).
+- Sensors in the root prim of attachments use the direction the avatar is facing as their forward vector. In mouselook, this means it will be wherever the avatar is looking; out of mouselook, it means whichever way the avatar is pointing. This does not include where the avatar's head is pointing or what animation the avatar is doing, just the direction the avatar would move if walking forward.
+- Sensors in non-root prims of attachments have their forward direction offset relative to the root prim's forward direction (e.g., a sensor in a prim whose +X direction is the reverse of the root +X will look backward).
+- llSensor does not detect objects or agents across region boundaries.
+- If Type is zero, the sensor will silently fail—neither `sensor` nor `no_sensor` events will be triggered.
+- Only 32 objects will be scanned each time (increased from 16 with Release 2024-03-18.8333615376 on Tuesday, March 19, 2024).
+- DAMAGEABLE is a filter flag and cannot be used alone. It must be combined with at least one other flag (e.g., `AGENT | ACTIVE | PASSIVE | DAMAGEABLE`).
+
+## Notes
+
+### Loops & Repetition
+
+Using llSensor in a `for` loop is a beginner's mistake, as events do not interrupt each other. The sensor event will not interrupt whatever event is currently executing. To perform repeat sensor sweeps, use `llSensorRepeat` instead. While it is possible to call llSensor from a `timer` event, it is less efficient; there is a limit to event processing per second, and using the timer just to call llSensor will reduce your script's timeslice.
+
+### Alternative: llGetAgentList
+
+Consider using `llGetAgentList` instead of sensors to get a list of all avatars within the same parcel or region.
+
+## See Also
+
+- [llSensorRepeat](../llsensorrepeat/)
+- [llSensorRemove](../llsensorremove/)
+- sensor event - Triggered when a sensor detects something
+- no_sensor event - Triggered when a sensor detects nothing
+
+<WikiAttribution />

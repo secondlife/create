@@ -1,0 +1,55 @@
+---
+title: llRot2Left
+description: |-
+  Returns the left vector defined by Rotation.
+  Returns the left axis represented by the Rotation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRot2Left" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Mathematically equivalent to:
+
+```lsl
+ret = llVecNorm(<0., 1., 0.> * q);
+```
+
+If the rotation is known to be a unit quaternion (which object and agent rotations always are), it can be simplified as:
+
+```lsl
+ret = <0., 1., 0.> * q;
+```
+
+For performance-critical code, direct vector multiplication can be 25-30% faster than calling llRot2Left(). If the operation is done often and at extremely fast rates, it can be advantageous to even save `<0., 1., 0.>` to a local or global variable and reuse it.
+
+## Examples
+
+Move an object 5 metres forward along its own y-axis (left direction), regardless of the object's orientation in the world. Works for both root and child prims:
+
+```lsl
+default {
+    touch_start(integer total_number) {
+        vector v = llRot2Left(llGetLocalRot());
+        llSetPos(llGetLocalPos() + v * 5);
+    }
+}
+```
+
+## Notes
+
+This function can be useful to identify the orientation of the local sagittal plane of the prim, since its y-axis is always perpendicular to this local sagittal plane.
+
+## See Also
+
+- [llRot2Up](/script/reference/lsl/functions/llrot2up/)
+- [llRot2Fwd](/script/reference/lsl/functions/llrot2fwd/)
+- [llRot2Axis](/script/reference/lsl/functions/llrot2axis/)
+- [llRot2Angle](/script/reference/lsl/functions/llrot2angle/)
+
+<WikiAttribution />

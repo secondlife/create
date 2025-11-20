@@ -1,0 +1,129 @@
+---
+title: llSameGroup
+description: >-
+  Returns TRUE if avatar ID is in the same region and has the same active group,
+  otherwise FALSE.
+
+  Returns TRUE if the object or agent identified is in the same simulator and
+  has the same active group as this object. Otherwise, returns FALSE.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSameGroup" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The function compares the group UUID of the prim containing the script to that of the UUID parameter. It answers these questions:
+
+- Is the script's prim in the same group as the UUID?
+- Is the group UUID of the script's prim equal to the UUID?
+
+### Group Resolution
+
+**For the script's prim, the group is:**
+- The group the prim is set-to
+- The group the prim is deeded-to
+- The group the prim is otherwise owned by
+- If no group information is set, the group UUID used is `NULL_KEY`
+
+**For the UUID parameter:**
+- If UUID is a prim (known to the region):
+  - If it is an attachment, the active group of the owner is used
+  - Otherwise, the group the prim is set-to, deeded-to, or owned by
+  - If no group information is set, `NULL_KEY` is used
+- If UUID is an avatar (known to the region):
+  - The active group of the avatar
+  - If no active group, `NULL_KEY` is used
+- Otherwise, the UUID is treated as a group UUID directly
+
+**Note:** No group, prim, or avatar shares the same UUID.
+
+### Pseudocode
+
+```lsl
+integer llSameGroup(key uuid){
+    key group = getGroupKey(llGetKey());
+    if(uuid == group)
+        return TRUE;
+    if(getGroupKey(uuid) == group)
+        return TRUE;
+    return FALSE;
+}
+```
+
+## Caveats
+
+- The function returns `TRUE` if the object is not set to a group (i.e., "(none)") and either the avatar with the given key has no active group OR the function is called with `NULL_KEY`.
+- This function only works with objects and avatars in the same region.
+
+## Examples
+
+### Basic Group Verification
+
+This example gives an inventory object only to agents with the same active group:
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        key id = llDetectedKey(0);
+
+        if (llSameGroup(id))
+        {
+            integer numberOfObjectsInPrim = llGetInventoryNumber(INVENTORY_OBJECT);
+
+            if (numberOfObjectsInPrim)
+                llGiveInventory(id, llGetInventoryName(INVENTORY_OBJECT, 0));
+        }
+        else
+        {
+            llRegionSayTo(id, 0, "Wrong active group!");
+        }
+    }
+}
+```
+
+### Parcel Rezzing Helper
+
+This helper function uses `llSameGroup()` to determine if a parcel is rezzable based on the object's active group and parcel details. This is useful for preventing unnecessary rez failure notices from various types of attached objects (guns, water/skywalk HUDs, etc).
+
+```lsl
+/*
+  By Aryn Gellner
+  pos - position (in region coordinates) to check against.
+  Additional Land Owner Test added by Ruthven Willenov, simplified by Strife
+*/
+
+integer is_rezzable(vector pos)
+{
+    integer parcel_flags = llGetParcelFlags(pos);
+    if (parcel_flags & PARCEL_FLAG_ALLOW_CREATE_OBJECTS)
+    {
+        return TRUE; // Anyone can rez. No further checks needed.
+    }
+
+    // Not just anyone can rez. Check if we share owner or group permissions.
+    list details = llGetParcelDetails(pos, [PARCEL_DETAILS_OWNER, PARCEL_DETAILS_GROUP]);
+
+    if (llList2Key(details, 0) == llGetOwner())
+    {
+        return TRUE; // Owner can always rez.
+    }
+
+    // Return the boolean result of checking group rez permissions
+    return (parcel_flags & PARCEL_FLAG_ALLOW_CREATE_GROUP_OBJECTS) && llSameGroup(llList2Key(details, 1));
+}
+```
+
+## See Also
+
+- [llDetectedGroup](../lldetectedgroup/)
+- [llGetAttachedList](../llgetattachedlist/)
+- [llGetOwner](../llgetowner/)
+
+<WikiAttribution />

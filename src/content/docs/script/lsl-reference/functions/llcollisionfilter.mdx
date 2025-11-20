@@ -1,0 +1,67 @@
+---
+title: llCollisionFilter
+description: >-
+  Specify an empty string or NULL_KEY for Accept, to not filter on the
+  corresponding parameter.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCollisionFilter" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Stop Filtering
+
+```lsl
+llCollisionFilter("", NULL_KEY, TRUE);
+```
+
+### Filter Out All Collisions
+
+```lsl
+llCollisionFilter("", NULL_KEY, FALSE);
+```
+
+### Detect Collisions with Specific Objects
+
+This script, placed in a wearable object, detects a collision when the person wearing it collides with an object named "Post":
+
+- **1st instance:** An object named "Post" has several child prims named "Object". The prim named "Post" hits the scripted object or scripted prim - the collision will be detected
+- **2nd instance:** An object named "Post" has several child prims named "Object". A child prim named "Object" hits the scripted object or scripted prim - the collision will be detected
+- **3rd instance:** An object named "Object" has several child prims named "Post". A prim named "Post" hits the scripted object or scripted prim - the collision will NOT be detected
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llCollisionFilter("Post", "", TRUE);
+    }
+
+    collision_start(integer total_number)
+    {
+        llSay(0, "OUCH!");
+    }
+}
+```
+
+## Caveats
+
+- Any call of `llCollisionFilter` in the same event as `llVolumeDetect` changing (not just being called, but actually moving from FALSE to TRUE or vice versa) will be disregarded (before or after), **if** the event handler previously called a user-defined function. See SVC-2490.
+  - You can work around this by calling them in separate events, such as `touch_start` and `touch_end`.
+- Damage caused by `llSetDamage` will still apply to a filtered avatar.
+  - Consequently, the object will immediately die on collision with the avatar (and kill the avatar if their health reaches 0).
+
+## See Also
+
+- [llPassCollisions](../llpasscollisions/)
+- [llVolumeDetect](../llvolumedetect/)
+- collision_start
+- collision
+- collision_end
+
+<WikiAttribution />

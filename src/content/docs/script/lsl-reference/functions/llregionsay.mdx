@@ -1,0 +1,57 @@
+---
+title: llRegionSay
+description: Broadcasts Text to entire region on Channel (except for channel 0).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRegionSay" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llRegionSay(25,"This is an incredibly useless program." );
+    }
+}
+```
+
+## Caveats
+
+- This function cannot transmit on channel 0; this is a design feature and not a bug.
+- If the message is longer than 1024 characters, it is truncated to 1024 characters. (Note that in Mono, each character occupies 2 memory bytes).
+- A prim cannot hear itself, which prevents recursion problems. However, it can hear other prims within the same object. Use `llMessageLinked` instead for intra-prim messaging.
+
+## Notes
+
+To avoid making your object spam its neighborhood, use `llOwnerSay` or `llInstantMessage` instead.
+
+When one object communicates with another object (e.g., a button that turns on a lamp), consider using a negative channel number, such as `-5243212`. Using negative channels for script communications has been a common practice because, prior to September 2016, the standard SL client was unable to chat on negative channels. Since 2016, viewers have been able to chat on negative channels with messages capped to 254 bytes.
+
+If `DEBUG_CHANNEL` is used as the channel parameter, the script will display the message in the Script Warning/Error window. As of version 1.18.3, using `llRegionSay` on the `DEBUG_CHANNEL` will wrap around and display on channel 0 with a range of 100m.
+
+If you want two objects owned by the same person to communicate within a SIM, you can compute the channel based on the owner UUID:
+
+```lsl
+gChannel = 0x80000000 | (integer) ( "0x" + (string) llGetOwner() );
+```
+
+## See Also
+
+- [llListen](../lllisten/)
+- [llRegionSayTo](../llregionsayto/)
+- [llOwnerSay](../llownersay/)
+- [llWhisper](../llwhisper/)
+- [llSay](../llsay/)
+- [llShout](../llshout/)
+- [llInstantMessage](../llinstantmessage/)
+- [llDialog](../lldialog/)
+- [llTextBox](../lltextbox/)
+
+<WikiAttribution />

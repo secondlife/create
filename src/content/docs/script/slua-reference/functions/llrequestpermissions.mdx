@@ -1,0 +1,33 @@
+---
+title: llRequestPermissions
+description: >-
+  Ask AvatarID to allow the script to perform certain actions, specified in the
+  PermissionMask bitmask. PermissionMask should be one or more PERMISSION_*
+  constants. Multiple permissions can be requested simultaneously by ORing the
+  constants together. Many of the permissions requests can only go to object
+  owner.
+
+  This call will not stop script execution. If the avatar grants the requested
+  permissions, the run_time_permissions event will be called.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llRequestPermissions" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.RequestPermissions()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llRequestPermissions](/script/reference/lsl/functions/llRequestPermissions/)
+
+

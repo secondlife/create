@@ -1,0 +1,140 @@
+---
+title: llRezAtRoot
+description: >-
+  Instantiate owner's InventoryItem at Position with Velocity, Rotation and with
+  StartParameter. The last selected root object's location will be set to
+  Position.
+
+  Creates object's inventory item at the given Position, with Velocity,
+  Rotation, and StartParameter.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRezAtRoot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Silently fails to rez the object if the position is more than 10 meters away from the prim trying to rez it. (Note: the actual max distance is 10.0 + llVecMag(llGetScale()/2))
+- If the object is unattached and the owner does not have copy permission on the inventory item, the object will no longer be present in inventory after it is rezzed (another attempt to rez the same object will fail). If the owner has copy permission, a copy is rezzed and the original remains in inventory.
+- If the object is attached and the owner does not have copy permission on the inventory item, an error is shouted on DEBUG_CHANNEL: "Cannot rez no copy objects from an attached object."
+- Silently fails if you don't have offline building rights on the land. To have the right, your objects need to *either*:
+  - Be on land you own yourself
+  - Be on land where anyone is allowed to build (e.g., a sandbox)
+  - Be deeded to the group that owns the land
+  - Be set to the same group that owns the land and the parcel flag 'allow group to build' set
+- The group role "Always allow 'Create Objects'" will only work to override this when you are online, in the region, or have a child agent in the region.
+
+## Notes
+
+- To rez an object so its center is at the position (instead of the root), use `llRezObject` instead.
+- The `param` parameter is passed to the `on_rez` event and can be retrieved in the rezzed object using `llGetStartParameter`.
+- See [object_rez](/script/reference/lsl/events/object-rez/) for examples on how to establish communications between the rezzing object and the new prim.
+
+## Examples
+
+Basic example - rez an object on touch:
+
+```lsl
+string object = "Object"; // Object in inventory
+integer start_param = 10;
+rotation rot;
+
+default
+{
+    state_entry()
+    {
+        rot = llEuler2Rot(<0, 90, 90> * DEG_TO_RAD);
+    }
+    touch_start(integer a)
+    {
+        vector vec = llGetPos() + <0.0, 0.0, 5.0>; // 5 meters above this
+        vector speed = llGetVel();
+        llRezAtRoot(object, vec, speed, rot, start_param);
+    }
+}
+```
+
+Rez with relative position, rotation, and velocity in the rezzing prim's coordinate system:
+
+```lsl
+string object = "Object"; // Name of object in inventory
+vector relativePosOffset = <2.0, 0.0, 1.0>; // "Forward" and a little "above" this prim
+vector relativeVel = <1.0, 0.0, 0.0>; // Traveling in this prim's "forward" direction at 1m/s
+rotation relativeRot = <0.707107, 0.0, 0.0, 0.707107>; // Rotated 90 degrees on the x-axis
+integer startParam = 10;
+
+default
+{
+    touch_start(integer a)
+    {
+        vector myPos = llGetPos();
+        rotation myRot = llGetRot();
+
+        vector rezPos = myPos + relativePosOffset * myRot;
+        vector rezVel = relativeVel * myRot;
+        rotation rezRot = relativeRot * myRot;
+
+        llRezAtRoot(object, rezPos, rezVel, rezRot, startParam);
+    }
+}
+```
+
+NO COPY rezzer example - rez the first object from inventory, removing it as items are rezzed:
+
+```lsl
+/*
+    NO COPY Rezzer Example by Daemonika Nightfire
+    Always rez the first object at touch, removing it from the content,
+    when the first one is removed, the next object automatically moves to the first position.
+
+    Content example:
+    object (no copy)
+    object 1 (no copy)
+    object 2 (no copy)
+    object 3 (no copy)
+    object 4 (no copy)
+    ...
+
+*/
+
+vector relativePosOffset = <2.0, 0.0, 1.0>; // "Forward" and a little "above" this prim
+vector relativeVel = <1.0, 0.0, 0.0>; // Traveling in this prim's "forward" direction at 1m/s
+vector relativeRot = <90, 0, 0>; // Rotated 90 degrees on the x-axis compared to this prim
+integer startParam = 10;
+
+default
+{
+    touch_start(integer a)
+    {
+        if(llGetInventoryNumber(INVENTORY_OBJECT) > 0) // checks if at least 1 object is present
+        {
+            string object = llGetInventoryName(INVENTORY_OBJECT, 0); // name of the first object
+            vector myPos = llGetPos();
+            rotation myRot = llGetRot();
+
+            vector rezPos = myPos + relativePosOffset * myRot;
+            vector rezVel = relativeVel * myRot;
+            rotation rezRot = llEuler2Rot(relativeRot * DEG_TO_RAD) * myRot;
+
+            llRezAtRoot(object, rezPos, rezVel, rezRot, startParam);
+        }
+        else
+        {
+            llSay(0, "This rezzer is empty");
+        }
+    }
+}
+```
+
+## See Also
+
+- [llRezObject](../llrezobject/)
+- [llGetStartParameter](../llgetstartparameter/)
+- [llGodLikeRezObject](../llgodlikerezobject/)
+- `PRIM_TEMP_ON_REZ` - Constant for temporary on-rez behavior
+
+<WikiAttribution />

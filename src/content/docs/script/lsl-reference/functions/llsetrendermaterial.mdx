@@ -1,0 +1,45 @@
+---
+title: llSetRenderMaterial
+description: |-
+  Applies Render Material to Face of prim.
+  Render Material may be a UUID or name of a material in prim inventory.
+  If Face is ALL_SIDES, set the render material on all faces.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetRenderMaterial" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        // the first material alphabetically inside the same prim's inventory
+        string material = llGetInventoryName(INVENTORY_MATERIAL, 0);
+
+        // set it on all sides of the prim containing the script
+        llSetRenderMaterial(material, ALL_SIDES);
+    }
+}
+```
+
+## Caveats
+
+- If `material` is provided as `NULL_KEY`, the glTF Material is removed from the face, reverting back to any underlying Blinn-Phong materials.
+- This function will clear most PRIM_GLTF_* properties on the face, with the exceptions of repeats, offsets, and rotation_in_radians.
+
+## See Also
+
+- [llSetLinkRenderMaterial](../llsetlinkrendermaterial/)
+- [llGetRenderMaterial](../llgetrendermaterial/)
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- PRIM_RENDER_MATERIAL
+
+<WikiAttribution />

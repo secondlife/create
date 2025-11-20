@@ -1,0 +1,50 @@
+---
+title: llListenRemove
+description: >-
+  Removes a listen event callback. Pass in the value returned from llListen to
+  the iChannelHandle parameter to specify which listener to remove.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListenRemove" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Listen for one line of chat from the owner, echo it back to them, then stop listening
+integer ListenHandle;
+default
+{
+    state_entry()
+    {
+        // Start listening on channel 0, for text from owner only
+        ListenHandle = llListen(0, "", llGetOwner(), "");
+    }
+    listen(integer channel, string name, key id, string message)
+    {
+        llOwnerSay(message);            // Echo the message back to the owner
+        llListenRemove(ListenHandle);   // Stop listening
+    }
+}
+```
+
+## Caveats
+
+- On state change or script reset, all listens are removed automatically. A state change can be used as a shortcut to releasing all listens in the script.
+- No error is thrown if the handle has already been released or is invalid.
+
+## Notes
+
+- It is good practice to remove listeners when they are no longer required, or set them inactive via `llListenControl`
+
+## See Also
+
+- [llListen]
+- [llListenControl]
+- [listen] event
+
+<WikiAttribution />

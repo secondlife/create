@@ -1,0 +1,36 @@
+---
+title: llPlaySound
+description: >-
+  Plays Sound once, at Volume (0.0 - 1.0) and attached to the object.
+
+  Only one sound may be attached to an object at a time, and attaching a new
+  sound or calling llStopSound will stop the previously attached sound.
+
+  A second call to llPlaySound with the same sound will not restart the sound,
+  but the new volume will be used, which allows control over the volume of
+  already playing sounds.
+
+  To restart the sound from the beginning, call llStopSound before calling
+  llPlaySound again.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llPlaySound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.PlaySound()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llPlaySound](/script/reference/lsl/functions/llPlaySound/)
+
+

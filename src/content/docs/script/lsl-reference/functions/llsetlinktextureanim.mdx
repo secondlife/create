@@ -1,0 +1,97 @@
+---
+title: llSetLinkTextureAnim
+description: >-
+  Animates a texture on the prim specified by LinkNumber, by setting the texture
+  scale and offset.
+
+  Mode is a bitmask of animation options.
+
+  Face specifies which object face to animate.
+
+  SizeX and SizeY specify the number of horizontal and vertical frames.Start
+  specifes the animation start point.
+
+  Length specifies the animation duration.
+
+  Rate specifies the animation playback rate.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLinkTextureAnim" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Frames are sub-rectangles within a texture. A set of frames with 2 horizontal (`SizeX`) and 3 vertical (`SizeY`) means the overall texture is divided into 3 rows of 2 columns of images, each of which is a frame. `llSetLinkTextureAnim` will animate across these 6, starting with the top left image and going across and down, optionally repeating. If `SMOOTH` is set, the frames slide smoothly from one to the next; if off, each frame is displayed in turn centered on the face.
+
+## Examples
+
+Smooth texture scroll along the horizontal U-axis with looping:
+
+```lsl
+llSetLinkTextureAnim(LINK_THIS, ANIM_ON | SMOOTH | LOOP, ALL_SIDES, 1, 1, 1, 1, 1);
+```
+
+Smooth texture scroll in the opposite direction:
+
+```lsl
+llSetLinkTextureAnim(LINK_THIS, ANIM_ON | SMOOTH | LOOP, ALL_SIDES, 1, 1, 1, 1, -1);
+```
+
+Cell animation: divide a texture into 64 cells (8x8) and flip through them left to right, top to bottom:
+
+```lsl
+llSetLinkTextureAnim(LINK_THIS, ANIM_ON | LOOP, ALL_SIDES, 8, 8, 0, 64, 6.4);
+```
+
+Rotate a texture counter-clockwise at 2 revolutions per second:
+
+```lsl
+llSetLinkTextureAnim(LINK_THIS, ANIM_ON | SMOOTH | ROTATE | LOOP, ALL_SIDES, 1, 1, 0, TWO_PI, 2*TWO_PI);
+```
+
+Scale a texture larger and smaller:
+
+```lsl
+llSetLinkTextureAnim(LINK_THIS, ANIM_ON | SMOOTH | SCALE | PING_PONG | LOOP, ALL_SIDES, 1, 1, 1, 3, 2);
+```
+
+Turn off all texture animations:
+
+```lsl
+llSetLinkTextureAnim(LINK_THIS, FALSE, ALL_SIDES, 0, 0, 0.0, 0.0, 1.0);
+```
+
+## Caveats
+
+- You can only have one texture animation on a prim. Calling `llSetLinkTextureAnim` more than once on a prim will reset it.
+  - Calling `llSetLinkTextureAnim` again with exact same values will not reset the animation (a small difference in rate will suffice).
+- You cannot combine `ROTATE` and `SCALE` flags.
+- `SizeX` and `SizeY` are both limited to a range of 0 to 255
+  - Negative sizes behave as if texture repeats were set to 0 and cannot be used to mirror frames.
+- Different animation modes override some of the prim's texture parameters, but others can still be used:
+  - Texture offsets are ignored in frame-based and `SMOOTH` scrolling modes.
+    - Repeats are ignored if `SizeX` and `SizeY` are not 0.
+    - With either of the sizes set to 0, `SMOOTH` scrolling will use the prim's texture repeats. In frame-based animation, there is no meaningful effect.
+  - Texture rotation is ignored in `ROTATE` mode.
+  - Texture repeats are ignored in `SCALE` mode.
+- Selecting and un-selecting a prim with animation will reset the animation from the beginning.
+- While a texture animation is active on any face of a prim, `PRIM_NORMAL` and `PRIM_SPECULAR` are forced to have their repeats, rotations, and offsets match the `PRIM_TEXTURE` ones, even on faces that are **not** being animated.
+
+## Notes
+
+- If `Rate` is negative, it has the same effect as using the `REVERSE` flag. However, if `Rate` is negative and the `REVERSE` flag is used, they cancel each other out.
+- If `Length` is 0, it is considered to be `SizeX * SizeY` if both are above 0, otherwise 1.
+- Frames are numbered from left to right, top to bottom, starting at 0.
+- Texture animation is a property of the prim—you can remove the script that started the animation, and the prim will remember the settings. However, texture animation is one of the prim properties that are lost when using the shift-drag copy method.
+- For Blinn-Phong materials, the texture's rotation for each side affects the apparent motion. If the texture is rotated 90 degrees in the edit box, the texture may not flow in the direction expected.
+- For PBR materials, the Blinn-Phong texture rotation for each side affects the apparent motion, and any Blinn-Phong transform component (such as offsets via `PRIM_TEXTURE`) that is not animated will be applied to the PBR material as well. A GLTF material without a GLTF texture transform will animate identically to a Blinn-Phong material. If a GLTF texture transform (such as `PRIM_GLTF_BASE_COLOR`) is applied, it will be in addition to the Blinn-Phong transform and texture animation, allowing more flexibility.
+
+## See Also
+
+- [llSetTextureAnim](../llsettextureanim/)
+
+<WikiAttribution />

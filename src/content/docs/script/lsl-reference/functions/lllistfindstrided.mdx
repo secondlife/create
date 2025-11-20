@@ -1,0 +1,129 @@
+---
+title: llListFindStrided
+description: >-
+  Returns the index of the first instance of Find in ListVariable. Returns -1 if
+  not found.
+
+  Returns the position of the first instance of the Find list in the
+  ListVariable after the start index and before the end index. Steps through
+  ListVariable by stride.  Returns -1 if not found.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListFindStrided" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Strict type matching and case sensitivity is enforced:
+  - `"1"` != `1`
+  - `"1.0"` != `1.0`
+  - `1` != `1.0`
+  - `"a822ff2b-ff02-461d-b45d-dcd10a2de0c2"` != `(key)"a822ff2b-ff02-461d-b45d-dcd10a2de0c2"`
+  - `"Justice"` != `"justice"`
+- If `test` is an empty list `[]`, the value returned is `0` rather than `-1`
+- If `test` is not found in `src`, `-1` is returned
+- The length of `test` may be equal to or less than `stride` in order to generate a match
+- The index of the first entry in the list is 0
+- If `test` is found at the last index in `src`, the positive index is returned (5th entry of 5 returns 4)
+- If `start` or `end` is negative, it is counted from the end of the list (the last element is -1, the first is -list_length)
+
+## Examples
+
+### Basic Search with Stride 1
+
+```lsl
+list mylist = ["a", 0, "b", 1, "c", 2, "b", 1];
+
+integer result_a = llListFindStrided(mylist, ["b"], 0, -1, 1);
+// result_a = 2 (functionally equivalent to llListFindList)
+
+integer result_b = llListFindStrided(mylist, ["b", 1], 2, -1, 1);
+// result_b = 2 (find pattern at index 2)
+
+integer result_c = llListFindStrided(mylist, ["b"], 3, -1, 1);
+// result_c = 6 (first "b" at index 2 is skipped by starting at 3)
+```
+
+### Using Different Strides
+
+```lsl
+list mylist = ["a", 0, "b", 1, "c", 2, "b", 1];
+
+integer result_h = llListFindStrided(mylist, ["c"], 0, -1, 2);
+// result_h = 4 (with stride of 2, "c" is found at index 4)
+
+integer result_i = llListFindStrided(mylist, ["c"], 0, -1, 3);
+// result_i = -1 (with stride of 3, "c" is not found)
+
+integer result_j = llListFindStrided(mylist, ["c"], 0, -1, 4);
+// result_j = 4 (with stride of 4, "c" is found at index 4)
+```
+
+### Finding Elements in a List
+
+```lsl
+list numbers = [1, 2, 3, 4, 5];
+
+default {
+    state_entry() {
+        integer index = llListFindStrided(numbers, [3], 0, -1, 1);
+        if (index != -1) {
+            list three_four = llList2List(numbers, index, index + 1);
+            llOwnerSay(llDumpList2String(three_four, ","));
+            // Output: 3,4
+        }
+    }
+}
+```
+
+### Searching for Patterns
+
+```lsl
+// Search for two items at once to find a pattern in a list
+list avatarsWhoFoundMagicLeaves = ["Water Duck", "Green Ham", "Fire Centaur", "Red Leaf"];
+
+default {
+    state_entry() {
+        integer index = llListFindStrided(avatarsWhoFoundMagicLeaves, ["Fire Centaur", "Red Leaf"], 0, -1, 2);
+        if (index != -1) {
+            list output = llList2List(avatarsWhoFoundMagicLeaves, index, index + 1);
+            llOwnerSay(llDumpList2String(output, ","));
+            // Output: Fire Centaur,Red Leaf
+        }
+    }
+}
+```
+
+### Database-like Search
+
+```lsl
+// Using stride to search like a database
+list food_db = ["FIRSTNAME", "LASTNAME", "FAVORITE FOOD", "ALLERGIES",
+                "Awesome", "Resident", "Apples", 0,
+                "Charlie", "Kites", "Peanuts", "dogs",
+                "Cool", "McLastname", "Burgers", "peanuts"];
+
+default {
+    state_entry() {
+        list potential_allergen = ["peanuts"];
+        integer any_allergies = llListFindStrided(food_db, potential_allergen, 4, -1, 4);
+        if (any_allergies != -1) {
+            llOwnerSay("Everyone can eat it");
+        } else {
+            list output = llList2List(food_db, any_allergies - 3, any_allergies - 2);
+            llOwnerSay(llDumpList2String(output, " ") + " is allergic to it!");
+        }
+    }
+}
+```
+
+## See Also
+
+- [llSubStringIndex](../llSubStringIndex) - Find a string in another string
+- [llListFindList](../llListFindList) - Find elements in a list
+
+<WikiAttribution />

@@ -1,0 +1,95 @@
+---
+title: llGetDate
+description: |-
+  Returns the current date in the UTC time zone in the format YYYY-MM-DD.
+  Returns the current UTC date as YYYY-MM-DD.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetDate" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Birthday Detection
+
+```lsl
+// Birthday surprise
+default
+{
+    state_entry()
+    {
+        llSetTimerEvent(0.1);
+    }
+
+    timer()
+    {
+        if(llGetDate() == "2009-02-15")
+            llSetText("HAPPY BIRTHDAY!", <0,1,0>, 1.0);
+        else
+            llSetText("A surprise is coming...", <0,1,0>, 1.0);
+
+        llSetTimerEvent(3600.0);  // check every hour.
+    }
+}
+```
+
+### Parse Date Components
+
+```lsl
+// Function to calculate the numeric day of year
+integer dayOfYear(integer year, integer month, integer day)
+{
+    return day + (month - 1) * 30 + (((month > 8) + month) / 2)
+        - ((1 + (((!(year % 4)) ^ (!(year % 100)) ^ (!(year % 400))) | (year <= 1582))) && (month > 2));
+}
+
+default
+{
+    touch_end(integer count)
+    {
+        list dateComponents = llParseString2List(llGetDate(), ["-"], []);
+        integer year  = (integer) llList2String(dateComponents, 0);
+        integer month = (integer) llList2String(dateComponents, 1);
+        integer day   = (integer) llList2String(dateComponents, 2);
+        llSay(0, "The current day of the year is " + (string) dayOfYear(year, month, day));
+    }
+}
+```
+
+### Leap Year Detection
+
+```lsl
+// Function to calculate whether a current year is a leap year
+integer is_leap_year( integer year )
+{
+    if( year % 4 )         return FALSE;   // Not a leap year under any circumstances
+    if( year <= 1582 )     return TRUE;    // In the Julian calender before 24 February 1582, every fourth year was a leap year
+    if( !( year % 400 ))   return TRUE;    // A leap century is a leap year if divisible by 400
+    if( !( year % 100 ))   return FALSE;   // Any other century is not a leap year
+    return TRUE;                           // It is divisible by 4 and not a century and not Julian, therefore it is a leap year
+}
+```
+
+For most SL applications (years 1901-2099), you can use this simpler check:
+
+```lsl
+if (year % 4)          //  TRUE if NOT a leap year
+```
+
+## Notes
+
+- The returned date is always in UTC time zone, regardless of user locale
+- For dates with time information, use `llGetTimestamp()` which returns the format `YYYY-MM-DDThh:mm:ss.ff...fZ`
+- The date string can be parsed using `llParseString2List()` with `["-"]` as delimiter to extract year, month, and day components
+
+## See Also
+
+- [`llGetTimestamp()`](../llgettimestamp/) - Returns the current date and time in ISO 8601 format
+- [`llParseString2List()`](../llparsestring2list/) - Useful for parsing the date string into components
+- Related helpers: Timestamp conversion functions for Unix timestamps and weekday calculations
+
+<WikiAttribution />

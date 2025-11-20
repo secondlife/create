@@ -1,0 +1,82 @@
+---
+title: llGetEnv
+description: Returns a string with the requested data about the region.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetEnv" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The following table lists the valid values for the `name` parameter. Remember that `llGetEnv` returns a string, so you may need to cast it to the appropriate type (integer or float) for use in calculations.
+
+| Name | Description | Cast To |
+|------|-------------|---------|
+| "agent_limit" | Maximum number of avatars normally allowed on this region (teleport home and login to last location are allowed to exceed this) | integer |
+| "agent_limit_max" | Maximum configurable setting for number of agents in the region | integer |
+| "agent_reserved" | Number of agent slots reserved for premium members in the region | integer |
+| "agent_unreserved" | Number of unreserved (non-premium) agent slots configured for the region | integer |
+| "dynamic_pathfinding" | Region's effective dynamic_pathfinding status, "enabled" or "disabled" (configured in Region Debug Console) | N/A |
+| "estate_id" | Numerical index identifying which estate a region belongs to (main grid mainland is "1") | integer |
+| "estate_name" | Estate name such as "mainland", "Linden Homes", or "My Happy Estate" | N/A |
+| "frame_number" | Frame number of the simulator, for example "42042" | integer |
+| "region_cpu_ratio" | Number of regions per CPU for this region type. Returns "1" or "4" | integer |
+| "region_idle" | Region's idle status, "1" or "0" | integer (boolean) |
+| "region_product_name" | Type of region such as "Estate / Full Region", "Mainland / Homestead", "Estate / Openspace", or "Estate / Full Region - Skill Gaming" | N/A |
+| "region_product_sku" | Region's product number as a string | N/A |
+| "region_start_time" | Time the region was last restarted, in Unix time format (see llGetUnixTime) | integer |
+| "sim_channel" | Region's channel string, for example "Second Life Server" | N/A |
+| "sim_version" | Region's version number string, for example "10.11.30.215699" | N/A |
+| "simulator_hostname" | Simhost running this region. Same as llGetSimulatorHostname but without the script delay | N/A |
+| "region_max_prims" | Maximum number of prims allowed on this region | integer |
+| "region_object_bonus" | Region's object bonus factor | float |
+| "whisper_range" | Range for whispered chat in the region | float |
+| "chat_range" | Range for spoken chat in the region | float |
+| "shout_range" | Range for shouted chat in the region | float |
+| "region_rating" | Maturity rating of the region. Same as DATA_SIM_RATING from llRequestSimulatorData | N/A |
+| "grid" | Grid the region is running on | N/A |
+| "allow_damage_adjust" | Whether scripts are allowed to adjust damage. Allowed by default | integer (boolean) |
+| "restrict_combat_log" | Whether scripts are restricted from writing into the combat log. Allowed by default | integer (boolean) |
+| "restore_health" | Whether health is reset to 100% on death. On by default | integer (boolean) |
+| "invulnerability_time" | Invulnerability time applied after avatar death. 0.0 by default | float |
+| "damage_throttle" | Maximum damage a single source may inflict on a target per second. 0.0 by default | float |
+| "health_regen_rate" | Speed of health regeneration in hitpoints per second. 1/6 by default | float |
+| "death_action" | Action to take when an avatar dies: 0 = Teleport home, 1 = Teleport to parcel landing point, 2 = Teleport to region telehub, 3 = No action | integer |
+| "damage_limit" | Maximum damage that may be delivered by a single bullet or call to llDamage. If 0, there is no limit | float |
+
+## Examples
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        string version = llGetEnv("sim_version");
+        llOwnerSay("Region " + llGetRegionName() + " is running "
+                   + llGetEnv("sim_channel") + " version " + version );
+
+        list ver = llParseString2List(version, ["."], []);
+
+        llOwnerSay("Build: " + llList2String(ver, 3));
+        llOwnerSay("Build Date: " + llList2String(ver, 2) + "-" + llList2String(ver, 1) + "-20" + llList2String(ver, 0));
+    }
+}
+```
+
+## Notes
+
+- Region idling lowers a region's framerate when no avatars are currently on or looking into the region. Scripts measuring time dilation with llGetRegionTimeDilation may report significant time dilation if the region is idle.
+- Always remember to cast the returned string to the appropriate type (integer or float) when using it in calculations.
+
+## See Also
+
+- [llRequestSimulatorData](../llrequestsimulatordata/)
+- [llGetSimulatorHostname](../llgetsimulatorhostname/)
+- [llGetRegionFlags](../llgetregionflags/)
+- [llGetRegionTimeDilation](../llgetregiontimedilation/)
+
+<WikiAttribution />

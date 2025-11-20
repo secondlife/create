@@ -1,0 +1,65 @@
+---
+title: llCreateKeyValue
+description: |2-
+
+                     Starts an asychronous transaction to create a key-value pair. Will fail with XP_ERROR_STORAGE_EXCEPTION if the key already exists. The dataserver callback will be executed with the key returned from this call and a string describing the result. The result is a two element commma-delimited list. The first item is an integer specifying if the transaction succeeded (1) or not (0). In the failure case, the second item will be an integer corresponding to one of the XP_ERROR_... constants. In the success case the second item will be the value passed to the function.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCreateKeyValue" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+key trans;
+default
+{
+    touch_start(integer total_number)
+    {
+        trans = llCreateKeyValue("FOO", "BAR");
+    }
+
+    dataserver(key t, string value)
+    {
+        if (t == trans)
+        {
+            // our llCreateKeyValue transaction is done
+            integer result = (integer)llGetSubString(value, 0, 0);
+            if (result == 1)
+            {
+                // the key-value pair was successfully created
+                llSay(0, "New key-value pair was created");
+            }
+            else
+            {
+                // the key-value pair was not created
+                integer error = (integer)(llGetSubString(value, 2, -1));
+                llSay(0, "Key-value failed to create: " + llGetExperienceErrorMessage(error));
+            }
+        }
+    }
+}
+```
+
+## Caveats and Notes
+
+- Keys do not contain commas due to `llKeysKeyValue` returning keys in CSV format.
+- As of January 1, 2016, maximum bytes is 1011 for key and 4095 for value for both LSO and Mono scripts.
+- If the key already exists, the dataserver event will return a failure along with the error `XP_ERROR_STORAGE_EXCEPTION`.
+- If this function returns an `XP_ERROR_STORAGE_EXCEPTION`, subsequent attempts to create the same key-value pair key may also fail, even if it appears that no key has been created. For that reason, it may be preferable to use `llUpdateKeyValue`, which will overwrite any existing value or will create a new key-value pair if none exists with that name.
+
+## See Also
+
+- [llGetExperienceErrorMessage](../llgetexperienceerrormessage/)
+- [llReadKeyValue](../llreadkeyvalue/)
+- [llUpdateKeyValue](../llupdatekeyvalue/)
+- [llDeleteKeyValue](../lldeletekeyvalue/)
+- [llDataSizeKeyValue](../lldatasizekeyvalue/)
+- [llKeyCountKeyValue](../llkeycountkeyvalue/)
+- [llKeysKeyValue](../llkeyskeyvalue/)
+
+<WikiAttribution />

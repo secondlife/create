@@ -1,0 +1,44 @@
+---
+title: llGetAndResetTime
+description: |-
+  Returns the script time in seconds and then resets the script timer to zero.
+  Gets the time in seconds since starting and resets the time to zero.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAndResetTime" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer num_touch)
+    {
+        // This is equivalent to calling llGetTime(), then llResetTime()
+        float time = llGetAndResetTime();
+
+        llSay(0, (string)time + " seconds have elapsed since the last touch or boot-up.");
+    }
+}
+```
+
+## Caveats
+
+- Script time is the amount of real-world time that the script has been in a running state. It is unaffected by time dilation, but it does not count time while the script is suspended, the user is offline (when in an attachment), the object is in inventory rather than rezzed, etc.
+- Script time resets when:
+  - Script reset (user or llResetScript or llResetOtherScript)
+  - Call to either llResetTime or llGetAndResetTime
+- Due to 32-bit floating point number limitations, the accuracy of this function is 1/32 sec up to ~3 days, 1/16 sec up to ~6 days, etc., doubling each time (for example, it's only 1 second at ~194 days). Use llResetTime or llGetAndResetTime whenever practical to maintain the accuracy you require.
+
+## See Also
+
+- [llResetTime](../llresettime/)
+- [llGetTime](../llgettime/)
+- [llGetRegionTimeDilation](../llgetregiontimedilation/)
+
+<WikiAttribution />

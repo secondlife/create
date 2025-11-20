@@ -1,0 +1,28 @@
+---
+title: llXorBase64StringsCorrect
+description: >-
+  Deprecated: Please use llXorBase64 instead.
+
+  Correctly (unless nulls are present) performs an exclusive OR on two Base64
+  strings and returns a Base64 string.
+
+  Text2 repeats if it is shorter than Text1.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llXorBase64StringsCorrect" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- During the conversion to a byte array the last `(bitcount % 8)` bits are discarded from both Text1 and Text2. See the Implementation section for details.
+- Considers any null encountered in Text2 to mark the end of Text2.
+
+## See Also
+
+- [llXorBase64](../llxorbase64/)
+
+<WikiAttribution />

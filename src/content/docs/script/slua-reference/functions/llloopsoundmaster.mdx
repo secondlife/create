@@ -1,0 +1,35 @@
+---
+title: llLoopSoundMaster
+description: >-
+  Plays attached Sound, looping at volume (0.0 - 1.0), and declares it a sync
+  master.
+
+  Behaviour is identical to llLoopSound, with the addition of marking the source
+  as a "Sync Master", causing "Slave" sounds to sync to it. If there are
+  multiple masters within a viewers interest area, the most audible one (a
+  function of both distance and volume) will win out as the master.
+
+  The use of multiple masters within a small area is unlikely to produce the
+  desired effect.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llLoopSoundMaster" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.LoopSoundMaster()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llLoopSoundMaster](/script/reference/lsl/functions/llLoopSoundMaster/)
+
+

@@ -1,0 +1,33 @@
+---
+title: llGetScale
+description: |-
+  Returns the scale of the prim.
+  Returns a vector that is the scale (dimensions) of the prim.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetScale" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        llSay(0, "My dimensions are: " + (string)llGetScale());
+    }
+}
+```
+
+## See Also
+
+- [llSetScale](/script/reference/lsl/functions/llsetscale/) - Sets the prim's size
+- [llSetPrimitiveParams](/script/reference/lsl/functions/llsetprimitiveparams/) - Sets prim attributes
+- [llGetPrimitiveParams](/script/reference/lsl/functions/llgetprimitiveparams/) - Gets prim attributes
+
+<WikiAttribution />

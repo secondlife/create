@@ -1,0 +1,87 @@
+---
+title: llGetLinkName
+description: |-
+  Returns the name of LinkNumber in a link set.
+  Returns the name of LinkNumber the link set.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetLinkName" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If `link` is out of bounds, NULL_KEY is returned.
+- The prim name attribute is limited to 63 bytes, any string longer than that will be truncated. This truncation does not always happen when the attribute is set or read.
+- There is no corresponding `llSetLinkName`, use `llSetLinkPrimitiveParamsFast(link, [PRIM_NAME, name]);` instead.
+
+## Examples
+
+Listen on channel 10 for a name and check if a prim with that name is part of this object:
+
+```lsl
+integer check_for_prim(string name)
+{
+    integer i = llGetNumberOfPrims();
+    for (; i >= 0; --i)
+    {
+        if (llGetLinkName(i) == name)
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+default
+{
+    state_entry()
+    {
+        llListen(10, "", llGetOwner(), "");
+    }
+    listen(integer chan, string obj, key id, string msg)
+    {
+        if (check_for_prim(msg))
+        {
+            llOwnerSay("found a linked prim named \"" + msg + "\"");
+        }
+        else
+        {
+            llOwnerSay("this object does not have any linked prims named \"" + msg + "\"");
+        }
+    }
+}
+```
+
+## Helper Functions
+
+Get a link number by the prim name:
+
+```lsl
+integer getLinkWithName(string name) {
+    integer i = llGetLinkNumber() != 0;   // Start at zero (single prim) or 1 (two or more prims)
+    integer x = llGetNumberOfPrims() + i; // [0, 1) or [1, llGetNumberOfPrims()]
+    for (; i < x; ++i)
+        if (llGetLinkName(i) == name)
+            return i; // Found it! Exit loop early with result
+    return -1; // No prim with that name, return -1.
+}
+```
+
+## See Also
+
+- [llGetLinkKey](/script/reference/lsl/functions/llgetlinkkey/) - Gets the instance UUID of the link
+- [llGetObjectName](/script/reference/lsl/functions/llgetobjectname/) - Get the prim's name
+- [llSetObjectName](/script/reference/lsl/functions/llsetobjectname/) - Set the prim's name
+- [llGetObjectDesc](/script/reference/lsl/functions/llgetobjectdesc/) - Get the prim's description
+- [llSetObjectDesc](/script/reference/lsl/functions/llsetobjectdesc/) - Set the prim's description
+- [llGetObjectDetails](/script/reference/lsl/functions/llgetobjectdetails/) - Get object properties
+
+## Related Articles
+
+- Prim Attribute Overloading
+
+<WikiAttribution />

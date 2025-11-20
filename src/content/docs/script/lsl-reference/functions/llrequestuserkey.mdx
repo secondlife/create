@@ -1,0 +1,51 @@
+---
+title: llRequestUserKey
+description: Look up Agent ID for the named agent using a historical name.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRequestUserKey" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+key name_key_query;
+default
+{
+   state_entry()
+   {
+       name_key_query = llRequestUserKey("rider.linden");
+   }
+
+   dataserver(key queryid, string data)
+   {
+       if ( name_key_query == queryid )
+       {
+           llSay(0, "The key for this user is : " + data);
+       }
+   }
+}
+```
+
+## Caveats
+
+- This function is throttled. The throttle is undocumented, but as of October 2018 the function appears to support bursts of up to 20 requests and sustained use at an average rate of 1.9 requests per second per owner, per region. (Meaning the throttle applies to all objects in the region with the same owner.) Once tripped, the function fails and says "Too many llRequestUserKey requests. Throttled until average falls." on DEBUG_CHANNEL.
+- This function will return a NULL_KEY for any agent that has yet to log on to the grid the function is used on.
+
+## Notes
+
+- Names are always provided in the form "First[ Last]" or "first[.last]" (first name with an optional last name.) If the last name is omitted a last name of "Resident" is assumed.
+- Case is not considered when resolving agent names.
+- The agent being searched for does not need to be signed on to Second Life.
+- Returns a handle (a key) that can be used to identify the request when the dataserver event is raised.
+
+## See Also
+
+- [llRequestUsername](../llrequestusername/)
+- [llName2Key](../llname2key/)
+
+<WikiAttribution />

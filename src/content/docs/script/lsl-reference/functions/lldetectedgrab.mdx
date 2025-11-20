@@ -1,0 +1,92 @@
+---
+title: llDetectedGrab
+description: |-
+  Returns the grab offset of a user touching the object.
+  Returns <0.0, 0.0, 0.0> if Number is not a valid object.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedGrab" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Grab Detection
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetStatus(PRIM_PHYSICS, TRUE); // This allows the object to be "grabbed" and dragged
+    }
+    touch(integer num_detected)
+    {
+        llSay(0, (string)llDetectedGrab(0)); // Be prepared for a great amount of chatted info.
+                                              // The faster you move the mouse while grabbing the object the greater the offset becomes.
+                                              // This is not due to the speed but the reaction time of the turn around of the physical prim,
+                                              // thus an offset (distance from grab to prim center) is created and measured by this function.
+    }
+}
+```
+
+### Following Mouse Grabs
+
+This example creates a cone-shaped object that follows the mouse when grabbed:
+
+```lsl
+/*
+Simple llDetectedGrab illustration, rez a prim and add this script.
+The prim will become a cone that follows mouse grabs.
+
+Click and hold the mouse button down on the object, then:
+- Drag left and right to move parallel to the camera focal plane.
+- Drag up and down to move to and from the camera.
+- Hold down Ctrl, then drag up and down to move vertically.
+*/
+
+default
+{
+    state_entry()
+    {
+        llMinEventDelay(0.25);
+        llSetStatus(STATUS_PHYSICS, FALSE); // make the object static for simplicity
+        llSetPrimitiveParams([
+            PRIM_SIZE, <0.5, 0.5, 0.5>,
+            PRIM_TYPE, PRIM_TYPE_CYLINDER, PRIM_HOLE_DEFAULT, <0.0, 1.0, 0.0>,
+              0.0, ZERO_VECTOR, ZERO_VECTOR, ZERO_VECTOR
+        ]); // a cone that can follow the mouse pointer
+    }
+
+    touch(integer total_number)
+    {
+        llLookAt(llGetPos() + llDetectedGrab(0), 1.0, 1.0);
+    }
+}
+```
+
+## Caveats
+
+- When called in HUD attachments, values returned are affected by the wearer's position and rotation.
+- For physical objects, grabs are detected only if the avatar has permission to move the object and the object is not locked.
+- For non-physical objects, grabs from all avatars are detected.
+- `llDetectedGrab()` is not blocked by `STATUS_BLOCK_GRAB` or `STATUS_BLOCK_GRAB_OBJECT`.
+
+## Notes
+
+- The grab offset represents the distance between where the avatar grabs the object and its center.
+- The offset changes based on how quickly the avatar moves the mouse while grabbing, which affects the physical reaction time of the prim.
+- This function only works in the touch event.
+- Returns `<0.0, 0.0, 0.0>` if the number parameter is out of range or called from an event other than the touch event.
+
+## See Also
+
+- [llPassTouches](../llpasstouches/)
+- touch_start event
+- touch event
+- touch_end event
+
+<WikiAttribution />

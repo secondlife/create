@@ -1,0 +1,47 @@
+---
+title: llGetRegionName
+description: Returns the current region name.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetRegionName" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This example demonstrates how to construct an SLURL (Second Life URL) using the region name, similar to the "Copy SLURL to clipboard" feature in the standard client's Map:
+
+```lsl
+// Say what would be said by "Copy SLURL to clipboard" in the Map of the standard client
+
+string wwGetSLUrl()
+{
+    string globe = "http://maps.secondlife.com/secondlife";
+    string region = llGetRegionName();
+    vector pos = llGetPos();
+    string posx = (string)llRound(pos.x);
+    string posy = (string)llRound(pos.y);
+    string posz = (string)llRound(pos.z);
+    return (globe + "/" + llEscapeURL(region) +"/" + posx + "/" + posy + "/" + posz);
+}
+
+default
+{
+    state_entry()
+    {
+        llOwnerSay( wwGetSLUrl() );
+    }
+}
+```
+
+## See Also
+
+- [llRequestSimulatorData](../llrequestsimulatordata/)
+- [llGetSimulatorHostname](../llgetsimulatorhostname/)
+- [llGetParcelDetails](../llgetparceldetails/)
+- [llEscapeURL](../llescapeurl/)
+
+<WikiAttribution />

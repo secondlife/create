@@ -1,0 +1,217 @@
+---
+title: llXorBase64
+description: >-
+  Performs an exclusive OR on two Base64 strings and returns a Base64 string.
+  Text2 repeats if it is shorter than Text1.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llXorBase64" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- During the conversion to a byte array the last `(bitcount % 8)` bits are discarded from both `str1` and `str2`. See the Implementation section for details.
+- If the inputs are not Base64 strings the result will be erratic.
+- `str2` repeats if it is shorter than `str1`.
+
+## Examples
+
+Basic encryption and decryption:
+
+```lsl
+default
+{
+    state_entry(){
+
+        // Use a HARD password ! with caps nocaps numbers and symbols !
+        string pass = "P4s5Wo_rD";
+
+        string data = "I am some ver important data.";
+
+        // Encrypting the data:
+        string crypt = llXorBase64(llStringToBase64(data), llStringToBase64(pass));
+
+        // Say the mess you made to Owner
+        llOwnerSay(crypt);
+
+        // DeCrypting the data and say back to owner:
+        llOwnerSay(llBase64ToString(llXorBase64(crypt, llStringToBase64(pass))));
+
+    }
+
+}
+```
+
+Stronger encryption with random salt generation:
+
+```lsl
+// Stronger encryption - generates a random encrypted string.
+//safe character set
+string ASCII = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+//convert integer to characters
+string chr(integer i)
+{
+    return llGetSubString(ASCII, i, i);
+}
+
+//for generating a random string.
+string salt(integer amount) {
+    string salt = "";
+    integer i;
+    //for length of salt , generate characters
+    for(i = 0; i < amount; i++) {
+        salt += chr((integer)llFrand(llStringLength(ASCII)));
+    }
+    return salt;
+}
+
+default
+{
+    touch_start(integer n) {
+        //generates a random salt to add to the string.
+        //put salt on the end so that even if the data is corrupted by SVC-6362, it is unimportant data
+        string data = "I am some very important data." + salt((integer)llFrand(5)+ 5);
+
+        string pass = "password";
+
+        // Encrypting the data:
+        string crypt = llXorBase64(llStringToBase64(data), llStringToBase64(pass));
+
+        // Say the mess you made to Owner
+        llOwnerSay(crypt);
+
+        // DeCrypting the data and say back to owner: Remember to remove the salt when needed ;)
+        llOwnerSay(llBase64ToString(llXorBase64(crypt, llStringToBase64(pass))));
+
+    }
+}
+```
+
+## Implementation
+
+The XOR is performed by converting each Base64 string (`str1` and `str2`) into byte arrays and then XORing the two byte arrays. Finally, the resulting byte array is converted back into Base64 and returned.
+
+However, during the conversion to byte arrays, the last `(bitcount % 8)` bits are discarded. LSL treats Base64 strings as 8-bit byte arrays, not arrays of 6-bit bytes.
+
+## Cryptography
+
+**Important:** While the information provided here is by no means exhaustive, it should give you enough information to ask the right questions and guide your future reading. Writing cryptographic algorithms should not be attempted without an understanding of cryptography, as the results may otherwise be disastrous.
+
+### Key Concepts
+
+- **Secret**: A bit of input information used to transform the cryptographic algorithm. The secret is not mutated with subsequent runs of the algorithm.
+- **Seed**: Also used to transform the algorithm but, unlike a secret, it does mutate. The method of mutation is part of the algorithm.
+
+To effectively use a secret and a seed, you need to keep secret at least two of the following: **1)** the algorithm, **2)** the seed, or **3)** the secret.
+
+Keeping your algorithm secret will not protect you. Attack vectors against XOR algorithms require little or no knowledge of the algorithm. The best protection is a strong algorithm that uses multiple secrets/seeds. Keep in mind how the secrets and seeds are used—an attacker need not determine the secrets, only intermediate static values and the relationship between them for the algorithm to be broken. Do not give the attacker secrets and seeds that render blocks of living code static.
+
+### Best Practices
+
+As a cryptographic technique, XOR is weak and there are several attacks that can be leveraged to determine the XOR inputs. Depending on how the secrets are used, cracking a single message could expose the input secrets and break the derived algorithm.
+
+1. **Keep your secrets secret.** Use a seeded trap door function to shake up the bits of the secret before using it with XOR and change the seed often.
+
+2. **Avoid XORing by two differing length values without understanding the implications.** While it may seem like a good idea to use different length keys, what it actually does is link the fields. Although it gives you a longer key value (the Least Common Multiple in length), the fields will be linked such that there are really only as many fields as the Greatest Common Divisor. The number of unique fields determines the theoretical maximum number of keys an attacker has to try:
+
+   ```
+   Unique_Key_Fields = Greatest_Common_Divisor(lengths_of_keys) * number_of_keys
+   ```
+
+### Attack Vectors
+
+XOR is a limited polyalphabetic cipher. The attack vectors that work for polyalphabetic ciphers work for XOR:
+
+- **Probability**: In English, letters have different probabilities of occurring because of grammar and spelling rules. XOR does not hide the letter probabilities. This attack only works when the keys are many times smaller than the message.
+- **UTF-8 Rules**: When you convert a string to Base64, UTF-8 encoding is used first. If you assume the inputs are valid UTF-8, some bits can be determined purely by examination. This is most useful in determining the length of the key.
+- **Plain Text**: If a user captures outputs for known inputs, it can expose weaknesses in the key.
+- **Brute Force**: Attacking the key, secret, and/or seed.
+
+### Cross-Language Implementation
+
+**PHP Decoder:**
+
+```php
+<?php
+/*
+ * Description: Implementation of SignpostMarv's php base64 decoder.
+ * Author: Kopilo Hallard
+ * License: http://creativecommons.org/licenses/by-sa/2.5/
+ */
+
+/* Cipher (s1 data, s2 key) */
+function llXorBase64($s1, $s2) {
+    $s1 = base64_decode($s1); $l1 = strlen($s1);
+    $s2 = base64_decode($s2);
+    if($l1 > strlen($s2)) $s2 = str_pad($s2, $l1, $s2, STR_PAD_RIGHT);
+    return base64_encode($s1 ^ $s2);
+}
+
+$Skey = "password";
+$para1 = $_POST["para1"];
+
+$result = llXorBase64($para1, base64_encode($Skey));
+
+echo "Encrypted Data: ".$para1.PHP_EOL;
+echo "Unencrypted ".base64_decode($result);
+
+?>
+```
+
+**Java Decoder:**
+
+Remember to URLEncode your BASE64 hash if you transfer it via GET.
+
+```java
+String BASE64datahash = "error";
+String passhash = "error";
+
+try {
+    //URLDecode the URL encoded encrypted data
+    BASE64datahash = java.net.URLDecoder.decode("KhoFRRYaAUMbEVU%3D", "UTF-8"); //KhoFRRYaAUMbEVU%3D
+    System.out.println("BASE64datahash: " + BASE64datahash); //KhoFRRYaAUMbEVU=
+
+    //create an array of BASE64 data
+    char[] BASE64data = BASE64datahash.toCharArray();
+    char[] dataUB = new String(new BASE64Decoder().decodeBuffer(new String(BASE64data))).toCharArray(); //BASE64 decode the data
+    System.out.println("encrypted data (but base64 decoded) [dataUB]: " + new String(dataUB));
+
+    //Encode the secred key/password to BASE64 (Just to show how to use BASE64Encoder)
+    //String BASE64password = new String(new BASE64Encoder().encodeBuffer("supersecretpassword".getBytes()));
+    //System.out.println("BASE64password: " + new String(BASE64password));
+
+    //create array of BASE64 key/password
+    //char[] key = BASE64password.toCharArray();
+    //char[] keyUB = new String(new BASE64Decoder().decodeBuffer(new String(key))).toCharArray();
+    char[] keyUB = "supersecretpassword".toCharArray();
+    System.out.println("plaintext key/password [keyUB]: " + new String(keyUB));
+
+    //XOR data array chars with corresponding key/password array chars
+    int k=0;
+    for (int i = 0; i < dataUB.length; i++) {
+        dataUB[i] = (char) (dataUB[i] ^ keyUB[k]);
+        k++;
+
+        //Loop to start of the key if the key is too short
+        if (k == keyUB.length)
+           k=0;
+    }
+
+    System.out.println("Decoded data [dataUB]: " + new String(dataUB));
+
+    } catch (Exception ex) {
+        System.out.println("Oops!");
+    }
+```
+
+## See Also
+
+- [llStringToBase64](../llstringtobase64/)
+- [llBase64ToString](../llbase64tostring/)
+
+<WikiAttribution />

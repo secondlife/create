@@ -1,0 +1,69 @@
+---
+title: llMakeExplosion
+description: >-
+  Make a round explosion of particles. Deprecated: Use llParticleSystem instead.
+
+  Make a round explosion of particles using texture from the objects inventory.
+  Deprecated: Use llParticleSystem instead.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llMakeExplosion" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Emulation with llParticleSystem
+
+Beginning in 1.14, the simulator uses `llParticleSystem` to emulate legacy llMakeExplosion particles. Here's a working implementation:
+
+```lsl
+fakeMakeExplosion(integer particle_count, float particle_scale, float particle_speed,
+                 float particle_lifetime, float source_cone, string source_texture_id,
+                 vector local_offset)
+{
+    //local_offset is ignored
+    llParticleSystem([
+        PSYS_PART_FLAGS,            PSYS_PART_INTERP_COLOR_MASK | PSYS_PART_INTERP_SCALE_MASK | PSYS_PART_EMISSIVE_MASK | PSYS_PART_WIND_MASK,
+        PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_ANGLE_CONE,
+        PSYS_PART_START_COLOR,      <1.0, 1.0, 1.0>,
+        PSYS_PART_END_COLOR,        <1.0, 1.0, 1.0>,
+        PSYS_PART_START_ALPHA,      0.50,
+        PSYS_PART_END_ALPHA,        0.25,
+        PSYS_PART_START_SCALE,      <particle_scale, particle_scale, 0.0>,
+        PSYS_PART_END_SCALE,        <particle_scale * 2 + particle_lifetime, particle_scale * 2 + particle_lifetime, 0.0>,
+        PSYS_PART_MAX_AGE,          particle_lifetime,
+        PSYS_SRC_ACCEL,             <0.0, 0.0, 0.0>,
+        PSYS_SRC_TEXTURE,           source_texture_id,
+        PSYS_SRC_BURST_RATE,        1.0,
+        PSYS_SRC_ANGLE_BEGIN,       0.0,
+        PSYS_SRC_ANGLE_END,         source_cone * PI,
+        PSYS_SRC_BURST_PART_COUNT,  particle_count / 2,
+        PSYS_SRC_BURST_RADIUS,      0.0,
+        PSYS_SRC_BURST_SPEED_MIN,   particle_speed / 3,
+        PSYS_SRC_BURST_SPEED_MAX,   particle_speed * 2/3,
+        PSYS_SRC_MAX_AGE,           particle_lifetime / 2,
+        PSYS_SRC_OMEGA,             <0.0, 0.0, 0.0>
+        ]);
+}
+```
+
+## Known Discrepancies
+
+When migrating from `llMakeExplosion` to the `llParticleSystem` emulation, be aware of these differences:
+
+1. **Particle Lifetime**: The original llMakeExplosion had random particle lifetime, which cannot be created in the current particle system via a single call
+2. **Particle Growth**: The original had continual particle growth throughout its lifetime, ending well past the 4m limit of the current system on long-lived particles
+3. **Arc Orientation**: The 'arc' parameter in the original oriented along the X axis, while the current particle system's angles orient along the Z axis
+4. **Value Scaling**: Several values are not taken 'verbatim' in the original particle system (velocity is not m/sec, and particle count may vary), approximated via basic divisors
+5. **Local Offset**: There is no way to duplicate the offset from the old functions within the new particle system
+
+## See Also
+
+- [llParticleSystem](../llparticlesystem/)
+- [llParticleFluid](../llparticlefluid/)
+
+<WikiAttribution />

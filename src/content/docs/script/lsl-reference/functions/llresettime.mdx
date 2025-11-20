@@ -1,0 +1,45 @@
+---
+title: llResetTime
+description: |-
+  Sets the time to zero.
+  Sets the internal timer to zero.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llResetTime" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    state_entry()
+    {
+        llResetTime();
+    }
+    touch_start(integer num_touch)
+    {
+        float time = llGetTime(); //Instead getting, and then resetting the time, we could use llGetAndReset() to accomplish the same thing.
+        llResetTime();
+        llSay(0,(string)time + " seconds have elapsed since the last touch." );
+    }
+}
+```
+
+## Caveats
+
+- Script time resets when:
+  - Script reset (user or llResetScript or llResetOtherScript)
+  - Simulator reset (admin or crash)
+  - Call to either llResetTime or llGetAndResetTime
+- Script time measures real world time, it is unaffected by time dilation.
+
+## See Also
+
+- [llGetTime]
+- [llGetAndResetTime]
+
+<WikiAttribution />

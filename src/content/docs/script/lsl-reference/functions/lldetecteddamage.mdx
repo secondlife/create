@@ -1,0 +1,41 @@
+---
+title: llDetectedDamage
+description: >-
+  Returns a list containing the current damage for the event, the damage type
+  and the original damage delivered.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedDamage" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+llDetectedDamage returns a list describing a single damage event. This function is only available from within an `on_damage` handler. If called from another detection event or from a non-detection handler, it will return an empty list.
+
+The list has the following format:
+
+```lsl
+[float damage, integer damage_type, float original_damage]
+```
+
+### Return Parameters
+
+- **damage**: The current amount of damage that will be applied after all `on_damage` events have completed processing.
+- **damage_type**: An integer describing the type of damage that will be applied. This could reflect one of the `DAMAGE_TYPE_*` constants, a custom damage type constant, or be a repurposed field as it can be set to anything.
+- **original_damage**: The original amount of damage that was specified when the event was triggered, either through a collision or a call to llDamage.
+
+## Notes
+
+- Returns an empty list if the number parameter does not relate to a valid damage source or if called from a handler other than `on_damage`.
+- Available only within `on_damage` event handlers.
+
+## See Also
+
+- [llAdjustDamage](../lladjustdamage/)
+- on_damage event
+
+<WikiAttribution />

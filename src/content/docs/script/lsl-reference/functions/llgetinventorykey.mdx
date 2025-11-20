@@ -1,0 +1,128 @@
+---
+title: llGetInventoryKey
+description: |-
+  Returns the key that is the UUID of the inventory named.
+  Returns the key of the inventory named.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetInventoryKey" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If the item does not have copy, modify, and transfer permissions, the return is `NULL_KEY`
+- Inventory items are records that usually *point* to assets, but they are not the actual assets
+- Multiple inventory items can point to the same asset and return the same key
+- Some newly created inventory entries get default keys until they are edited and saved:
+  - Newly created notecard entries use `NULL_KEY` until they are edited and saved
+  - Newly created script entries point to the "Hello Avatar" script until they are edited and saved
+  - Most other inventory entries are given unique asset keys at creation time, but this relies on client cooperation
+- When an asset is "edited" a new asset key is assigned. The inventory item used to open the asset is updated with the new key, but other inventory items sharing the original asset are NOT updated
+
+## Notes
+
+- The UUID returned is that of the asset to which the inventory item points, not the UUID of the inventory item itself
+- Assets are immutable (never changed, only created and deleted), allowing multiple inventory items to refer to the same asset without duplication
+- When an asset appears to be modified, it is actually saved as a new asset
+- Multiple copies of items in inventory all share the same asset UUID
+- To verify inventory item existence, use `llGetInventoryType` instead of checking for `NULL_KEY`
+- It is possible to inspect the UUID of any animation in inventory by triggering it and using `llGetAnimationList`:
+  ```lsl
+  llStartAnimation("myAnim");
+  llOwnerSay("myAnim's UUID is " + llList2String(llGetAnimationList(llGetPermissionsKey()), -1));
+  ```
+
+## Examples
+
+### Get texture UUID from inventory
+
+```lsl
+// Put this script in an empty prim, and drag a full-perm texture into the prim's contents to find out its UUID
+default
+{
+    changed(integer change)
+    {
+        if (change & CHANGED_INVENTORY)    // if there has been a change to the prim's contents ...
+        {
+            string name = llGetInventoryName(INVENTORY_TEXTURE, 0);
+            if (name)        // if a texture exists ...
+            {
+                key uuid = llGetInventoryKey(name);
+                if (uuid)    // if the uuid is valid ...
+                    llOwnerSay( "The UUID of '" + name + "' is " + (string) uuid);
+                else         // texture was not full-perm
+                    llOwnerSay( "The UUID of '" + name + "' could not be determined");
+            }
+        }
+    }
+}
+```
+
+### Get inventory item information
+
+```lsl
+string item = "Default";
+
+default
+{
+    state_entry()
+    {
+        llOwnerSay("Touch to get information about \"" + item + "\".");
+    }
+
+    touch_start(integer total_number)
+    {
+        integer type = llGetInventoryType(item);
+        integer index = llListFindList([ INVENTORY_NONE,
+            INVENTORY_TEXTURE, INVENTORY_SOUND, INVENTORY_LANDMARK, INVENTORY_CLOTHING,
+            INVENTORY_OBJECT, INVENTORY_NOTECARD, INVENTORY_SCRIPT, INVENTORY_BODYPART,
+            INVENTORY_ANIMATION, INVENTORY_GESTURE], [type]);
+        string name = llList2String(["does not exist",
+            "texture", "sound", "landmark", "clothing",
+            "object", "notecard", "script", "body part",
+            "animation", "gesture"], index);
+
+        llOwnerSay("Type: " + name);
+
+        if(type == INVENTORY_NONE)
+            return;
+
+        integer owner_perms = llGetInventoryPermMask(item, MASK_OWNER);
+        list perms;
+        if(owner_perms & PERM_COPY)
+            perms += "Copy";
+
+        if(owner_perms & PERM_MODIFY)
+            perms += "Modify";
+
+        if(owner_perms & PERM_TRANSFER)
+            perms += "Transfer";
+
+        if(owner_perms & PERM_MOVE)
+            perms += "Move";
+
+        llOwnerSay("Perms: " + llList2CSV(perms));
+
+        integer temp = PERM_COPY | PERM_MODIFY | PERM_TRANSFER;
+        if((owner_perms & temp) != temp)
+            return;
+
+        llOwnerSay("Key: " + (string)llGetInventoryKey(item));
+    }
+}
+```
+
+## See Also
+
+- [llGetInventoryAcquireTime](../llgetinventoryacquiretime/)
+- [llGetInventoryName](../llgetinventoryname/)
+- [llGetInventoryType](../llgetinventorytype/)
+- [llGetInventoryNumber](../llgetinventorynumber/)
+- [llGetInventoryPermMask](../llgetinventorypermmask/)
+- [llGetInventoryCreator](../llgetinventorycreator/)
+
+<WikiAttribution />

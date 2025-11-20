@@ -1,0 +1,67 @@
+---
+title: llList2ListStrided
+description: |-
+  Copies the strided slice of the list from Start to End.
+  Returns a copy of the strided slice of the specified list from Start to End.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llList2ListStrided" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Strided Access
+
+```lsl
+list mylist = [0,1,2,3,4,5,6];
+list result_a = llList2ListStrided(mylist,0,-1,2); //start at first item in list, go to the end, return every 2nd item
+//result_a == [0,2,4,6]
+
+list result_b = llList2ListStrided(mylist,1,-1,2); //start at second item in list, go to the end, return every 2nd item
+//result_b == [2,4,6]
+
+list result_c = llList2ListStrided(mylist,2,-1,2); //start at third item in list, go to the end, return every 2nd item
+//result_c == [2,4,6]
+```
+
+### Dialog Menu from List
+
+```lsl
+list menu = ["1", "one", "2", "two", "3", "three"];
+default
+{
+    state_entry()
+    {
+        llListen(10, "", llGetOwner(), "");
+    }
+    touch_start(integer detected)
+    {
+        list buttons = llList2ListStrided(menu, 0, -1, 2);
+        llDialog(llDetectedKey(0), "choose a number", buttons, 10);
+    }
+    listen(integer channel, string obj, key id, string message)
+    {
+        integer index = llListFindList(menu, [message]);
+        if (index != -1)
+        {
+            llOwnerSay("you chose " + llList2String(menu, index + 1) + " (" + message + ")");
+        }
+    }
+}
+```
+
+## Notes
+
+### Starting at an Offset
+
+If you want every second (or third, etc.) item in each stride returned, rather than the first, use [llList2ListSlice](/script/reference/lsl/functions/lllist2listslice/) instead.
+
+## See Also
+
+- [llList2ListSlice](/script/reference/lsl/functions/lllist2listslice/)
+
+<WikiAttribution />

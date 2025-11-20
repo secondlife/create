@@ -1,0 +1,35 @@
+---
+title: llParcelMediaCommandList
+description: >-
+  Controls the playback of multimedia resources on a parcel or for an agent, via
+  one or more PARCEL_MEDIA_COMMAND_* arguments specified in CommandList.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llParcelMediaCommandList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+key myTexture = llGetTexture(0);
+llParcelMediaCommandList([PARCEL_MEDIA_COMMAND_TEXTURE,myTexture,PARCEL_MEDIA_COMMAND_PLAY]);
+```
+
+## Caveats
+
+- This script's object must be owned by the landowner or the function will silently fail.
+- If the script's object is over group owned land, then the object must be deeded to **that** group.
+- If the PARCEL_MEDIA_COMMAND_URL value is greater than 254 characters, the command will silently fail.
+- If using PARCEL_MEDIA_COMMAND_URL and PARCEL_MEDIA_COMMAND_AGENT, make sure the *Media URL* in the *About Land ...* dialog is unset.
+
+## See Also
+
+- [llParcelMediaQuery](../llparcelmediaquery/)
+- [llSetTextureAnim](../llsettextureanim/)
+- [llSetTexture](../llsettexture/)
+
+<WikiAttribution />

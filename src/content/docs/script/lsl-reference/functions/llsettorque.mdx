@@ -1,0 +1,35 @@
+---
+title: llSetTorque
+description: >-
+  Sets the Torque acting on the script's object, in object-local coordinates if
+  Local == TRUE (otherwise, the region reference frame is used).
+
+  Only works on physical objects.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetTorque" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        llSetTorque(<0,10,0>,1);
+                   //X  Y Z  Local
+    }
+}
+```
+
+## See Also
+
+- [llSetForceAndTorque](../llsetforceandtorque/)
+- [llSetForce](../llsetforce/)
+
+<WikiAttribution />

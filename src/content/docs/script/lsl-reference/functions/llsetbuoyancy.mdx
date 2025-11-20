@@ -1,0 +1,57 @@
+---
+title: llSetBuoyancy
+description: >-
+  Set the tasks buoyancy (0 is none, < 1.0 sinks, 1.0 floats, > 1.0 rises).
+
+  Set the object buoyancy. A value of 0 is none, less than 1.0 sinks, 1.0
+  floats, and greater than 1.0 rises.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetBuoyancy" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Makes an object float up slowly (e.g. a red balloon):
+
+```lsl
+default {
+    state_entry() {
+        llSetStatus(STATUS_PHYSICS, TRUE);
+        llSetBuoyancy(1.05);
+    }
+}
+```
+
+## Notes
+
+Often used to make an object appear to be unaffected by gravity.
+
+## Caveats
+
+- Wind can cause the prim to drift
+- Unlike some other characteristics, a buoyancy effect is cancelled if the script that set buoyancy is removed from the prim
+- This function cannot be used to set relative levels of buoyancy in parts of a linked object, e.g. to simulate a helium balloon weighted by its string. The most recent call of `llSetBuoyancy` in any child prim appears to set the global buoyancy level for the object
+- This function eats energy to keep the object floating. Large objects may not be able to supply enough energy to keep the object floating
+- When buoyancy is changed, the object briefly continues to be affected by the last value. For example, if buoyancy was set to 1.5 to raise an object, and whilst moving, buoyancy is changed to 0.0, the object continues to rise for a moment, because the force is not reversed, only cancelled
+
+## Performance Note
+
+For better performance, use `llSetPhysicsMaterial(GRAVITY_MULTIPLIER, gravity, 0.0, 0.0, 0.0)` instead, which doesn't consume energy:
+
+- To raise an object, replace `llSetBuoyancy(1.5)` with `llSetPhysicsMaterial(GRAVITY_MULTIPLIER, -0.5, 0.0, 0.0, 0.0)`
+- To float an object, replace `llSetBuoyancy(1.0)` with `llSetPhysicsMaterial(GRAVITY_MULTIPLIER, 0.0, 0.0, 0.0, 0.0)`
+
+With `llSetPhysicsMaterial`, the change in movement is immediate, and the object starts to fall at the instant that the second call is done.
+
+## See Also
+
+- [llSetPhysicsMaterial](../llsetphysicsmaterial/)
+- [llSetStatus](../llsetstatus/)
+- [llWind](../llwind/)
+
+<WikiAttribution />

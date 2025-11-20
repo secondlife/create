@@ -1,0 +1,31 @@
+---
+title: llsRGB2Linear
+description: Converts a color from the sRGB to the linear colorspace.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llsRGB2Linear" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Lights in Second Life are specified in LSL as linear red, green, blue values in the range (0.0, 1.0). Internally, light calculations are performed in the sRGB colorspace.
+
+The sRGB (Standard Red Green Blue) colorspace is defined in IEC 61966-2-1:1999 and was developed as a joint project between Microsoft and HP.
+
+This calculation is known as an Electro-Optical Transfer Function (EOTF).
+
+## Caveats
+
+- **Naming Confusion**: The name of this function is actually a misnomer. LSL color is actually in Rec.709 space, not sRGB space. While they are very similar, the gamma value for sRGB is approximately 2.2, whereas the gamma value for Rec.709 is approximately 2.4.
+
+- **PBR Viewer Scripting**: If you enter color vectors manually using the viewer's color picker, enter them as sRGB values. The color picker automatically converts them internally to Linear RGB, so someone using a PBR-enabled viewer will see them correctly. When you apply color vectors directly with a script, however, you must apply sRGB to Blinn-Phong textured faces and Linear RGB to PBR materials.
+
+## See Also
+
+- [llLinear2sRGB] - Convert from the linear colorspace to sRGB (inverse EOTF)
+
+<WikiAttribution />

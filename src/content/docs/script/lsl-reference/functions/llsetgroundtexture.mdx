@@ -1,0 +1,24 @@
+---
+title: llSetGroundTexture
+description: Changes terrain texture properties in the region.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetGroundTexture" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- This function must be executed from a script in an object owned by the region owner or an estate manager.
+- This function is throttled at 4 calls every 2 minutes.
+- Always returns 0
+- PBR terrain is all or nothing. Mixing normal terrain textures with PBR textures will cause the PBR textures to appear gray.
+
+## See Also
+
+- [llModifyLand](../llmodifyland/)
+
+<WikiAttribution />

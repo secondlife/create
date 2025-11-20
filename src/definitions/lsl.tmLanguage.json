@@ -1,0 +1,155 @@
+{
+  "displayName": "LSL",
+  "name": "lsl",
+  "scopeName": "source.lsl",
+  "fileTypes": ["lsl"],
+  "patterns": [
+    {"include": "#comments"},
+    {"include": "#states"},
+    {"include": "#events"},
+    {"include": "#functions"},
+    {"include": "#keywords"},
+    {"include": "#types"},
+    {"include": "#constants"},
+    {"include": "#strings"},
+    {"include": "#numbers"},
+    {"include": "#operators"},
+    {"include": "#punctuation"}
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "begin": "/\\*",
+          "end": "\\*/",
+          "name": "comment.block.lsl"
+        },
+        {
+          "begin": "//",
+          "end": "$",
+          "name": "comment.line.double-slash.lsl"
+        }
+      ]
+    },
+    "states": {
+      "patterns": [
+        {
+          "match": "\\b(default|state)\\b",
+          "name": "keyword.control.state.lsl"
+        },
+        {
+          "begin": "\\b(state)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "beginCaptures": {
+            "1": {"name": "keyword.control.state.lsl"},
+            "2": {"name": "entity.name.state.lsl"}
+          },
+          "end": "(?=\\{)",
+          "name": "meta.state.declaration.lsl"
+        }
+      ]
+    },
+    "events": {
+      "match": "\\b(state_entry|state_exit|touch_start|touch|touch_end|collision_start|collision|collision_end|land_collision_start|land_collision|land_collision_end|timer|listen|sensor|no_sensor|control|at_target|not_at_target|at_rot_target|not_at_rot_target|money|email|run_time_permissions|changed|attach|dataserver|moving_start|moving_end|object_rez|link_message|remote_data|http_response|http_request|path_update|transaction_result|experience_permissions|experience_permissions_denied)\\b",
+      "name": "entity.name.function.event.lsl"
+    },
+    "functions": {
+      "patterns": [
+        {
+          "match": "\\bll[A-Z][a-zA-Z0-9]*\\b(?=\\s*\\()",
+          "name": "entity.name.function.builtin.lsl"
+        },
+        {
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*\\()",
+          "name": "entity.name.function.user.lsl"
+        }
+      ]
+    },
+    "keywords": {
+      "match": "\\b(if|else|for|do|while|jump|return|state)\\b",
+      "name": "keyword.control.lsl"
+    },
+    "types": {
+      "match": "\\b(integer|float|string|key|vector|rotation|list)\\b",
+      "name": "storage.type.lsl"
+    },
+    "constants": {
+      "patterns": [
+        {
+          "match": "\\b(TRUE|FALSE|NULL_KEY|EOF|ZERO_VECTOR|ZERO_ROTATION)\\b",
+          "name": "constant.language.lsl"
+        },
+        {
+          "match": "\\b(PI|TWO_PI|PI_BY_TWO|DEG_TO_RAD|RAD_TO_DEG|SQRT2)\\b",
+          "name": "constant.numeric.math.lsl"
+        },
+        {
+          "match": "\\b[A-Z][A-Z0-9_]*\\b",
+          "name": "constant.other.lsl"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "begin": "\"",
+          "end": "\"",
+          "name": "string.quoted.double.lsl",
+          "patterns": [
+            {
+              "match": "\\\\[\"\\\\ntr]",
+              "name": "constant.character.escape.lsl"
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "match": "\\b0[xX][0-9a-fA-F]+\\b",
+          "name": "constant.numeric.hex.lsl"
+        },
+        {
+          "match": "\\b\\d+\\.\\d*([eE][+-]?\\d+)?[fF]?\\b",
+          "name": "constant.numeric.float.lsl"
+        },
+        {
+          "match": "\\b\\d+[fF]\\b",
+          "name": "constant.numeric.float.lsl"
+        },
+        {
+          "match": "\\b\\d+\\b",
+          "name": "constant.numeric.integer.lsl"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "\\+\\+|--|\\+=|-=|\\*=|/=|%=|==|!=|<=|>=|&&|\\|\\||<<|>>|\\+|-|\\*|/|%|<|>|=|&|\\||\\^|~|!",
+          "name": "keyword.operator.lsl"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "match": "[{}]",
+          "name": "punctuation.section.block.lsl"
+        },
+        {
+          "match": "[\\[\\]]",
+          "name": "punctuation.section.brackets.lsl"
+        },
+        {
+          "match": "[()]",
+          "name": "punctuation.section.parens.lsl"
+        },
+        {
+          "match": "[;,]",
+          "name": "punctuation.separator.lsl"
+        }
+      ]
+    }
+  }
+}

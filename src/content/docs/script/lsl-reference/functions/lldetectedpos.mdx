@@ -1,0 +1,81 @@
+---
+title: llDetectedPos
+description: |-
+  Returns the position of detected object or avatar number.
+  Returns <0.0, 0.0, 0.0> if Number is not a valid index.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedPos" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Get position and distance of toucher
+
+```lsl
+// Get position and distance of toucher
+
+default
+{
+    touch_start(integer total_number)
+    {
+	// get the position of the avatar touching this prim
+	vector pos = llDetectedPos(0);
+		
+	// compute how far away they are
+	float dist = llVecDist(pos, llGetPos() );
+		
+	llSay(0, "You are " + (string) dist + " metres from me, at coordinates " + (string) pos);
+    }
+}
+```
+
+### Get name and sim position of avatars within "say" range
+
+```lsl
+// get name and sim position of Avatars within "say" range
+
+default
+{
+    state_entry()
+    {
+        llOwnerSay( "Touch me to get the positions of avatars in 'Say' range" );
+    }
+
+    touch_start( integer vIntTouchCount )
+    {
+        // Do a one-off sensor sweep over a 20m radius sphere for avatars
+        llSensor( "", "", AGENT, 20, PI );
+    }
+
+    sensor( integer vIntFound )
+    {
+        integer vIntCounter = 0;
+        //-- loop through all avatars found
+        do
+        {
+            llOwnerSay( llDetectedName( vIntCounter )
+                // get the position of this detected avatar
+                + (string) llDetectedPos( vIntCounter ) );
+        } while (++vIntCounter < vIntFound); 
+    }
+
+    // sensor does not detect owner if it's attached
+    no_sensor()
+    {
+        llOwnerSay( "I couldn't find anybody" );
+    }
+}
+```
+
+## Notes
+
+- Returns the position in region coordinates
+- Returns \<0.0, 0.0, 0.0\> (ZERO_VECTOR) if the number parameter is not a valid sensed object
+- Commonly used with `llSensor()` and `llDetectedName()` to work with detected avatars and objects
+
+<WikiAttribution />

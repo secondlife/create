@@ -1,0 +1,85 @@
+---
+title: llDeleteSubString
+description: >-
+  Removes the indicated sub-string and returns the result.
+
+  Start and End are inclusive.
+
+  Using negative numbers for Start and/or End causes the index to count
+  backwards from the length of the string, so 0, -1 would delete the entire
+  string.
+
+  If Start is larger than End, the sub-string is the exclusion of the entries;
+  so 6, 4 would delete the entire string except for the 5th character.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDeleteSubString" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function returns a new string; it does not modify the source string in place.
+
+**Incorrect:**
+```lsl
+string ex = "abcdefghi";
+llDeleteSubString(ex, 4, 7); // Result is discarded!
+```
+
+**Correct:**
+```lsl
+string ex = "abcdefghi";
+ex = llDeleteSubString(ex, 4, 7); // Result is assigned back
+llSay(0, ex); // Would say "abcdi"
+```
+
+## Examples
+
+```lsl
+//-- Simple example
+default {
+    state_entry() {
+        string ex = "abcdefghi";
+        ex = llDeleteSubString(ex, 4, 7);
+        llSay(0, ex); // Output: "abcdi"
+    }
+}
+```
+
+```lsl
+//-- Using the result inline
+default {
+    state_entry() {
+        string ex = "abcdefghi";
+        llSay(0, llDeleteSubString(ex, 4, 7)); // Output: "abcdi"
+        // Original string 'ex' remains unchanged
+    }
+}
+```
+
+## Notes
+
+- Indexes start at zero; the first character is at index 0
+- Both `start` and `end` positions are **inclusive** (characters at both positions are removed)
+- Using `0, 0` deletes only the first character
+- Negative indexes count from the end of the string backwards: `-1` is the last character
+- Positive and negative indexes can be mixed: `0, -1` deletes the entire string
+- If `start` is larger than `end`, the deletion is inverted: characters at `start` and `end` are kept, everything else is removed
+- Use `llStringLength()` to determine string length for dynamic index calculations
+- Use `llSubStringIndex()` to find a substring's position before deleting it
+- For removing all occurrences of a substring, consider using a str_replace function from the Combined Library
+
+## See Also
+
+- [llGetSubString](../llgetsubstring/)
+- [llReplaceSubString](../llreplacesubstring/)
+- [llInsertString](../llinsertstring/)
+- [llDeleteSubList](../lldeletesublist/)
+- [llStringLength](../llstringlength/)
+- [llSubStringIndex](../llsubstringindex/)
+
+<WikiAttribution />

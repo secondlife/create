@@ -1,0 +1,49 @@
+---
+title: llDamage
+description: Generates a damage event on the targeted agent or task.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDamage" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The llDamage function triggers a damage event on the targeted task. If any scripts in the target process the `on_damage` event, they will be fired before the damage is applied or distributed.
+
+## Caveats
+
+- Calls are throttled to a rate of ≤10/30sec per recipient. Exceptions are:
+  - Recipient is avatar of the attachment
+  - Recipient is sitting on the object
+- Triggering the damage throttle will shout an error to the debug channel and the script will continue running
+- The prim containing the script and the prim receiving the damage must both be in damage enable parcels
+- Targeting a seated avatar will redirect damage to the object the avatar is sitting on
+
+### on_damage Event Behavior
+
+The `on_damage` event will NOT be triggered if the source of the damage is either:
+- An attachment on the avatar
+- An object or vehicle that the avatar is sitting on
+
+`final_damage` will be triggered as normal.
+
+### Damage Throttle Exceptions
+
+The damage throttle is skipped if:
+- Damage is negative
+- The source is an attachment on the avatar
+- The source is an object that the avatar is sitting on
+- The source is an object owned by a parcel owner or land group
+
+## See Also
+
+- [llDetectedDamage](../lldetecteddamage/)
+- [llAdjustDamage](../lladjustdamage/)
+- on_damage event
+- final_damage event
+
+<WikiAttribution />

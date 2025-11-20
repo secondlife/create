@@ -1,0 +1,62 @@
+---
+title: llRequestUsername
+description: >-
+  Requests single-word user-name of an avatar. When data is available the
+  dataserver event will be raised.
+
+  Requests the user-name of the identified agent. When the user-name is
+  available the dataserver event is raised.
+
+  The agent identified does not need to be in the same region or online at the
+  time of the request.
+
+  Returns a key that is used to identify the dataserver event when it is raised.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRequestUsername" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+key owner_name_query;
+
+default
+{
+    state_entry()
+    {
+        owner_name_query = llRequestUsername(llGetOwner());
+    }
+
+    dataserver(key queryid, string data)
+    {
+        if ( owner_name_query == queryid )
+        {
+            llSay(0, "The username of the owner of this script : " + data);
+        }
+    }
+}
+```
+
+## Caveats
+
+- If you merely wish to show the agent username in the viewer window, it may be more straightforward to use Viewer URI Name Space and avoid a dataserver event, e.g.:
+  ```lsl
+  llSay(0, "secondlife:///app/agent/" + (string)id + "/username");
+  ```
+
+- This function is throttled. The throttle is undocumented, but as of October 2018 the function appears to support bursts of up to 20 requests and sustained use at an average rate of 1.9 requests per second per owner, per region. (Meaning the throttle applies to all objects in the region with the same owner.) Once tripped, the function fails and says "Too many llRequestUsername requests. Throttled until average falls." on DEBUG_CHANNEL.
+
+- If the name has been changed some time in the past, this provides only the current name.
+
+## See Also
+
+- [llGetUsername](/script/reference/lsl/functions/llgetusername/) - works only for avatars that are present
+- [llRequestUserKey](/script/reference/lsl/functions/llrequestuserkey/) - general way to translate a name to a key
+- [dataserver](/script/reference/lsl/events/dataserver/) - event raised when data is available
+
+<WikiAttribution />

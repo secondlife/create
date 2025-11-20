@@ -1,0 +1,97 @@
+---
+title: llResetLandPassList
+description: Removes all residents from the land access/pass list.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llResetLandPassList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Land access/pass list management script
+// This example demonstrates the use of llResetLandPassList() along with other pass list functions
+// Commands:
+//   /5 pass:full_avatar_name
+//   /5 unpass:full_avatar_name
+//   /5 clearpass
+
+string command;
+
+default
+{
+    state_entry()
+    {
+        llListen(5, "", llGetOwner(), "");
+    }
+
+    on_rez(integer param)
+    {
+        llResetScript();
+    }
+
+    listen(integer chan, string name, key id, string message)
+    {
+        if (command != "")
+        {
+            llOwnerSay("Sorry, still processing last command, try again in a second.");
+        }
+
+        list args = llParseString2List(message,[":"],[]);
+        command = llToLower(llList2String(args,0));
+
+        if (command == "clearpass")
+        {
+            llResetLandPassList();
+        }
+        else
+        {
+            llSensor(llList2String(args,1), NULL_KEY, AGENT, 96, PI);
+        }
+    }
+
+    no_sensor()
+    {
+        command = "";
+    }
+
+    sensor(integer num)
+    {
+        integer i;
+        for (i = 0; i < num; ++i)
+        {
+            if (command == "pass")
+            {
+                // Add to land pass list for 1 hour
+                llAddToLandPassList(llDetectedKey(i), 1.0);
+            }
+            if (command == "unpass")
+            {
+                llRemoveFromLandPassList(llDetectedKey(i));
+            }
+        }
+        command = "";
+    }
+}
+```
+
+## Notes
+
+- `llResetLandPassList()` removes all residents from the land access/pass list
+- This is useful when you need to clear all pass list entries at once
+- The function requires owner permissions to execute
+- Use this in conjunction with `llAddToLandPassList()` and `llRemoveFromLandPassList()` to manage individual pass entries
+
+## See Also
+
+- [llAddToLandPassList](../lladdtolandpasslist/)
+- [llRemoveFromLandPassList](../llremovefromlandpasslist/)
+- [llAddToLandBanList](../lladdtolandbanlist/)
+- [llRemoveFromLandBanList](../llremovefromlandbanlist/)
+- [llResetLandBanList](../llresetlandbanlist/)
+
+<WikiAttribution />

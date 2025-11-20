@@ -1,0 +1,80 @@
+---
+title: llClearCameraParams
+description: >-
+  Resets all camera parameters to default values and turns off scripted camera
+  control.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llClearCameraParams" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+A complete example showing how to toggle camera control on and off with permission checks:
+
+```lsl
+integer gEnabled;
+
+askForPermissions()
+{
+    llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA);
+}
+
+default
+{
+    on_rez(integer sp)
+    {
+        llResetScript();
+    }
+
+    state_entry()
+    {
+        askForPermissions();
+    }
+
+    touch_start(integer total_number)
+    {
+        if (llDetectedKey(0) != llGetOwner())
+        {
+            return;
+        }
+        else if (!llGetPermissions() & PERMISSION_CONTROL_CAMERA)
+        {
+            llOwnerSay("I need permissions to control your camera.");
+            askForPermissions();
+            return;
+        }
+
+        gEnabled = !gEnabled;
+        if (gEnabled)
+        {
+            llOwnerSay("Enabled.");
+            llSetCameraParams([
+                CAMERA_ACTIVE, 1,
+                CAMERA_DISTANCE, 50.0
+            ]);
+        }
+        else
+        {
+            llOwnerSay("Disabled.");
+            llClearCameraParams();
+        }
+    }
+}
+```
+
+## Notes
+
+- Requires `PERMISSION_CONTROL_CAMERA` permission to function
+- Use this function to disable scripted camera control and restore the avatar's default camera behavior
+- Call [llSetCameraParams] to enable scripted camera control again after calling this function
+
+## See Also
+
+- [llSetCameraParams]
+
+<WikiAttribution />

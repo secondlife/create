@@ -1,0 +1,64 @@
+---
+title: llRot2Angle
+description: |-
+  Returns the rotation angle represented by Rotation.
+  Returns the angle represented by the Rotation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRot2Angle" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function always returns a positive angle \<= PI radians (the unsigned minimum angle). A rotation of 3/2 PI radians (270 degrees) will return an angle of PI/2 radians, not -PI/2.
+
+## Reference Implementation
+
+The function can be implemented in LSL with varying levels of complexity and accuracy:
+
+### Simple Implementation (Less Accurate)
+
+```lsl
+float Rot2Angle(rotation a)
+{
+    return 2.0 * llAcos(llSqrt((a.s * a.s) / (a.x * a.x + a.y * a.y + a.z * a.z + a.s * a.s)));
+}
+```
+
+### Optimized Implementation (More Accurate)
+
+```lsl
+float Rot2Angle(rotation r)
+{
+    float s2 = r.s * r.s; // square of the s-element
+    float v2 = r.x * r.x + r.y * r.y + r.z * r.z; // sum of the squares of the v-elements
+
+    if (s2 < v2) // compare the s-component to the v-component
+        return 2.0 * llAcos(llSqrt(s2 / (s2 + v2))); // use arccos if the v-component is dominant
+    if (v2) // make sure the v-component is non-zero
+        return 2.0 * llAsin(llSqrt(v2 / (s2 + v2))); // use arcsin if the s-component is dominant
+
+    return 0.0; // argument is scaled too small to be meaningful, or it is a zero rotation, so return zero
+}
+```
+
+*Written by Moon Metty & Miranda Umino. Minor optimizations by Strife Onizuka.*
+
+## Notes
+
+Use in conjunction with `llRot2Axis` to extract both the axis and angle of a rotation. To undo this operation and reconstruct a rotation from axis and angle, use `llAxisAngle2Rot`.
+
+## See Also
+
+- [llAxisAngle2Rot](../llaxisangle2rot/)
+- [llRot2Axis](../llrot2axis/)
+- [llRot2Up](../llrot2up/)
+- [llRot2Fwd](../llrot2fwd/)
+- [llRot2Left](../llrot2left/)
+- [llAngleBetween](../llanglebetween/)
+
+<WikiAttribution />

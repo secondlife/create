@@ -1,0 +1,83 @@
+---
+title: llSetMemoryLimit
+description: |-
+  Requests Limit bytes to be reserved for this script.
+  Returns TRUE or FALSE indicating whether the limit was set successfully.
+  This function has no effect if the script is running in the LSO VM.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetMemoryLimit" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Mono
+
+- The memory limit can be set up to 64KB
+- The memory limit cannot be set lower than the memory currently in use by the script
+- All new scripts start with a limit of 64KB
+- Mono scripts compiled before this function was introduced continue to use the 64KB limit
+- A lower limit will affect the amount of memory reported in the viewer UI and by `llGetObjectDetails`
+- The memory limit is not the amount of real memory actually used by the script, just the upper limit on it
+
+### LSO
+
+- Has no effect on LSO scripts, which will always use exactly 16KB
+
+## Caveats
+
+- When the limit value is too small, `llSetMemoryLimit(limit)` is ignored and the memory limit is not changed
+
+## Examples
+
+```lsl
+// Memory-walkthrough by Daemonika Nightfire (daemonika.nightfire)
+
+integer limit = 20000; // <- bytes
+
+Test()
+{
+    llSetText("Limited Memory " + (string)llGetMemoryLimit() +
+              "\nUsed Memory " + (string)llGetUsedMemory() +
+              "\nFree Memory " + (string)llGetFreeMemory(),<1,1,1>,1);
+}
+
+default
+{
+    state_entry()
+    {
+        llSetMemoryLimit(limit);
+
+        llScriptProfiler(PROFILE_SCRIPT_MEMORY);
+        Test();
+        llScriptProfiler(PROFILE_NONE);
+
+        llSay(0,"This script used at most " + (string)llGetSPMaxMemory() + " bytes of memory during Test.");
+    }
+}
+
+// Result:
+
+// Floating Text:
+// Limited Memory 20000
+// Used Memory 4972
+// Free Memory 15100
+
+// Chat:
+// [05:11] Object: This script used at most 4972 bytes of memory during Test.
+```
+
+## See Also
+
+- [llScriptProfiler](../llscriptprofiler/)
+- [llGetSPMaxMemory](../llgetspmaxmemory/)
+- [llGetMemoryLimit](../llgetmemorylimit/)
+- [llGetFreeMemory](../llgetfreememory/)
+- [llGetUsedMemory](../llgetusedmemory/)
+- [llGetObjectDetails](../llgetobjectdetails/)
+
+<WikiAttribution />

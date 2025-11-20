@@ -1,0 +1,31 @@
+---
+title: llList2ListSlice
+description: >-
+  Returns a subset of entries from ListVariable, in a range specified by Start
+  and End indices (inclusive) return the slice_index element of each stride.
+   Using negative numbers for Start and/or End causes the index to count backwards from the length of the list. (e.g. 0, -1 captures entire list)
+  If slice_index is less than 0, it is counted backwards from the end of the
+  stride.
+   Stride must be a positive integer > 0 or an empy list is returned.  If slice_index falls outside range of stride, an empty list is returned. slice_index is zero-based. (e.g. A stride of 2 has valid indices 0,1)
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llList2ListSlice" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.List2ListSlice()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llList2ListSlice](/script/reference/lsl/functions/llList2ListSlice/)
+
+

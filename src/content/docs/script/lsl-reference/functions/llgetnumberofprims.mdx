@@ -1,0 +1,49 @@
+---
+title: llGetNumberOfPrims
+description: >-
+  Returns the number of prims in a link set the script is attached to.
+
+  Returns the number of prims in (and avatars seated on) the object the script
+  is in.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetNumberOfPrims" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- The number of prims returned also includes the number of avatars sitting on the object.
+
+## Examples
+
+```lsl
+default {
+    state_entry() {
+        llOwnerSay((string)llGetLinkNumber());
+        llOwnerSay((string)llGetNumberOfPrims());
+    }
+}
+```
+
+## Helper Function
+
+If you need to get the number of prims while excluding seated avatars:
+
+```lsl
+// Returns the number of prims in the object, ignoring seated avatars
+integer getNumberOfPrims() {
+  if (llGetObjectPrimCount(llGetKey()) == 0) return llGetNumberOfPrims(); // attachment
+  return llGetObjectPrimCount(llGetKey());   // non-attachment
+}
+```
+
+## See Also
+
+- [llGetObjectPrimCount](/script/reference/lsl/functions/llgetobjectprimcount/) - Returns the number of prims in any object
+- [llGetLinkNumber](/script/reference/lsl/functions/llgetlinknumber/) - Returns the link number of the prim the script is in
+
+<WikiAttribution />

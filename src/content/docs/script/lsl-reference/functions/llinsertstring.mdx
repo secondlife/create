@@ -1,0 +1,58 @@
+---
+title: llInsertString
+description: >-
+  Inserts SourceVariable into TargetVariable at Position, and returns the
+  result.
+
+  Inserts SourceVariable into TargetVariable at Position and returns the result.
+  Note this does not alter TargetVariable.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llInsertString" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+llInsertString("input", 2, "put out")  // returns "input output"
+```
+
+## Helpers
+
+### insertString with Negative Index Support
+
+Unlike `llGetSubString` and `llDeleteSubString`, `llInsertString` does not accept negative indices for position counting. Use this helper function to add that capability:
+
+```lsl
+string insertString(string destination, integer position, string str) {
+    if (position < 0)
+        if ((position += llStringLength(destination)) < 0)
+            position = 0;
+    return llInsertString(destination, position, str);
+}
+```
+
+This wrapper allows you to use negative numbers as the position parameter, where -1 refers to the last position in the string.
+
+## Notes
+
+- Unlike `llGetSubString` and `llDeleteSubString`, `llInsertString` does not accept negative indices for position counting
+- The position parameter is zero-indexed (first character is at position 0)
+- Does not modify the original strings; returns a new string with the insertion
+
+## See Also
+
+- [llDeleteSubString](../lldeletesubstring/)
+- [llGetSubString](../llgetsubstring/)
+- [llReplaceSubString](../llreplacesubstring/)
+- `str_replace` (Library) - Replace all instances of a string with another string
+
+## Related Examples
+
+- SplitLine - Insert newline escape codes at certain positions of a string
+
+<WikiAttribution />

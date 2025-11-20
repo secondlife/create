@@ -1,0 +1,53 @@
+---
+title: llGetObjectDesc
+description: >-
+  Returns the description of the prim the script is attached to.
+
+  Returns the description of the scripted object/prim. You can set the
+  description using llSetObjectDesc.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetObjectDesc" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function does **not** get the description of the object's root prim, but the description of the prim containing the script. To get the root prim's description, use `llList2String(llGetLinkPrimitiveParams(LINK_ROOT, [PRIM_DESC]), 0)` instead.
+
+## Examples
+
+### Get This Prim's Description
+
+```lsl
+default {
+    state_entry() {
+        //  PUBLIC_CHANNEL has the integer value 0
+        llSay(PUBLIC_CHANNEL, "This prim's description: " + llGetObjectDesc());
+    }
+}
+```
+
+### Get the Root Prim's Description
+
+```lsl
+default {
+    state_entry() {
+        //  PUBLIC_CHANNEL has the integer value 0
+        llSay(PUBLIC_CHANNEL, "Rootprim's description: "
+            + llList2String(llGetLinkPrimitiveParams(LINK_ROOT, [PRIM_DESC]), 0));
+    }
+}
+```
+
+## See Also
+
+- [llSetObjectDesc](../llsetobjectdesc/)
+- [llGetObjectName](../llgetobjectname/)
+- [llSetObjectName](../llsetobjectname/)
+- [llGetObjectDetails](../llgetobjectdetails/)
+
+<WikiAttribution />

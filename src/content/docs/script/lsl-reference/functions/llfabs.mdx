@@ -1,0 +1,38 @@
+---
+title: llFabs
+description: |-
+  Returns the positive version of Value.
+  Returns the absolute value of Value.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llFabs" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSay(0,"The (Float)absolute value of -4.5 is: "+(string)llFabs(-4.5) );
+    }
+}
+// returns :
+// The (Float)absolute value of -4.5 is: 4.500000
+```
+
+## Notes
+
+- Using `val - 2 * val * (val < 0)` is roughly 60% faster than `llFabs` as it avoids a function call. However, this optimization produces NaN (not a number) if given an infinite value and returns 0.0 instead of -0.0 when taking the absolute value of negative zero.
+
+## See Also
+
+- [llAbs](llAbs) - Integer version of llFabs
+- [Absolute value](https://en.wikipedia.org/wiki/Absolute_value) (Wikipedia)
+
+<WikiAttribution />

@@ -1,0 +1,49 @@
+---
+title: llGround
+description: |-
+  Returns the ground height at the object position + offset.
+  Returns the ground height at the object's position + Offset.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGround" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Landing on Ground or Water
+
+This example lands an object on the ground or water surface, whichever is higher:
+
+```lsl
+FindGroundOrWater()
+{
+    vector vTarget = llGetPos();
+    vTarget.z = llGround(ZERO_VECTOR);
+    float fWaterLevel = llWater(ZERO_VECTOR);
+    if (vTarget.z < fWaterLevel)
+        vTarget.z = fWaterLevel;
+    llSetRegionPos(vTarget);
+}
+
+default
+{
+    touch_start(integer total_number)
+    {
+        FindGroundOrWater();
+    }
+}
+```
+
+## See Also
+
+- [llGroundContour] - Gets the ground contour
+- [llGroundNormal] - Gets the ground normal
+- [llGroundSlope] - Gets the ground slope
+- [llEdgeOfWorld] - Returns existence of neighboring sims
+- [llWater] - Gets the water height at a location
+
+<WikiAttribution />

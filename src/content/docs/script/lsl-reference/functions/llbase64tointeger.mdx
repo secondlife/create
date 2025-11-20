@@ -1,0 +1,39 @@
+---
+title: llBase64ToInteger
+description: >-
+  Returns an integer that is the Text, Base64 decoded as a big endian integer.
+
+  Returns zero if Text is longer then 8 characters. If Text contains fewer then
+  6 characters, the return value is unpredictable.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llBase64ToInteger" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+integer value = llBase64ToInteger("3q0AAA==");
+
+// writes out -559087616
+llOwnerSay((string)value);
+```
+
+## Caveats
+
+- If the input string contains fewer than 6 characters, any incomplete least-significant bytes of the integer are set to 0.
+  - For example, the Base64 value `"qqqqqq=="` corresponds to the hexadecimal value `0xAAAAAAAA`. If the padding "=" characters and the last "q" are dropped, there are 5*6=30 bits remaining and those can form only 3 full bytes (24 bits). The result is `0xAAAAAA00`.
+  - The Base64 value `"qqqq"` has 4*6=24 bits available, which is enough for the same 3 full bytes. The result is also `0xAAAAAA00`.
+  - Similarly, 3-character Base64 has 18 bits, enough for 2 bytes, and 2-character Base64 has 12 bits, enough for one byte.
+  - Single-character Base64 has only 6 bits and thus no complete bytes, and the result is always zero.
+- Returns zero if the string is longer than 8 characters.
+
+## See Also
+
+- [llIntegerToBase64]
+
+<WikiAttribution />

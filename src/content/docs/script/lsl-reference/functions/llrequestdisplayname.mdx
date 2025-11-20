@@ -1,0 +1,62 @@
+---
+title: llRequestDisplayName
+description: >-
+  Requests the display name of the agent. When the display name is available the
+  dataserver event will be raised.
+
+  The avatar identified does not need to be in the same region or online at the
+  time of the request.
+
+  Returns a key that is used to identify the dataserver event when it is raised.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRequestDisplayName" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- **Security**: It is a terrible idea to tie any security measures to display names; they are not unique and can easily be changed.
+- **Data Execution Risk**: Display names can contain quotes and some punctuation. While this is not a problem for LSL, remember to escape strings being passed to command line scripts, SQL queries, etc. See: [XKCD: Exploits of a Mom](http://xkcd.com/327/)
+- If the request fails for any reason, there will be no error notice or dataserver event. You may use a timer to check for stale requests.
+- If you merely wish to show the agent display name in the viewer window, it may be more straightforward to use Viewer URI Name Space and avoid a dataserver event:
+
+```lsl
+llSay(0, "secondlife:///app/agent/" + (string)id + "/displayname");
+```
+
+## Examples
+
+```lsl
+key owner_key;
+key owner_name_query;
+string owner_display_name;
+
+default
+{
+    state_entry()
+    {
+        owner_key = llGetOwner();
+        owner_name_query = llRequestDisplayName(owner_key);
+    }
+    dataserver(key queryid, string data)
+    {
+        if ( owner_name_query == queryid )
+        {
+            owner_display_name = data;
+            llSay(0, "The display name of the owner of this script : " + owner_display_name );
+        }
+    }
+}
+```
+
+## See Also
+
+- [llGetDisplayName](llgetdisplayname)
+- [llRequestUsername](llrequestusername)
+- [dataserver](../../events/dataserver/)
+
+<WikiAttribution />

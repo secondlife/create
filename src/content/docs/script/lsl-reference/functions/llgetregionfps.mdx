@@ -1,0 +1,54 @@
+---
+title: llGetRegionFPS
+description: Returns the mean region frames per second.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetRegionFPS" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Region FPS is currently capped at 45.0 frames per second, so this function never returns greater than 45.0
+
+## Examples
+
+```lsl
+// The beginnings of a region-info script.
+string region;
+string sim;
+
+default
+{
+    state_entry()
+    {
+        llSetTimerEvent(1.0);
+    }
+
+    timer()
+    {
+        string here = llGetRegionName();
+        if(region != here)
+        {
+            sim = llGetSimulatorHostname();
+            region = here;
+        }
+        llSetText(
+                "   REGION NAME : " + region +
+              "\n  SIM HOSTNAME : " + sim +
+              "\nTIME DIALATION : " + (string)llGetRegionTimeDilation() +
+              "\n    REGION FPS : " + (string)llGetRegionFPS(),
+            <0,1,0>, 1.0);
+    }
+}
+```
+
+## See Also
+
+- [llGetSimulatorHostname](../llgetsimulatorhostname/)
+- [llGetRegionTimeDilation](../llgetregiontimedilation/)
+
+<WikiAttribution />

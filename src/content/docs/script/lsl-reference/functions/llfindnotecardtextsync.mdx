@@ -1,0 +1,51 @@
+---
+title: llFindNotecardTextSync
+description: >-
+  Searches the text of a cached notecard for lines containing the given
+  pattern. 
+              Returns a list of line numbers and column where a match is found. If the notecard is not in
+              the cache it returns a list containing a single entry of NAK. If no matches are found an
+              empty list is returned.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llFindNotecardTextSync" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Every match in the notecard is represented as a sequence of three integers:
+
+```lsl
+[integer row, integer column, integer length]
+```
+
+The returned list has a stride of 3. A maximum of 64 matches are returned, resulting in a maximum list length of 192.
+
+## Behavior
+
+- If the notecard is not in the cache, returns a list containing a single `NAK`
+- If the notecard does not exist, returns a list containing a single `NAK` and the script will shout an error on `DEBUG_CHANNEL` (but the script continues to run)
+- If there is an error in the regular expression, returns an empty list and the script will shout an error on `DEBUG_CHANNEL` (but the script continues to run)
+- If no matches are found, an empty list is returned
+
+## Caveats
+
+- If the notecard contains embedded inventory items (such as textures and landmarks), an empty list will be returned, regardless of the search string
+- No more than 64 matches are returned
+- Notecards are cached into a fixed-size buffer, with the oldest (least-recently read) notecard getting removed first. It is not safe to assume a notecard has been previously cached. Data for a previously cached notecard may be dropped from the cache at any time, especially on a busy server
+
+## Notes
+
+This function uses regular expressions for pattern matching. Refer to the LSL Regular Expressions documentation for pattern syntax and examples.
+
+## See Also
+
+- [llGetNumberOfNotecardLines](/script/reference/lsl/functions/llgetnumberofnotecardlines/)
+- [llGetNotecardLine](/script/reference/lsl/functions/llgetnotecardline/)
+- [llGetNotecardLineSync](/script/reference/lsl/functions/llgetnotecardlinesync/)
+
+<WikiAttribution />

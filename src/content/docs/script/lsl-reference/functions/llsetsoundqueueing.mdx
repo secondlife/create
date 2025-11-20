@@ -1,0 +1,61 @@
+---
+title: llSetSoundQueueing
+description: >-
+  Sets whether successive calls to llPlaySound, llLoopSound, etc., (attached
+  sounds) interrupt the currently playing sound.
+
+  The default for objects is FALSE. Setting this value to TRUE will make the
+  sound wait until the current playing sound reaches its end. The queue is one
+  level deep.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetSoundQueueing" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llPreloadSound("SoundName1"); // This loads the sounds into all in range viewers and cuts delay between sounds.
+        llPreloadSound("SoundName2"); // All sound parameters can be the name of a sound in the prim's inventory or a UUID of a sound
+        llPreloadSound("SoundName3");  // This sound will be skipped, as the queue is only 1 level deep.
+    }
+    touch_start(integer detected)
+    {
+        llSetSoundQueueing(TRUE); // Set to TRUE for queueing and SoundName2 plays after SoundName1 has ended.
+        // Set to FALSE only the second will be played since the prim has only one sound emitter and the second was called last.
+        // Can be set anywhere within the script (if within an event it will activate when the event is triggered).
+        llPlaySound("SoundName1", 1.0);
+        llPlaySound("SoundName2", 1.0);
+        llPlaySound("SoundName3", 1.0); // This sound isn't played as the queue is already full, so this is discarded.
+    }
+}
+```
+
+## Caveats
+
+- The sound queue is only 1 level deep - beside the sound currently playing, there can only be 1 sound in reserve. The sound queue is first-come, first-serve.
+- The queue order is reversed when using `llPlaySoundSlave` - using the example above, the default behavior would be to play SoundName1 and SoundName2, however when using the aforementioned function the order would be to play SoundName2 and SoundName3.
+- Sound queuing is a property of the prim, not the script. It can be activated and deactivated by any script in the prim and survives script reset, re-rez, and script removal.
+- If used to make smooth transitions using slave/master sounds, the sounds tend to go out of sync.
+- Although sounds are queued, the volume of all sounds in the queue is set by the last item in the queue. If your application requires different volume values, you may wish to implement `llAdjustSoundVolume` alongside the sound queue.
+- There is a very small (but audible) gap of silence between sounds due to network latency and processing time.
+- The queued sound must be fully loaded in the viewer, or else it will not play. `llPreloadSound` is not always reliable.
+- Queueing a sound that is identical to the one currently playing will fail. Use `llLoopSound` instead.
+- While this function does not have a delay, enabling or disabling the sound queue is not instant. It takes approximately 0.1 seconds to set the queueing flag.
+
+## See Also
+
+- [llLoopSound](../llloopsound/)
+- [llLoopSoundSlave](../llloopsoundslave/)
+- [llPlaySoundSlave](../llplaysoundslave/)
+- [llAdjustSoundVolume](../lladjustsoundvolume/)
+
+<WikiAttribution />

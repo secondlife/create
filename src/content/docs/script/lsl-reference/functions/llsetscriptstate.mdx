@@ -1,0 +1,43 @@
+---
+title: llSetScriptState
+description: Enable or disable the script Running state of Script in the prim.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetScriptState" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Stop the script at the end of the current time slice, until re-enabled:
+
+```lsl
+//Stops the Script, at some non-deterministic time later, until invoked with TRUE, in another script
+llSetScriptState(llGetScriptName(), FALSE);
+// Stall until end of time slice
+llSleep(0.1);
+```
+
+Start another script:
+
+```lsl
+//Starts Another Script
+llSetScriptState("somescript", TRUE);
+```
+
+## Caveats
+
+- Cannot be used to restart a script that has encountered a runtime error.
+- Cannot be used to start a script that has been added via `llGiveInventory`. Scripts sent via `llRemoteLoadScriptPin`, and which have the running state set FALSE by that command, may be started.
+- The script appears to stop when its time slice ends, not sooner. If a script tries to stop itself then some LSL code following the `llSetScriptState` call may be executed before the script stops.
+- If a script is paused by `llSetScriptState` and is then either re-rezzed, in a region during a restart, or moved into a different region, the script's memory is reset.
+
+## See Also
+
+- [llGetScriptState](../llgetscriptstate/)
+- [llResetOtherScript](../llresetotherscript/)
+
+<WikiAttribution />

@@ -1,0 +1,53 @@
+---
+title: llGetAttachedList
+description: >-
+  Returns a list of keys of all visible (not HUD) attachments on the avatar
+  identified by the ID argument
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAttachedList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Touch to list all attachments
+default
+{
+    touch_start(integer total_number)
+    {
+        list AttachedNames;
+        list AttachedUUIDs = llGetAttachedList(llDetectedKey(0));
+        integer i;
+        while (i < llGetListLength(AttachedUUIDs) )
+        {
+            list temp = llGetObjectDetails(llList2Key(AttachedUUIDs,i),[OBJECT_NAME]);
+            AttachedNames += [llList2String(temp,0)];
+            ++i;
+        }
+        llSay(PUBLIC_CHANNEL,"\n" + llDumpList2String(AttachedNames,"\n"));
+    }
+}
+```
+
+## Caveats
+
+- HUD attachment keys are not reported by this function by design.
+- When an avatar first arrives in a region, there is a brief period when their attachments are not yet fully rezzed or added. During this time, those attachments will not appear in the results.
+- If the avatar is a child agent, `["NOT ON REGION"]` is returned.
+- If the avatar is not a main agent and not a child agent or not an agent at all, `["NOT FOUND"]` is returned.
+
+## See Also
+
+- [llGetAttached]
+- [llGetAttachedListFiltered]
+- [llAttachToAvatar]
+- [llDetachFromAvatar]
+- [llGetObjectDetails]
+- [attach] event
+
+<WikiAttribution />

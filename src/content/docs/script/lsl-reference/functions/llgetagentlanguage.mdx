@@ -1,0 +1,77 @@
+---
+title: llGetAgentLanguage
+description: >-
+  Returns the language code of the preferred interface language of the avatar.
+
+  Returns a string that is the language code of the preferred interface language
+  of the resident.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAgentLanguage" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    touch_start(integer num_detected) {
+        //-- loop through all detected touches
+        for (num_detected -= 1; num_detected > -1; num_detected -= 1) {
+            key agent = llDetectedKey(num_detected);
+            string name = llGetDisplayName(agent);
+            string language = llGetAgentLanguage(agent);
+
+            if (("" == name) || ("???" == name))
+                name = llDetectedName(num_detected);
+
+            //-- PUBLIC_CHANNEL is 0
+            if (language == "es") {
+                llSay(PUBLIC_CHANNEL, "¡Hola, " + name + "!");
+            } else if (language == "fr") {
+                llSay(PUBLIC_CHANNEL, "Salut, " + name + " !");
+            } else if (language == "ja") {
+                llSay(PUBLIC_CHANNEL, "やあ、　" + name + "！");
+            } else if (language == "de") {
+                llSay(PUBLIC_CHANNEL, "Hallo, " + name + "!");
+            } else if (language == "en") { //-- returned by some TPVs
+                llSay(PUBLIC_CHANNEL, "Hello, " + name + "!");
+            } else if (language == "pt") {
+                llSay(PUBLIC_CHANNEL, "Olá!, " + name + "!");
+            } else if (language == "ko") {
+                llSay(PUBLIC_CHANNEL, "안녕하세요, " + name + "!");
+            } else if (language == "zh") {
+                llSay(PUBLIC_CHANNEL, "你好啊， " + name + "！");
+            } else { //-- Default to 'en-us' if language is unrecognized / not provided.
+                llSay(PUBLIC_CHANNEL, "Hi there, " + name + "!");
+            }
+        }
+    }
+}
+```
+
+## Caveats
+
+- If the user has "Share language with objects" disabled, this function returns an empty string.
+- During a 1-5 second period after an agent logs in, this function will return an empty string until the viewer sends the data to the simulator.
+- Users may prefer to see the client interface in a language that is not their native language. Some may prefer to use objects in the creator's native language or dislike low-quality translations. Consider providing a manual language override when appropriate.
+- New language/variant values may be added later. Scripts should be prepared for unexpected values.
+- If the viewer is set to "System Default," the possible return may be outside the standard list. See the List of ISO 639-1 codes for reference.
+- Viewers can specify other arbitrary language strings with the 'InstallLanguage' debug setting. For example, launching with `--set InstallLanguage american` results in this function returning 'american'.
+- If the viewer supplies a multiline value, the simulator will only accept the first line and ignore all others.
+- Older viewers may return "en-us" instead of "en".
+
+## Notes
+
+The function returns a language code representing the avatar's preferred interface language. Common values include: en, es, fr, ja, de, pt, ko, zh, and others. However, since viewers can be configured with custom language settings or set to system defaults, the returned value may not always be from the standard ISO 639-1 code list.
+
+## See Also
+
+- [llGetDisplayName](../llgetdisplayname/)
+- [llDetectedKey](../lldetectedkey/)
+- [llDetectedName](../lldetectedname/)
+
+<WikiAttribution />

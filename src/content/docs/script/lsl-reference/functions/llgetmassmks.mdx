@@ -1,0 +1,46 @@
+---
+title: llGetMassMKS
+description: Acts as llGetMass(), except that the units of the value returned are Kg.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetMassMKS" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Reports an object's mass in Lindograms and Kilograms.
+default
+{
+    touch_start()
+    {
+        llSay(0, "My weight in Lindograms: " + (string)llGetMass() + "\nMy weight in Kilograms: " + (string)llGetMassMKS());
+    }
+}
+```
+
+## Caveats
+
+- Attachments do not affect an avatar's mass, only certain Appearance settings.
+- Avatar mass is reported to either be unexpectedly low (when measured using `llGetMass`) or unexpectedly high (when measured using `llGetMassMKS`). This is likely due to the weight being calculated based on a fixed value, with a modifier for height. The fixed value being used is incorrect, likely due to an incorrect density value being used.
+
+## Notes
+
+- The Kilogram value seems to be the Lindogram value (reported by `llGetMass()`) multiplied by 100.
+- **MKS** as used in the name of this function is likely a reference to the [MKS system of units](https://en.wikipedia.org/wiki/MKS_system_of_units) (Meter, Kilogram, Second), which form the base of SI units (with some minor differences).
+
+## See Also
+
+- [llGetMass](llgetmass.mdx) - Gets the mass of an object (in Lindograms)
+- [llGetObjectMass](llgetobjectmass.mdx) - Gets the object mass (in Lindograms)
+- [llGetForce](llgetforce.mdx) - Gets the object's force
+- [llGetOmega](llgetomega.mdx) - Gets rotational velocity
+- [llGetVel](llgetvel.mdx) - Gets linear velocity
+- [llGetTorque](llgettorque.mdx) - Gets torque
+- [llGetAccel](llgetaccel.mdx) - Gets acceleration
+
+<WikiAttribution />

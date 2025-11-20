@@ -1,0 +1,49 @@
+---
+title: llDetectedVel
+description: |-
+  Returns the velocity of the detected object Number.
+  Returns<0.0, 0.0, 0.0> if Number is not a valid offset.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedVel" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Tells the name and velocity of all nearby avatars:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        // Scan once for avatars within a 96 metre radius sphere
+        llSensor("", "", AGENT, 96, PI);
+    }
+    sensor(integer num)
+    {
+        // num will initially be 1 or more. When num is 1, the index of the detected avatar will be zero
+        while(num--)
+        {
+            llOwnerSay(llDetectedName(num) + " is moving at " + (string)llVecMag(llDetectedVel(num)) + " m/s.");
+        }
+    }
+}
+```
+
+## Notes
+
+- Returns `ZERO_VECTOR` (0.0, 0.0, 0.0) if the `number` parameter is not a valid detected object or avatar
+- This function is typically used within sensor event handlers after detecting objects or avatars with `llSensor()`
+
+## See Also
+
+- [llDetectedName](../lldetectedname/)
+- [llSensor](../llsensor/)
+- [llVecMag](../llvecmag/)
+
+<WikiAttribution />

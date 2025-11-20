@@ -1,0 +1,45 @@
+---
+title: llLog10
+description: |-
+  Returns the base 10 logarithm of Value. Returns zero if Value <= 0.
+  Returns the base 10 (common) logarithm of the specified Value.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLog10" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+  state_entry()
+  {
+    float num1 = llFrand(100.0);
+
+    llOwnerSay("The base 10 logarithm of " + (string)num1 + " is " + (string)llLog10(num1));
+  }
+}
+```
+
+## Notes
+
+- There are only two log functions: llLog and llLog10
+- llLog10 should only be used where the base 10 log is needed; all other applications should use llLog instead
+- Use llLog when converting the base of the logarithm:
+  ```lsl
+  float LogBaseN = llLog(value) / llLog(Base); //This technique introduces errors but is the only way
+  ```
+- Errors introduced as a result of floating-point arithmetic are most noticeable when working with logarithms
+
+## See Also
+
+- [llLog](../lllog/)
+- [llPow](../llpow/)
+- [llSqrt](../llsqrt/)
+
+<WikiAttribution />

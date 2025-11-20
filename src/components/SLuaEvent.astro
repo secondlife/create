@@ -1,0 +1,53 @@
+---
+/**
+ * LuaEvent component - Displays SLua/Luau event documentation
+ *
+ * This component loads event data from lsl_definitions.yaml at build time.
+ * It only requires the event name as a prop.
+ */
+
+import EventReference from './EventReference.astro';
+import { type Argument, getEvent } from '../utils/lsl-definitions';
+import { toLuauType } from '../utils/slua';
+
+export interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+
+// Load event definition from YAML
+const eventDef = getEvent(name);
+
+if (!eventDef) {
+  throw new Error(`Event "${name}" not found in lsl_definitions.yaml`);
+}
+
+const args = Object.values(eventDef.arguments);
+
+// Build event signature with Luau typing
+const params = args.map((arg: Argument) => `${arg.name}: ${toLuauType(arg.type)}`).join(', ');
+const signature = `function ${name}(${params})`;
+
+// Map arguments to Luau types for display
+const luauArgs: Record<string, Argument> = {};
+Object.values(eventDef.arguments).forEach((arg: Argument) => {
+  luauArgs[arg.name] = {
+    ...arg,
+    type: toLuauType(arg.type)
+  };
+});
+---
+
+<EventReference
+  name={name}
+  arguments={luauArgs}
+  signature={signature}
+  language="lua"
+  className="event-reference lua-event-reference"
+  tooltip={eventDef.tooltip}
+  deprecated={eventDef.deprecated}
+  experience={eventDef.experience}
+  lindenExperience={eventDef.lindenExperience}
+  godMode={eventDef.godMode}
+/>

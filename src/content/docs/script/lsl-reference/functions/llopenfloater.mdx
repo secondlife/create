@@ -1,0 +1,44 @@
+---
+title: llOpenFloater
+description: |-
+  Returns the value for header for request_id.
+  Returns a string that is the value of the Header for HTTPRequestID.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llOpenFloater" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The `llOpenFloater` function sends a request to the viewer to open a new floater with the provided title. This function must be called from a script running within an attachment and the script must be compiled as part of a Linden-owned experience.
+
+If the request was successfully sent to the viewer, the function returns 0. In case of an error, the return value will be one of the error codes listed below.
+
+## Return Codes
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| NOT_EXPERIENCE | -1 | The script is not compiled as part of an experience, or the experience is not privileged. |
+| NOT_ATTACHMENT | -2 | There was an issue finding the object, or the object is not an attachment. |
+| BAD_AGENT | -3 | There was an issue finding the owner. |
+| NOT_EXPERIENCE_PERMISSIONS | -4 | There was some other issue with the experience permissions. |
+
+## Valid Floater Names
+
+The `floater_name` parameter accepts the following known valid values:
+
+- `guidebook`
+- `how_to`
+- `web_content`
+
+## Requirements
+
+- Must be called from a script running within an attachment
+- Script must be compiled as part of a Linden-owned experience
+- Requires experience permissions to execute
+
+<WikiAttribution />

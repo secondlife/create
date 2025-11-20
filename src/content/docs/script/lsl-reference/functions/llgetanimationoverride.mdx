@@ -1,0 +1,75 @@
+---
+title: llGetAnimationOverride
+description: >-
+  Returns a string that is the name of the animation that is used for the
+  specified animation state
+
+  To use this function the script must obtain either the
+  PERMISSION_OVERRIDE_ANIMATIONS or PERMISSION_TRIGGER_ANIMATION permission
+  (automatically granted to attached objects).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAnimationOverride" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This example demonstrates how to check all available overridable animation states. The script first requests permission to override animations, then systematically queries each animation state to display what animation is currently in use for that state.
+
+```lsl
+//    llGetAnimationOverride Example
+//    A Script to check the animation Stats on
+//  all available overridable animations.
+//    By Kanashio Koroshi and Pedro Oval
+
+default
+{
+    state_entry()
+    {
+        llRequestPermissions(llGetOwner(),
+            PERMISSION_OVERRIDE_ANIMATIONS);
+    }
+
+    run_time_permissions(integer permissions)
+    {
+        if (permissions & PERMISSION_OVERRIDE_ANIMATIONS)
+        {
+            llOwnerSay("Listing Overridden Animations");
+            llOwnerSay("Crouching: " + llGetAnimationOverride("Crouching"));
+            llOwnerSay("CrouchWalking: " + llGetAnimationOverride("CrouchWalking"));
+            llOwnerSay("Falling Down: " + llGetAnimationOverride("Falling Down"));
+            llOwnerSay("Flying: " + llGetAnimationOverride("Flying"));
+            llOwnerSay("FlyingSlow: " + llGetAnimationOverride("FlyingSlow"));
+            llOwnerSay("Hovering: " + llGetAnimationOverride("Hovering"));
+            llOwnerSay("Hovering Down: " + llGetAnimationOverride("Hovering Down"));
+            llOwnerSay("Hovering Up: " + llGetAnimationOverride("Hovering Up"));
+            llOwnerSay("Jumping: " + llGetAnimationOverride("Jumping"));
+            llOwnerSay("Landing: " + llGetAnimationOverride("Landing"));
+            llOwnerSay("PreJumping: " + llGetAnimationOverride("PreJumping"));
+            llOwnerSay("Running: " + llGetAnimationOverride("Running"));
+            llOwnerSay("Sitting: " + llGetAnimationOverride("Sitting"));
+            llOwnerSay("Sitting on Ground: " + llGetAnimationOverride("Sitting on Ground"));
+            llOwnerSay("Standing: " + llGetAnimationOverride("Standing"));
+            llOwnerSay("Standing Up: " + llGetAnimationOverride("Standing Up"));
+            llOwnerSay("Striding: " + llGetAnimationOverride("Striding"));
+            llOwnerSay("Soft Landing: " + llGetAnimationOverride("Soft Landing"));
+            llOwnerSay("Taking Off: " + llGetAnimationOverride("Taking Off"));
+            llOwnerSay("Turning Left: " + llGetAnimationOverride("Turning Left"));
+            llOwnerSay("Turning Right: " + llGetAnimationOverride("Turning Right"));
+            llOwnerSay("Walking: " + llGetAnimationOverride("Walking"));
+        }
+    }
+}
+```
+
+## See Also
+
+- [llSetAnimationOverride](../llsetanimationoverride/)
+- [llResetAnimationOverride](../llresetanimationoverride/)
+- Internal_Animations - Lists internal animations always available
+
+<WikiAttribution />

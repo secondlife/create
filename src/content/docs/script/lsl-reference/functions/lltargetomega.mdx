@@ -1,0 +1,129 @@
+---
+title: llTargetOmega
+description: >-
+  Attempt to spin at SpinRate with strength Gain on Axis.
+
+  A spin rate of 0.0 cancels the spin. This function always works in
+  object-local coordinates.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTargetOmega" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Basic rotation with combined axes:
+
+```lsl
+// Rotates the x axis once per second,
+// Rotates the y axis 3 times per second,
+// Rotates the z axis once every two seconds.
+// Combined the rate is about 3.20156 revolutions per second
+
+llTargetOmega(<1.0,3.0,0.5>, TWO_PI, 1.0);
+```
+
+Globe rotation around tilted axis:
+
+```lsl
+// Rotates very slowly around a sphere's local X axis
+// Good for making a globe that rotates around a tilted axis
+
+default {
+    state_entry() {
+        llTargetOmega(<1.0,0.0,0.0> * llGetRot(), 0.1, 0.01);
+    }
+}
+```
+
+Propeller rotation:
+
+```lsl
+// Rotates very slowly around a cylinder's local or global Z axis
+// Good for making a propeller that rotates regardless of initial orientation
+
+default {
+    state_entry() {
+        llTargetOmega(llRot2Up(llGetLocalRot()), PI, 1.0);
+    }
+}
+```
+
+Returning object to initial rotation:
+
+```lsl
+// To make an object return to its initial rotation when target omega stops,
+// first make the object rotate both client side and server side.
+// Then, when you stop llTargetOmega, reset server side rotation.
+
+integer iOn;
+integer iStep;
+
+default {
+    touch_start(integer total_number) {
+        iOn = !iOn;
+        if (iOn) {
+            llTargetOmega(<0.0,0.0,1.0>, PI/8, 1.0);  // Start rotating client side
+            llSetTimerEvent(1.0);  // Start timer to rotate server side
+        } else {
+            llTargetOmega(<0.0,0.0,1.0>, 0.0, 0.0);  // Stop client side rotation
+            llSetTimerEvent(0.0);   // Stop timer and server side rotation
+            llSetRot(ZERO_ROTATION); // Set server side rotation to <0.0,0.0,0.0>
+            iStep = 0;
+        }
+    }
+
+    timer() {
+        llSetRot(llAxisAngle2Rot(<0.0,0.0,1.0>, ++iStep * PI/8)); // Rotate at same speed
+    }
+}
+```
+
+## Physics Behavior
+
+**Physical Objects:**
+- If the object is physical and the script is attached to the root prim, the physical representation is updated regularly and the rotation can be detected by script
+- The axis parameter specifies the rotation axis and passes through the center of mass
+- If the object's center differs from its center of mass, the center will orbit around the center of mass
+- If the script is attached to a child prim, the same behavior applies using that child prim's center of mass
+
+**Non-Physical Objects:**
+- The effect is entirely client-side
+- Only scripts within the object can detect it by reading the PRIM_OMEGA parameters
+- If attached to a root prim, rotation occurs around the object's center (root prim center)
+- If attached to a child prim, rotation occurs around the child prim's center
+
+**Link Set Behavior:**
+- Root prim: entire object rotates around the region axis
+- For attached objects: rotation occurs around the attachment axis
+- Child prim: the prim rotates around its local axis
+- A child prim can rotate around its own axis while the entire object rotates around another axis
+
+## Caveats
+
+- If the object is not physical, rotation is client-side only and collision geometry remains non-moving
+- If the function doesn't appear to work, verify that **Advanced > Network > Velocity Interpolate Objects** (viewer 1.x) or **Develop > Network > Velocity Interpolate Objects** (viewer 2.x) is enabled
+- When rotating stops, the object keeps its final orientation (client-side only). Other viewers will see the object in its real pre-omega orientation
+
+## Notes
+
+- Use `llVecNorm()` on the axis parameter so that spinrate actually represents the rate of rotation
+- Set gain to zero to disable rotation: `llTargetOmega(ZERO_VECTOR, 0, 0)`
+  - When rotation stops, the object retains its final orientation
+- A spinrate of 0 with non-zero gain causes the object to stop all spin rather than clearing a previous call
+- To cancel spin when other forces are applied (like `llSetForce`), use: `llTargetOmega(-llGetOmega(), 0., 1.)` (gain must be non-zero)
+
+## See Also
+
+- [llRot2Fwd] - Gets the local x-axis orientation relative to global coordinates
+- [llRot2Left] - Gets the local y-axis orientation relative to global coordinates
+- [llRot2Up] - Gets the local z-axis orientation relative to global coordinates
+- [llGetOmega] - Gets current rotation velocity
+- [llSetRot] - Sets object rotation
+- [llGetRot] - Gets object rotation
+
+<WikiAttribution />

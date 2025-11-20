@@ -1,0 +1,47 @@
+---
+/**
+ * LSLFunction component - Displays LSL function documentation
+ *
+ * This component loads function data from lsl_definitions.yaml at build time.
+ * It only requires the function name as a prop.
+ */
+
+import FunctionReference from './FunctionReference.astro';
+import { type Argument, getFunction } from '../utils/lsl-definitions';
+
+export interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+
+// Load function definition from YAML
+const funcDef = getFunction(name);
+
+if (!funcDef) {
+  throw new Error(`Function "${name}" not found in lsl_definitions.yaml`);
+}
+
+// Extract and convert function data
+
+const args = Object.values(funcDef.arguments);
+
+// Build LSL function signature
+const signature = `${funcDef.returnType} ${name}(${args.map((arg: Argument) => `${arg.type} ${arg.name}`).join(', ')})`;
+---
+
+<FunctionReference
+  name={name}
+  returnType={funcDef.returnType}
+  arguments={funcDef.arguments}
+  signature={signature}
+  language="lsl"
+  className="function-reference lsl-function-reference"
+  tooltip={funcDef.tooltip}
+  energy={funcDef.energy}
+  sleep={funcDef.sleep}
+  deprecated={funcDef.deprecated}
+  experience={funcDef.experience}
+  lindenExperience={funcDef.lindenExperience}
+  godMode={funcDef.godMode}
+/>

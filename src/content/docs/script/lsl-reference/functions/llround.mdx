@@ -1,0 +1,57 @@
+---
+title: llRound
+description: |-
+  Returns Value rounded to the nearest integer.
+  Returns the Value rounded to the nearest integer.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSay(0,  "The rounded value of -4.9 is: "+(string)llRound(-4.9) );
+        //Returns "The rounded value of -4.9 is: -5"
+
+        llSay(0,  "The rounded value of -4.1 is: "+(string)llRound(-4.1) );
+        //Returns "The rounded value of -4.1 is: -4"
+
+        llSay(0,  "The rounded value of 4.5 is: "+(string)llRound(4.5) );
+        //Returns "The rounded value of 4.5 is: 5"
+
+        llSay(0,  "The rounded value of 4.9 is: "+(string)llRound(4.9) );
+        //Returns "The rounded value of 4.9 is: 5"
+
+        llSay(0,  "The rounded value of 4.1 is: "+(string)llRound(4.1) );
+        //Returns "The rounded value of 4.1 is: 4"
+
+        llSay(0,  "The rounded value of -4.5 is: "+(string)llRound(-4.5) );
+        //Returns "The rounded value of -4.5 is: -4"
+    }
+}
+```
+
+## Caveats
+
+- The returned value is -2147483648 (0x80000000) if the arithmetic result is outside of the range of valid integers (-2147483648 to 2147483647 inclusive).
+- If the absolute value of the tenths position is 4 or less, the value is rounded off; otherwise, the value is rounded towards positive infinity.
+
+## Notes
+
+- For positive values, it is quicker to add 0.5 to the value and cast to an integer. `i=(integer)(f+0.5)` produces less bytecode than `llRound(f)` and is about 5 times faster in execution, while giving the same result.
+
+## See Also
+
+- [llCeil](../llceil/)
+- [llFloor](../llfloor/)
+
+<WikiAttribution />

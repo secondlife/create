@@ -1,0 +1,30 @@
+---
+title: llToUpper
+description: Returns a string that is Text with all upper-case characters.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llToUpper" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+string msg = "I like candy!";
+string p = llToUpper(msg);
+llOwnerSay(p); // Will say "I LIKE CANDY!"
+```
+
+## Notes
+
+- There is no Linden Library `llToProperCase` function that would return properly capitalized strings. However, user-created functions exist that provide this functionality, such as `ToNormal`.
+- The function works for many characters outside the 7-bit ASCII range, especially Latin, Cyrillic, and Greek characters. However, not all characters tagged as "lowercase" in the Unicode specification are converted.
+
+## See Also
+
+- [llToLower](/script/reference/lsl/functions/llToLower/)
+
+<WikiAttribution />

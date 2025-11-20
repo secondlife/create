@@ -1,0 +1,84 @@
+---
+title: llTakeControls
+description: >-
+  Take controls from the agent the script has permissions for.
+
+  If (Accept == (Controls & input)), send input to the script.  PassOn
+  determines whether Controls also perform their normal functions.
+
+  Requires the PERMISSION_TAKE_CONTROLS permission to run.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTakeControls" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The behavior of `llTakeControls` depends on the combination of the `accept` and `pass_on` parameters:
+
+- **accept = FALSE, pass_on = FALSE**: The complement of the specified controls do not generate events and do not perform their normal functions. They are effectively disabled. Certain control bits (e.g. CONTROL_ROT_LEFT) are also disabled when specified.
+- **accept = FALSE, pass_on = TRUE**: The specified controls do not generate events but perform their normal functions.
+- **accept = TRUE, pass_on = FALSE**: The specified controls generate events but do not perform their normal functions.
+- **accept = TRUE, pass_on = TRUE**: The specified controls generate events and perform their normal functions.
+
+## Examples
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llRequestPermissions(llGetOwner(), PERMISSION_TAKE_CONTROLS);
+    }
+    run_time_permissions(integer perm)
+    {
+        if(PERMISSION_TAKE_CONTROLS & perm)
+        {
+            llTakeControls(
+                            CONTROL_FWD |
+                            CONTROL_BACK |
+                            CONTROL_LEFT |
+                            CONTROL_RIGHT |
+                            CONTROL_ROT_LEFT |
+                            CONTROL_ROT_RIGHT |
+                            CONTROL_UP |
+                            CONTROL_DOWN |
+                            CONTROL_LBUTTON |
+                            CONTROL_ML_LBUTTON ,
+                            TRUE, TRUE);
+
+        }
+    }
+    control(key id, integer level, integer edge)
+    {
+        integer start = level & edge;
+        integer end = ~level & edge;
+        integer held = level & ~edge;
+        integer untouched = ~(level | edge);
+        llOwnerSay(llList2CSV([level, edge, start, end, held, untouched]));
+    }
+}
+```
+
+## Caveats
+
+- There appears to be no penalty for using `accept` = TRUE, `pass_on` = TRUE when there is no `control` event in the script (such as is used in AO's to ensure they work on no-script land).
+- There is a bug in some permissions that prevents left clicks from working in mouselook if they are set to `accept` = FALSE, `pass_on` = TRUE.
+- If you sit/are sitting on the object that has taken your controls using `accept` = TRUE and `pass_on` = TRUE, then CONTROL_FWD, CONTROL_BACK, CONTROL_ROT_LEFT, and CONTROL_ROT_RIGHT will never generate events; instead these controls will only perform their normal functions.
+- If the undocumented controls 0x02000000 or 0x04000000 are taken with `pass_on` = FALSE, then `llGetAnimation` will never return "Turning Left" or "Turning Right" respectively, and those animations set by `llSetAnimationOverride` will never play.
+- If your viewer's "Single click on land" setting is set to "Move to clicked point", then CONTROL_LBUTTON might not be sent to the server when taken by `llTakeControls()`.
+
+## Notes
+
+- If a script has taken controls, it and other scripts in the same prim will not be stopped if the agent enters a "No Outside Scripts" parcel. This is done to keep vehicle control alive and AOs functional. This is an intentional feature.
+
+## See Also
+
+- [llReleaseControls](../llreleasecontrols/)
+- control (event)
+
+<WikiAttribution />

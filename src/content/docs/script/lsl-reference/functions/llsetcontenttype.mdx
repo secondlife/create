@@ -1,0 +1,108 @@
+---
+title: llSetContentType
+description: >-
+  Set the media type of an LSL HTTP server response to ContentType.
+
+  HTTPRequestID must be a valid http_request ID. ContentType must be one of the
+  CONTENT_TYPE_* constants.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetContentType" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+When using `CONTENT_TYPE_HTML`, this setting will be ignored unless **all** of these conditions are met:
+
+1. The web browser is the Second Life client
+2. The user (logged into the SL client viewing the page) is the owner of the object
+3. The user (logged into the SL client viewing the page) is connected to the region the object is located in
+
+Note: This is incompatible with group-owned objects. One workaround is to use `llAttachToAvatarTemp` to temporarily attach a repeater.
+
+## Examples
+
+```lsl
+key url_request;
+
+string HTML_BODY =
+"<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Heading</h1>
+
+<p>My first paragraph.</p>
+
+</body>
+</html>";
+
+default
+{
+    state_entry()
+    {
+        url_request = llRequestURL();
+    }
+
+    http_request(key id, string method, string body)
+    {
+        key owner = llGetOwner();
+        vector ownerSize = llGetAgentSize(owner);
+
+        if (url_request == id)
+        {
+            // if you're usually not resetting the query ID
+            // now is a good time to start!
+            url_request = "";
+
+            if (method == URL_REQUEST_GRANTED)
+            {
+                llOwnerSay("URL: " + body);
+
+                // if owner in sim
+                if (ownerSize) // != ZERO_VECTOR
+                    llLoadURL(owner, "I got a new URL!", body);
+            }
+
+            else if (method == URL_REQUEST_DENIED)
+                llOwnerSay("Something went wrong, no url:\n" + body);
+        }
+
+        else
+        {
+            llOwnerSay("request body:\n" + body);
+
+            // if owner in sim
+            if (ownerSize) // != ZERO_VECTOR
+            {
+                llSetContentType(id, CONTENT_TYPE_HTML);
+                llHTTPResponse(id, 200, HTML_BODY);
+            }
+            else
+            {
+                llSetContentType(id, CONTENT_TYPE_TEXT);
+                llHTTPResponse(id, 200, "OK");
+            }
+        }
+    }
+}
+```
+
+## Notes
+
+- A workaround for displaying HTML to non-owners inworld can be found on the Teacup page
+- The owner and client limitations prevent running a website from a prim in most scenarios
+- Always reset the query ID when handling new URL requests
+
+## See Also
+
+- [llHTTPResponse](../llhttpresponse/)
+- http_request event
+- http_response event
+- LSL HTTP server
+
+<WikiAttribution />

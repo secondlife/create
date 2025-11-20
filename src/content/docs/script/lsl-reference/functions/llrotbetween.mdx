@@ -1,0 +1,138 @@
+---
+title: llRotBetween
+description: |-
+  Returns the rotation to rotate Vector1 to Vector2.
+  Returns the rotation needed to rotate Vector1 to Vector2.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRotBetween" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+**Input vectors are directions, NOT position coordinates.** Feeding position coordinates will not work, or at minimum be very inaccurate and/or inconsistent.
+
+Start and end are directions relative to the origin \<0.0, 0.0, 0.0\>. If you have coordinates relative to a different origin, subtract that origin from the input vectors.
+
+### Caveats
+
+- `start * llRotBetween(start, end) == end` is only true if **start** and **end** have the same magnitude and neither have a magnitude of zero (see Useful Snippets below for a workaround). This is ignoring floating point precision errors.
+- The above is true because of vector magnitudes and not a shortcoming of this function. The rotation returned is correct regardless of magnitudes.
+- Rotations are from -PI to +PI around each axis.
+- Vectors that are near opposite each other in direction may lead to erroneous results.
+
+### Known Issues
+
+When vectors are nearly opposite in direction, the function may return unexpected results:
+
+```lsl
+// First Vector is due north second vector is ALMOST due south.
+rotation lRotation = llRotBetween( <0., 1., 0.>, <-0.001, -.1, 0.> );
+llSay(0, lRotation );
+// Provides a result of <1.00000, 0.00000, 0.00000, 0.00000>.
+```
+
+## Examples
+
+### Orient Object Toward Avatar
+
+This script will cause the object to orient its positive X axis towards its owner's avatar when touched:
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        list lTemp = llGetObjectDetails(llGetOwner(),[OBJECT_POS]); //Get the owner's position (region coordinates)
+        vector start = llRot2Fwd(ZERO_ROTATION); //Object's X axis is forward. (Can be substituted with llRot2Left (Y axis) or llRot2Up (Z axis). Negative values (-llRot2Fwd) can be used to spin the prim 180 degrees)
+        //start = llRot2Fwd( llAxisAngle2Rot(<0,0,1>,45*DEG_TO_RAD) ); //Uncommenting this line will cause the prim to point one of it's corners towards the avatar, instead of the forward face.
+        vector end = llVecNorm(llList2Vector(lTemp,0) - llGetPos()); //Convert the owner's position into a normalized direction vector (relative to the prim).
+        llSetLinkPrimitiveParamsFast(LINK_THIS,[PRIM_ROTATION,llRotBetween(start,end)]); //Set the prim's rotation accordingly.
+    }
+    //llRot2Fwd(ZERO_ROTATION) is equivalent to <1,0,0> , llRot2Left would be <0,1,0> and llRot2Up would be <0,0,1>. Negative values ( -llRot2Fwd(ZERO_ROTATION) ) would be <-1,0,0>, -llRot2Left would be <0,-1,0> and -llRot2Up would be <0,0,-1>
+    //Note that a value other than ZERO_ROTATION may cause unexpected results. Unless you know the exact offset you need for your object, then leave this as-is.
+}
+// Credit: Jenna Huntsman
+```
+
+### Basic Examples
+
+```lsl
+llRotBetween(<1.0, 0.0, 0.0>, <0.0, -1.0, 0.0>)
+// will return <0.00000, 0.00000, -0.70711, 0.70711> (which represents -90 degrees on the z axis)
+
+llRotBetween(<0.0, 0.0, 0.0>, <0.0, -1.0, 0.0>)
+// will return <0.00000, 0.00000, 0.00000, 1.00000> (which represents a zero angle on all axis)
+// because <0.0, 0.0, 0.0> does not convey a direction.
+```
+
+## Useful Snippets
+
+### Magnitude-Adjusted Rotation
+
+This function adjusts the magnitude of the quaternion so `start * llRotBetween(start, end) == end` is true as long as neither have a magnitude really close to zero. They do not have to have the same magnitude. If either is too close to zero, this will return an unadjusted quaternion.
+
+```lsl
+rotation RotBetween(vector start, vector end) //adjusts quaternion magnitude so (start * return == end)
+{
+    rotation rot = llRotBetween(start, end);
+    float d = start * start;
+    if(d)//is 'start' zero?
+        if((d = llPow(end * end / d, 0.25)))//is 'end' zero?
+            return <rot.x * d, rot.y * d, rot.z * d, rot.s * d>;
+    return rot;
+}
+// Credit: Strife Onizuka
+```
+
+### Improved Implementation
+
+Due to quirks in the standard function, here's a drop-in replacement with better accuracy (maximum error reported as 2.7e-7 @ 2.2 radians):
+
+```lsl
+rotation RotBetween(vector a, vector b)
+{
+    float aabb = llSqrt((a * a) * (b * b)); // product of the lengths of the arguments
+    if (aabb)
+    {
+        float ab = (a * b) / aabb; // normalized dotproduct of the arguments (cosine)
+        vector c = <(a.y * b.z - a.z * b.y) / aabb,
+                    (a.z * b.x - a.x * b.z) / aabb,
+                    (a.x * b.y - a.y * b.x) / aabb >; // normalized crossproduct of the arguments
+        float cc = c * c; // squared length of the normalized crossproduct (sine)
+        if (cc) // test if the arguments are not (anti)parallel
+        {
+            float s;
+            if (ab > -0.707107)
+                s = 1 + ab; // use the cosine to adjust the s-element
+            else
+                s = cc / (1 + llSqrt(1 - cc)); // use the sine to adjust the s-element
+            float m = llSqrt(cc + s * s); // the magnitude of the quaternion
+            return <c.x / m, c.y / m, c.z / m, s / m>; // return the normalized quaternion
+        }
+        if (ab > 0)
+            return ZERO_ROTATION; // the arguments are parallel, or anti-parallel if not true:
+        float m = llSqrt(a.x * a.x + a.y * a.y); // the length of one argument projected on the XY-plane
+        if (m)
+            return <a.y / m, -a.x / m, 0, 0>; // return a rotation with the axis in the XY-plane
+        return <1, 0, 0, 0>; // the arguments are parallel to the Z-axis, rotate around the X-axis
+    }
+    return ZERO_ROTATION; // the arguments are too small, return zero rotation
+}
+// Credit: Moon Metty, optimized by Strife Onizuka
+// This version keeps the axis in the XY-plane, in case of anti-parallel vectors (unlike the current LL implementation).
+```
+
+## See Also
+
+- [llAngleBetween](../llanglebetween/)
+- [llRot2Fwd](../llrot2fwd/)
+- [llRot2Left](../llrot2left/)
+- [llRot2Up](../llrot2up/)
+- [llVecNorm](../llvecnorm/)
+
+<WikiAttribution />

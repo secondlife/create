@@ -1,0 +1,105 @@
+---
+title: llDetectedTouchFace
+description: >-
+  Returns the index of the face where the avatar clicked in a triggered touch
+  event.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedTouchFace" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- `TOUCH_INVALID_FACE` (-1) is returned when:
+  - The avatar's viewer does not support face touch detection.
+  - The touch has moved off the surface of the prim.
+  - The event triggered is not a touch event.
+
+## Examples
+
+### Basic Face Detection
+
+This example demonstrates how to detect which face was touched on a prim:
+
+```lsl
+say(string message)
+{
+    llSay(PUBLIC_CHANNEL, message);
+}
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        integer face = llDetectedTouchFace(0);
+
+        if (face == TOUCH_INVALID_FACE)
+        {
+            say("The touched face could not be determined");
+        }
+        else
+        {
+            say("You touched face number " + (string) face);
+        }
+    }
+}
+```
+
+### Face Detection with Color Change
+
+This example shows how to get the face number and temporarily change its color:
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        integer link = llDetectedLinkNumber(0);
+        integer face = llDetectedTouchFace(0);
+
+        if (face == TOUCH_INVALID_FACE)
+            llSay(PUBLIC_CHANNEL, "Sorry, your viewer doesn't support touched faces.");
+        else
+        {
+            // store the original color
+            list   colorParams   = llGetLinkPrimitiveParams(link, [PRIM_COLOR, face]);
+            vector originalColor = llList2Vector(colorParams, 0);
+
+            // color detected face white
+            llSetLinkColor(link, <1.0, 1.0, 1.0>, face);
+            llSleep(0.2);
+
+            // color detected face black
+            llSetLinkColor(link, ZERO_VECTOR, face);
+            llSleep(0.2);
+
+            // color detected face back to original color
+            llSetLinkColor(link, originalColor, face);
+        }
+    }
+}
+```
+
+## Notes
+
+- This function only works with touch events. Use it in `touch_start`, `touch`, or `touch_end` events.
+- The prim that was touched may not be the prim receiving the event. Use `llDetectedLinkNumber` to check for this.
+- Always check for `TOUCH_INVALID_FACE` to handle viewers that don't support face touch detection.
+
+## See Also
+
+- [llDetectedLinkNumber](../lldetectedlinknumber/)
+- [llDetectedTouchST](../lldetectedtouchst/)
+- [llDetectedTouchUV](../lldetectedtouchuv/)
+- [llDetectedTouchPos](../lldetectedtouchpos/)
+- [llDetectedTouchNormal](../lldetectedtouchnormal/)
+- [llDetectedTouchBinormal](../lldetectedtouchbinormal/)
+- `touch_start` - Event triggered when avatar starts touching
+- `touch` - Event triggered while avatar is touching
+- `touch_end` - Event triggered when avatar stops touching
+
+<WikiAttribution />

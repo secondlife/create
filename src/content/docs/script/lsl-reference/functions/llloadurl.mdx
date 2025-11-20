@@ -1,0 +1,70 @@
+---
+title: llLoadURL
+description: "Shows dialog to avatar AvatarID offering to load web page at URL.\tIf user clicks yes, launches their web browser.\nllLoadURL displays a dialogue box to the user, offering to load the specified web page using the default web browser."
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLoadURL" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- This function should not be called from group deeded objects—it will silently fail. (Note: Support for group deeded objects was added in version 1.9 but removed again in the server upgrade of 2007-03-14)
+- This function silently fails for an avatar that has muted itself, which can be extremely bewildering to debug since there's no easy way for a user to self-mute
+
+## Important Limitations
+
+- The URL is truncated to 255 characters
+- The message text is truncated to 254 characters
+- The protocol must be specified and currently only "https://" and "http://" are supported
+- The URL should be RFC 1738 compliant with proper escapes
+
+## Examples
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        key id = llDetectedKey(0);
+        string info = "Visit the Second Life website!";
+
+        // must start with either "http://..." or "https://..."
+        string url = "http://www.secondlife.com/";
+
+        integer avatarInSameRegion = (llGetAgentSize(id) != ZERO_VECTOR); // TRUE or FALSE
+
+        if (avatarInSameRegion)
+        {
+            llLoadURL(id, info, url);
+        }
+        else
+        {
+            // if the agent is not in the same region, send a message instead
+            // the viewer will turn the URL clickable
+            llInstantMessage(id, info + " " + url);
+        }
+    }
+}
+```
+
+This example demonstrates:
+- Detecting which avatar touched the object
+- Checking if the avatar is in the same region (important for llLoadURL to work)
+- Falling back to llInstantMessage if the avatar is in a different region (the viewer will automatically make the URL clickable)
+
+## See Also
+
+- [llInstantMessage](../llinstantmessage/)
+- [llDetectedKey](../lldetectedkey/)
+
+## Version History
+
+- Introduced in version 1.6 with no support for group deeded objects
+- Version 1.9: Support for group deeded objects was added (possibly by accident)
+- Server upgrade 2007-03-14: Support for group deeded objects was removed
+
+<WikiAttribution />

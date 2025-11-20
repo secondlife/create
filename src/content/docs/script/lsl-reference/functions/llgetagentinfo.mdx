@@ -1,0 +1,69 @@
+---
+title: llGetAgentInfo
+description: >-
+  Returns an integer bit-field containing the agent information about id.
+
+                      Returns AGENT_FLYING, AGENT_ATTACHMENTS, AGENT_SCRIPTED, AGENT_SITTING, AGENT_ON_OBJECT, AGENT_MOUSELOOK, AGENT_AWAY, AGENT_BUSY, AGENT_TYPING, AGENT_CROUCHING, AGENT_ALWAYS_RUN, AGENT_WALKING, AGENT_IN_AIR and/or AGENT_FLOATING_VIA_SCRIPTED_ATTACHMENT.
+  Returns information about the given agent ID as a bit-field of agent info
+  constants.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAgentInfo" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer buf)
+    {
+        buf = llGetAgentInfo(llDetectedKey(0));
+        string out;
+        if(buf & AGENT_FLYING)
+            out += "The agent is flying.\n";
+        else
+            out += "The agent is not flying.\n";
+
+        if(buf & AGENT_ATTACHMENTS)
+        {
+            if(buf & AGENT_SCRIPTED)
+                out += "The agent has scripted attachments.\n";
+            else
+                out += "The agent's attachments are unscripted.\n";
+        }
+        else
+            out += "The agent does not have attachments.\n";
+
+        if(buf & AGENT_MOUSELOOK)
+            out += "the agent is in mouselook.";
+        else
+            out += "the agent is in normal camera mode.";
+        llWhisper(0, out);
+    }
+}
+```
+
+## Caveats
+
+- `AGENT_BUSY` indicates that the "busy" internal animation is playing, even if the user is not truly in busy mode.
+- **On server 1.40 and below**, `AGENT_TYPING` indicated that the "type" internal animation is playing, it would not be set if the user disabled PlayTypingAnim. **On server 1.42 and up**, it reflects typing start/stop messages from the client and does not depend on the animation.
+- `AGENT_ALWAYS_RUN | AGENT_WALKING` indicates that the user requested to run using standard viewer controls. Use `llGetAnimation()` to also detect running caused by physics.
+- This function does not return reliable information immediately after a border crossing. Use `llGetAnimation()` instead, if you can.
+- `AGENT_AUTOMATED` may unexpectedly be enabled, see AGENT_AUTOMATED for more detail.
+
+## Notes
+
+This is not a good way of testing if an avatar is in the region, use `llGetAgentSize()` instead.
+
+## See Also
+
+- [llRequestAgentData](../llrequestagentdata/)
+- [llGetAnimation](../llgetanimation/)
+- [llGetAnimationList](../llgetanimationlist/)
+
+<WikiAttribution />

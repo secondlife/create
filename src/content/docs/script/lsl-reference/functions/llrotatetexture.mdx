@@ -1,0 +1,35 @@
+---
+title: llRotateTexture
+description: |-
+  Sets the texture rotation for the specified Face to angle Radians.
+  If Face is ALL_SIDES, rotates the texture of all sides.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRotateTexture" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    touch_start(integer total_number) {
+        // Makes the object's texture rotate a quarter of turn
+        llRotateTexture(PI_BY_TWO, ALL_SIDES);
+    }
+}
+```
+
+## Notes
+
+This function only sets the absolute orientation of the texture. See [llSetTextureAnim] for animations.
+
+## See Also
+
+- [llGetTextureRot] - Gets the texture rotation
+- [llSetTextureAnim] - Animates the texture
+
+<WikiAttribution />

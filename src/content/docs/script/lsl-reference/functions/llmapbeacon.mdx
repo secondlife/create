@@ -1,0 +1,54 @@
+---
+title: llMapBeacon
+description: >-
+  Displays an in world beacon and optionally opens world map for avatar who
+  touched the object or is wearing the script, centered on RegionName with
+  Position highlighted. Only works for scripts attached to avatar, or during
+  touch events.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llMapBeacon" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Since this function requests the client to perform a task, there is no way for script to know if it has failed.
+
+## Options
+
+The `Options` parameter accepts the following list entries:
+
+| Option | Parameters | Description |
+|--------|-----------|-------------|
+| `BEACON_MAP` | `[integer open_map, integer focus_map]` | Requests viewer world map behavior. If the first parameter is `TRUE` the viewer should open the world map. If the second parameter is `TRUE` this function also requests that the map should receive focus. Setting both values to true mimics the behavior of `llMapDestination`. Note that the focus_map parameter is only meaningful if open_map is `TRUE`. |
+
+## Examples
+
+The following example mimics the behavior of `llMapDestination`:
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        llMapBeacon("WindSong", <185,140,29>, [BEACON_MAP, TRUE, TRUE]);
+    }
+}
+```
+
+## Notes
+
+- The `Position` parameter will work with region coordinates not inside the specified region name (like those returned by `llRequestInventoryData`).
+- If called from non-touch events, it only works for the owner.
+- If called from touch events, it may only work for the first or last touch in the event queue (when `num_touched > 1`).
+- If called inside an attachment, it only works for the owner.
+
+## See Also
+
+- [llMapDestination](../llmapdestination/)
+
+<WikiAttribution />

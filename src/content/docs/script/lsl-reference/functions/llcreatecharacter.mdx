@@ -1,0 +1,97 @@
+---
+title: llCreateCharacter
+description: >-
+  Convert link-set to AI/Physics character.
+
+  Creates a path-finding entity, known as a "character", from the object
+  containing the script. Required to activate use of path-finding functions.
+
+  Options is a list of key/value pairs.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCreateCharacter" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+create_character()
+{
+    // Clear any previous character behaviors
+    llDeleteCharacter();
+
+    // MAX_SPEED is @ 20 by default
+    llCreateCharacter([ CHARACTER_MAX_SPEED, 25,
+                        CHARACTER_DESIRED_SPEED, 15.0]);
+}
+
+patrol_around(vector targetPos)
+{
+    list points = [targetPos + <5, 0, 0>, targetPos - <5, 0, 0>];
+    llPatrolPoints(points, []);
+}
+
+default
+{
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
+
+    state_entry()
+    {
+        create_character();
+    }
+
+    touch_start(integer num_detected)
+    {
+        patrol_around(llGetPos());
+    }
+}
+```
+
+## Caveats and Important Notes
+
+- You only need to use one `llCreateCharacter` call per object; calling multiple times has no effect
+- One script can contain an `llCreateCharacter` call and other scripts can exploit that with other path functions that require it
+- `llCreateCharacter` status survives state changes, script resets, and rezzing
+- `llCreateCharacter` is always required for all pathfinding functions
+- When an object becomes a character, its physics weight becomes fixed at 15
+- If multiple scripts contain `llCreateCharacter` in the same object, nothing untoward happens
+- If multiple scripts use conflicting path functions in the same object, one will take precedence randomly
+- `CHARACTER_MAX_SPEED` - In testing, a desired speed of 10m/s is plenty fast for most uses; higher speeds may produce unexpected results (particularly when navigating tight spaces or making sharp turns)
+- `CHARACTER_MAX_ANGULAR_ACCEL` minimum is 1.5708
+- The character's shape is a capsule (cylinder with spherical ends) with a length and circular cross section controlled by `CHARACTER_LENGTH` and `CHARACTER_RADIUS` parameters
+- The character's true "length" cannot be smaller than twice the radius plus 0.1m
+- The capsule is usually oriented vertically; use `[CHARACTER_ORIENTATION, HORIZONTAL]` if you need your character to be horizontal
+  - Use a vertical capsule whenever possible; horizontal capsules may become stuck more easily than vertical capsules
+- Removing the script from a prim will not stop pathfinding behavior, similar to how particles and hover text remain. However, if the character encounters an error state, it will be unable to recover. Removing scripts from actively used characters is NOT recommended. To stop a pathfinding command use `llExecCharacterCmd(CHARACTER_CMD_STOP, [])`
+- The root prim's position determines the character's height above the surface; if your character sinks under the surface or is too high above it, adjust the relative position of the root prim to the rest of the linkset
+- The default value of `CHARACTER_STAY_WITHIN_PARCEL` depends on the `CHARACTER_TYPE`:
+  - If `CHARACTER_TYPE` is set to anything other than `CHARACTER_TYPE_NONE`, then `CHARACTER_STAY_WITHIN_PARCEL` will default to `TRUE`, so always explicitly set `CHARACTER_STAY_WITHIN_PARCEL` to `FALSE` if you don't want the character to stop at parcel borders
+
+## Key Implementation Notes
+
+- If called on an existing character, all unspecified parameters other than character size will revert to their defaults (if not specified, character size will not change)
+- Calling `llCreateCharacter` again is STRONGLY preferred over calling `llDeleteCharacter()` followed by `llCreateCharacter()` as it is much less taxing on the server
+
+## See Also
+
+- [llDeleteCharacter](../lldeletecharacter/)
+- [llEvade](../llevade/)
+- [llExecCharacterCmd](../llexeccharactercmd/)
+- [llGetClosestNavPoint](../llgetclosestnavpoint/)
+- [llGetStaticPath](../llgetstaticpath/)
+- [llFleeFrom](../llfleefrom/)
+- [llNavigateTo](../llnavigateto/)
+- [llPatrolPoints](../llpatrolpoints/)
+- [llPursue](../llpursue/)
+- [llUpdateCharacter](../llupdatecharacter/)
+- [llWanderWithin](../llwanderwithin/)
+- path_update event
+
+<WikiAttribution />

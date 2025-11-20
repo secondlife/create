@@ -1,0 +1,31 @@
+---
+title: llGetMass
+description: >-
+  Returns the mass of object that the script is attached to.
+
+  Returns the scripted object's mass. When called from a script in a link-set,
+  the parent will return the sum of the link-set weights, while a child will
+  return just its own mass. When called from a script inside an attachment, this
+  function will return the mass of the avatar it's attached to, not its own.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llGetMass" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.GetMass()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llGetMass](/script/reference/lsl/functions/llGetMass/)
+
+

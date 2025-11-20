@@ -1,0 +1,33 @@
+---
+title: llVolumeDetect
+description: >-
+  If DetectEnabled = TRUE, object becomes phantom but triggers collision_start
+  and collision_end events when other objects start and stop interpenetrating.
+
+  If another object (including avatars) interpenetrates it, it will get a
+  collision_start event.
+
+  When an object stops interpenetrating, a collision_end event is generated.
+  While the other is inter-penetrating, collision events are NOT generated.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llVolumeDetect" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.VolumeDetect()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llVolumeDetect](/script/reference/lsl/functions/llVolumeDetect/)
+
+

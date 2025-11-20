@@ -1,0 +1,57 @@
+---
+title: llResetOtherScript
+description: Resets the named script.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llResetOtherScript" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+When a script is reset:
+
+- The current event/function is exited without further execution or return
+- All global variables are set to their defaults
+- The event queue is cleared, and recurring events are stopped
+- The default state is set as the active state
+- If it has a state_entry event, then it is queued
+
+## Caveats
+
+- If the script is not running, this call has no effect, even after the script is set running again
+- The other script must be within the same prim and has to be running
+- A script can reset itself with this function (not just other scripts)
+
+## Examples
+
+```lsl
+// the other script must be within the same prim and has to be running
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        llResetTime();
+    }
+
+    touch_end(integer num_detected)
+    {
+        if (llGetTime() < 3.0)
+            llSay(0, "Please click & hold for at least 3.0 seconds.");
+        else
+            llResetOtherScript("second");
+    }
+}
+```
+
+## See Also
+
+- [llResetScript](../llresetscript/)
+- [llGetScriptState](../llgetscriptstate/)
+- [llSetScriptState](../llsetscriptstate/)
+
+<WikiAttribution />

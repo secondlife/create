@@ -1,0 +1,29 @@
+---
+/**
+ * WikiAttribution component - Attribution notice for CC-licensed wiki content
+ *
+ * Use this component at the bottom of pages that contain content adapted from
+ * the Second Life Wiki, which is licensed under CC BY-SA 3.0.
+ */
+
+import '../styles/function-reference.css';
+
+export interface Props {
+  /** Optional: Specific wiki page name/title for the link. If not provided, shows generic attribution */
+  page?: string;
+}
+
+const { page } = Astro.props;
+const wikiUrl = page ? `https://wiki.secondlife.com/wiki/${page}` : 'https://wiki.secondlife.com/';
+const linkText = page ? 'Second Life Wiki' : 'Second Life Wiki';
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="content-attribution">
+  <p>
+    <small>
+      Content adapted from the <a href={wikiUrl} target="_blank" rel="noopener noreferrer">{linkText}</a>.
+      © 2007-{currentYear} Linden Research, Inc. Licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 3.0</a>.
+    </small>
+  </p>
+</footer>

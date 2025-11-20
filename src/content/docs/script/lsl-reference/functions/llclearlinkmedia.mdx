@@ -1,0 +1,93 @@
+---
+title: llClearLinkMedia
+description: >-
+  Clears (deletes) the media and all parameters from the given Face on the
+  linked prim.
+
+  Returns an integer that is a STATUS_* flag, which details the success/failure
+  of the operation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llClearLinkMedia" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This example removes all media from all sides of every prim in an object, then deletes itself:
+
+```lsl
+integer GetPrimCount()
+{
+    if(llGetAttached())
+        return llGetNumberOfPrims();
+
+    return llGetObjectPrimCount(llGetKey());
+}
+
+publish_returned_status_flag(integer inputLink, integer inputFace, integer inputStatus)
+{
+    string outputStatus = "STATUS_OK";
+    if (inputStatus == 1000) outputStatus = "STATUS_MALFORMED_PARAMS";
+    else if (inputStatus == 1001) outputStatus = "STATUS_TYPE_MISMATCH";
+    else if (inputStatus == 1002) outputStatus = "STATUS_BOUNDS_ERROR";
+    else if (inputStatus == 1003) outputStatus = "STATUS_NOT_FOUND";
+    else if (inputStatus == 1004) outputStatus = "STATUS_NOT_SUPPORTED";
+    else if (inputStatus == 1999) outputStatus = "STATUS_INTERNAL_ERROR";
+    else if (inputStatus == 2001) outputStatus = "STATUS_WHITELIST_FAILED";
+
+    llSay(PUBLIC_CHANNEL, "llClearLinkMedia(link " + (string)inputLink
+        + ", face " + (string)inputFace + ") = " + outputStatus + ";");
+}
+
+default
+{
+    state_entry()
+    {
+        integer numOfPrims = GetPrimCount();
+        integer numOfSides;
+
+        integer link;
+        integer face;
+
+        if (1 < numOfPrims)
+            link = 1;
+
+        do
+        {
+            numOfSides = llGetLinkNumberOfSides(link);
+            face = 0;
+            do
+            {
+                integer clearLinkMediaSuccessFlag = llClearLinkMedia(link, face);
+                publish_returned_status_flag(link, face, clearLinkMediaSuccessFlag);
+
+                ++face;
+            }
+            while (face < numOfSides);
+
+            if (numOfPrims == 1)
+                jump continue;
+
+            ++link;
+        }
+        while (link <= numOfPrims);
+
+        @continue;
+
+        string thisScript = llGetScriptName();
+        llRemoveInventory(thisScript);
+    }
+}
+```
+
+## See Also
+
+- [llClearPrimMedia]
+- [llSetLinkMedia]
+- [llGetLinkMedia]
+
+<WikiAttribution />

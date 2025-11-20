@@ -1,0 +1,39 @@
+---
+title: llRemoveVehicleFlags
+description: >-
+  Removes the enabled bits in 'flags'.
+
+  Sets the vehicle flags to FALSE. Valid parameters can be found in the vehicle
+  flags constants section.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRemoveVehicleFlags" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    state_entry() {
+        // Remove the MOUSELOOK_STEER flag from the vehicle
+        llRemoveVehicleFlags(VEHICLE_FLAG_MOUSELOOK_STEER);
+    }
+}
+```
+
+## Notes
+
+- Some vehicle flags may remain enabled after script reset. Use `llRemoveVehicleFlags` to disable any flags that would interfere with the correct functioning of your vehicle.
+- The `VEHICLE_FLAG_MOUSELOOK_STEER` and `VEHICLE_FLAG_MOUSELOOK_BANK` flags only allow the vehicle to turn up to the current `VEHICLE_ANGULAR_MOTOR_DIRECTION`; if `VEHICLE_ANGULAR_MOTOR_DIRECTION` is set to `ZERO_VECTOR`, then the vehicle will not turn even if these flags are enabled.
+- Use this function in conjunction with `llSetVehicleFlags` to manage which vehicle behaviors are active.
+
+## See Also
+
+- [llSetVehicleFlags](../llsetvehicleflags/)
+- Vehicle flag constants (VEHICLE_FLAG_*)
+
+<WikiAttribution />

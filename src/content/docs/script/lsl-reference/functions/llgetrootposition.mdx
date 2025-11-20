@@ -1,0 +1,51 @@
+---
+title: llGetRootPosition
+description: >-
+  Returns the position (in region coordinates) of the root prim of the object
+  which the script is attached to.
+
+  This is used to allow a child prim to determine where the root is.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetRootPosition" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This example demonstrates how to determine if a script is running in the root prim or a child prim:
+
+```lsl
+default {
+  touch_start(integer vIntTouched) {
+    string vStrMessage = "The prim with this script is ";
+    if (llGetPos() != llGetRootPosition()) {
+      vStrMessage += "NOT ";
+    }
+    llSay(PUBLIC_CHANNEL, vStrMessage + "centered on the root prim.");
+  }
+}
+```
+
+## Helper Function
+
+Since there is no `llSetLocalPos` function, this helper adds functionality to match `llGetLocalPos()` in a child prim:
+
+```lsl
+fSetLocalPos(vector vPosOffset) {
+  llSetPos(llGetRootPosition() + vPosOffset);
+}
+// This will move a root prim by the offset, or set the
+// position of a child prim relative to the root.
+```
+
+## See Also
+
+- [llGetLocalPos](../llgetlocalpos/)
+- [llGetPos](../llgetpos/)
+- [llSetPos](../llsetpos/)
+
+<WikiAttribution />

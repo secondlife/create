@@ -1,0 +1,60 @@
+---
+title: llEdgeOfWorld
+description: >-
+  Checks to see whether the border hit by Direction from Position is the edge of
+  the world (has no neighboring region).
+
+  Returns TRUE if the line along Direction from Position hits the edge of the
+  world in the current simulator, returns FALSE if that edge crosses into
+  another simulator.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llEdgeOfWorld" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+//--// Tells if there are neighboring sims on touch //--//
+
+default {
+  touch_start(integer vIntTouched) {
+    vector vPosObject = llGetPos();
+    if (!llEdgeOfWorld(vPosObject, <0.0, 1.0, 0.0>)) {
+      llOwnerSay("There is a Sim to the North");
+    }
+    if (!llEdgeOfWorld(vPosObject, <1.0, 0.0, 0.0>)) {
+      llOwnerSay("There is a Sim to the East");
+    }
+    if (!llEdgeOfWorld(vPosObject, <0.0, -1.0, 0.0>)) {
+      llOwnerSay("There is a Sim to the South");
+    }
+    if (!llEdgeOfWorld(vPosObject, <-1.0, 0.0, 0.0>)) {
+      llOwnerSay("There is a Sim to the West");
+    }
+  }
+}
+```
+
+## Caveats
+
+- If the **x** and **y** components of Direction are zero (like with `ZERO_VECTOR`), `TRUE` is always returned.
+- Position must be in the region.
+- Can only be used to detect directly adjacent regions, not diagonally adjacent regions.
+- This function will also return `TRUE` if `llRequestSimulatorData()` returns "up" for an adjacent region but that region doesn't visibly show when standing next to its border.
+
+## Notes
+
+The **z** component of the Direction parameter is ignored.
+
+## See Also
+
+- [llScriptDanger](../llscriptdanger/)
+- STATUS_DIE_AT_EDGE
+- STATUS_RETURN_AT_EDGE
+
+<WikiAttribution />

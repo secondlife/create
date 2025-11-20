@@ -1,0 +1,43 @@
+---
+title: llTeleportAgentHome
+description: Teleport agent over the owner's land to agent's home location.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTeleportAgentHome" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        // floattext is red and opaque
+        llSetText("Don't touch me!", <1.0, 0.0, 0.0>, 1.0);
+    }
+
+    touch_start(integer num_detected)
+    {
+        key id = llDetectedKey(0);
+
+        llTeleportAgentHome(id);
+    }
+}
+```
+
+## Notes
+
+This function teleports an avatar to their home location without any warning, similar to a God Summons or dying. The avatar must be on land owned by the script owner for the teleportation to work.
+
+## See Also
+
+- [llEjectFromLand](../llejectfromland/)
+- [llTeleportAgent](../llteleportagent/)
+- [llTeleportAgentGlobalCoords](../llteleportagentglobalcoords/)
+
+<WikiAttribution />

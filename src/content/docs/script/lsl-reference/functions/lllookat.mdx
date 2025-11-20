@@ -1,0 +1,135 @@
+---
+title: llLookAt
+description: >-
+  Cause object name to point its forward axis towards Target, at a force
+  controlled by Strength and Damping.
+
+  Good Strength values are around half the mass of the object and good Damping
+  values are less than 1/10th of the Strength.
+
+  Asymmetrical shapes require smaller Damping. A Strength of 0.0 cancels the
+  look at.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLookAt" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Causes the object to point its up axis (positive z) towards the target, while keeping its forward axis (positive x) below the horizon. The function continues to track the target until `llStopLookAt` is called.
+
+**Technical Details:**
+- If the object isn't physical, the settings don't seem to have any effect except the force must be > 0
+- For physical objects, strength is similar to viscosity (weaker values = faster rotation)
+- Damping controls how fast the rotation damps out
+- Low damping relative to strength creates a bouncy effect with potential overshooting
+- High damping creates sluggish movement
+- Strength and damping values have no relation to the mass of the object
+
+## Examples
+
+### Basic: Object Looks at Nearest Avatar
+
+```lsl
+//Causes Object to look at nearest Avatar.
+default
+{
+    state_entry()
+    {
+        llSensorRepeat("", "", AGENT, 20.0, PI, 0.2);
+    }
+
+    sensor(integer total_number)
+    {
+        llLookAt( llDetectedPos(0) + <0.0, 0.0, 1.0>, 3.0, 1.0 );
+    }
+}
+```
+
+### For Child Prims or Attachments
+
+For use inside a child prim or the root of an attachment. The target position needs correction for the root prim's rotation:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSensorRepeat("", "", AGENT, 20.0, PI, 0.2);
+    }
+
+    sensor(integer total_number)
+    {
+        vector p = llGetPos();
+        llLookAt(p + (llDetectedPos(0) + <0.0, 0.0, 1.0> - p) / llGetRootRotation(), 3.0, 1.0);
+    }
+}
+```
+
+## Caveats
+
+- There is no guarantee that the host object will wind up pointing at the target. Depending on the shape of the object, the strength and damping, it may settle out at a different rotation pointing in a different direction if damping stops the rotation before the final position is reached.
+- If the prim is not the root, the target will need correction for the root prim's rotation (see child prim example above).
+- If the object is an attachment, the target will need correction for the wearer's rotation.
+- If the host object is physical and not symmetrical, it may cause a recoil effect where the object drifts away from its original position and makes the final rotation less accurate.
+
+## Helper Functions
+
+### Smooth, Constant-Rate Rotation (Non-Physical Objects)
+
+If you want a smooth, one-time, constant rate of motion using the x axis on a non-physical object:
+
+```lsl
+//-- rotate objects x axis toward vPosTarget (local offset), at vFltRate (in radians per second)
+//-- vFltRate < ~0.00000003rad/sec, (~0.00002deg/sec) will result in errors (and is just too slow anyway)
+//-- vFltRate >= (PI * 5.0)rad/sec, (900deg/sec) will result in a single snap move to vRotTarget
+uSteppedLookAt( vector vPosTarget, float vFltRate ){
+	rotation vRotTarget = llRotBetween( <1.0, 0.0, 0.0>,  vPosTarget );
+	if ((integer)(vFltRate = llAcos( (vPosTarget = llVecNorm( vPosTarget )) *
+	                                 (<1.0, 0.0, 0.0> * llGetLocalRot()) ) / (vFltRate / 5.0))){
+		rotation vRotStep = llAxisAngle2Rot( llRot2Axis( vRotTarget / llGetLocalRot() ),
+		                    (1.0 / vFltRate) * llRot2Angle( vRotTarget / llGetLocalRot() ) );
+		vFltRate = (integer)vFltRate;
+		do{
+			llSetLocalRot( vRotStep * llGetLocalRot() );
+		}while( --vFltRate );
+	}
+	llSetLocalRot( vRotTarget );
+} //-- for fixed time on any rotation try llKeyframeMotion
+```
+
+### LookAt for Linked Objects
+
+```lsl
+LinkedLookAt( vector Target){
+    rotation rotvec = llRotBetween(<0,1,0>,llVecNorm((Target - llGetPos())));
+    rotation rotbet = rotvec/llGetRootRotation();
+    llSetRot(rotbet);
+}
+
+default
+{
+    state_entry()
+    {
+        llSensorRepeat("", "", AGENT, 20.0, PI, 1.0);
+    }
+
+    sensor(integer total_number)
+    {
+        vector p = llDetectedPos(0);
+        LinkedLookAt(p);
+    }
+}
+```
+
+## See Also
+
+- [llRotLookAt](../llrotlookat/)
+- [llStopLookAt](../llstoplookat/)
+- [llMoveToTarget](../llmovetotarget/)
+
+<WikiAttribution />

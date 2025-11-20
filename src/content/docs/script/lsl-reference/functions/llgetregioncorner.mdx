@@ -1,0 +1,56 @@
+---
+title: llGetRegionCorner
+description: >-
+  Returns a vector, in meters, that is the global location of the south-west
+  corner of the region which the object is in.
+
+  Returns the Region-Corner of the simulator containing the task. The
+  region-corner is a vector (values in meters) representing distance from the
+  first region.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetRegionCorner" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Calculates your position relative to <0,0,0> of 'Da Boom' in meters when you touch it
+vector vecrel; //a sum of llgetpos and llgetregioncorner (and another vector). Saving time doing vector math.
+
+default
+{
+    state_entry()
+    {
+        llSetText("Touch me to get your position", <1.0,1.0,1.0>, 1.0);
+    }
+
+    touch_start(integer total_number)
+    {
+        vecrel = llGetRegionCorner() + llDetectedPos(0);
+        llWhisper(0, "llGetRegionCorner() is:"+(string)vecrel); //for debugging before vector addition
+
+        vecrel -= <256000.0, 256000.0, 0.0>;//Da Boom's region corner is at <256000.0, 256000.0, 0.0>
+        llWhisper (0, "Position relative to <0,0,0> of 'Da Boom': " +
+        (string)llRound(vecrel.x) + ", " + (string)llRound(vecrel.y) + ", " + (string)llRound(vecrel.z) + ".");
+
+        llWhisper(0, "Position relative to <0,0,0> of 'Da Boom':" +(string)vecrel); //faster but unformatted output
+    }
+}
+```
+
+## Notes
+
+- Divide the returned value by 256 to get the region offset.
+- The great zero is at region offset \<1000,1000\>. Use the SLurl tool to reference the Da Boom region if needed.
+- The z component of the returned vector is always 0.0.
+
+## See Also
+
+- [llGetPos](../llgetpos/)
+
+<WikiAttribution />

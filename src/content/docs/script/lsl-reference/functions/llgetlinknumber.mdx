@@ -1,0 +1,69 @@
+---
+title: llGetLinkNumber
+description: >-
+  Returns the link number of the prim containing the script (0 means not linked,
+  1 the prim is the root, 2 the prim is the first child, etc.).
+
+  Returns the link number of the prim containing the script. 0 means no link, 1
+  the root, 2 for first child, etc.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetLinkNumber" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Links are numbered in the reverse order in which they were linked. For example, if you select a box, a sphere, and a cylinder in that order, then link them:
+- The cylinder is link number 1 (the root)
+- The sphere is link number 2 (the first child)
+- The box is link number 3 (the second child)
+
+The last selected prim has the lowest link number.
+
+## Examples
+
+### Basic Link Number Query
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llOwnerSay((string) llGetLinkNumber());
+        llOwnerSay((string) llGetNumberOfPrims());
+    }
+}
+```
+
+### Using Double-Negation for Conditional Logic
+
+A non-obvious feature is using double-negation to obtain a link number zero (for an unlinked prim) or one (for the root of a linkset). Unlike constants like `LINK_ROOT`, this number can be used directly with functions like `llGetLinkPrimitiveParams` without first determining whether a prim is part of a linkset:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        integer rootLinkNum = !!llGetLinkNumber();
+        // returns 0 in an unlinked prim, 1 in a linkset
+
+        integer isFullBright = llList2Integer(llGetLinkPrimitiveParams(rootLinkNum,[PRIM_FULLBRIGHT, ALL_SIDES]),0);
+        // TRUE if all sides of an unlinked prim or the root of a linkset are set to full bright, FALSE otherwise
+    }
+}
+```
+
+## Caveats
+
+- By design may equal `llGetNumberOfPrims()` when the prim is last, the object contains multiple prims, and no sitting avatars are present.
+
+## See Also
+
+- [llGetNumberOfPrims](/script/reference/lsl/functions/llgetnumberofprims/)
+- [llGetKey](/script/reference/lsl/functions/llgetkey/)
+
+<WikiAttribution />

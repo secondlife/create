@@ -1,0 +1,76 @@
+---
+title: llEvade
+description: >-
+  Evade a specified target.
+
+  Characters will (roughly) try to hide from their pursuers if there is a good
+  hiding spot along their fleeing path. Hiding means no direct line of sight
+  from the head of the character (centre of the top of its physics bounding box)
+  to the head of its pursuer and no direct path between the two on the
+  navigation-mesh.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llEvade" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+vector start_position;
+
+default
+{
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
+
+    state_entry()
+    {
+        llDeleteCharacter();
+        llCreateCharacter([CHARACTER_MAX_SPEED, 25, CHARACTER_DESIRED_SPEED, 15.0]);
+
+        start_position = llGetPos();
+        llWanderWithin(start_position, <10.0, 10.0, 2.0>, [] );
+    }
+
+    touch_start(integer num_detected)
+    {
+        llEvade(llDetectedKey(0), []);
+        llSetTimerEvent(20.0);
+    }
+
+    timer()
+    {
+    //  do not keep running away...
+        llSetTimerEvent(0.0);
+
+        llWanderWithin(start_position, <10.0, 10.0, 2.0>, [] );
+    }
+}
+```
+
+## Notes
+
+- Must use `llCreateCharacter` or script will not compile.
+- If the target is an object, it must be unlinked or be the root prim of a linkset.
+
+## See Also
+
+- [llCreateCharacter](../llcreatecharacter/)
+- [llDeleteCharacter](../lldeletecharacter/)
+- [llExecCharacterCmd](../llexeccharactercmd/)
+- [llGetClosestNavPoint](../llgetclosestnavpoint/)
+- [llFleeFrom](../llfleefrom/)
+- [llNavigateTo](../llnavigateto/)
+- [llPatrolPoints](../llpatrolpoints/)
+- [llPursue](../llpursue/)
+- [llUpdateCharacter](../llupdatecharacter/)
+- [llWanderWithin](../llwanderwithin/)
+- `path_update` (event)
+
+<WikiAttribution />

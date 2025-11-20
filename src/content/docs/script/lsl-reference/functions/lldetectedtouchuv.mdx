@@ -1,0 +1,95 @@
+---
+title: llDetectedTouchUV
+description: >-
+  Returns a vector that is the texture coordinates for where the prim was
+  touched.
+
+  The X and Y vector positions contain the U and V face coordinates
+  respectively.
+
+  TOUCH_INVALID_TEXCOORD is returned if the touch UV coordinates cannot be
+  determined (e.g. when the viewer does not support this function).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedTouchUV" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- `TOUCH_INVALID_TEXCOORD` (vector `<-1.0, -1.0, 0.0>`) is returned when:
+  - The avatar's viewer does not support face touch detection (check `llDetectedTouchFace()` return value to verify)
+  - The touch has moved off the surface of the prim
+  - The touch happened too close to the edge of the face to determine a location
+  - The event triggered is not a touch event
+
+## Notes
+
+- For the touch category of events only. The prim that was touched may not be the prim receiving the event—use `llDetectedLinkNumber` to check for this
+- Use `llDetectedTouchFace` to determine which face was touched
+- The texture coordinates interval is [0.0, 1.0] unless texture repeats are set to non-default values
+- Increasing or decreasing texture repeats of the face will change this interval accordingly
+- Unlike `llDetectedTouchST`, changing a texture's rotation will change the results of this function
+- `ZERO_VECTOR` (`<0.0, 0.0, 0.0>`) is in the bottom left corner of the texture
+- `touchUV.x` goes across the texture from left to right
+- `touchUV.y` goes up the texture from bottom to top
+
+## Examples
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        integer face = llDetectedTouchFace(0);
+        vector  touchUV   = llDetectedTouchUV(0);
+
+        if (face == TOUCH_INVALID_FACE)
+            llWhisper(PUBLIC_CHANNEL, "Sorry, your viewer doesn't support touched faces.");
+        else if (touchUV == TOUCH_INVALID_TEXCOORD)
+            llWhisper(PUBLIC_CHANNEL, "Sorry, the touch position upon the texture could not be determined.");
+        else
+            llSay(PUBLIC_CHANNEL, "llDetectedTouchUV(" + (string)touchUV + ")"
+                    + "\ntouchUV.x = " + (string)touchUV.x
+                    + "\ntouchUV.y = " + (string)touchUV.y);
+    }
+}
+```
+
+Grid-based UV mapping example:
+
+```lsl
+integer numberOfRows    = 12;
+integer numberOfColumns = 12;
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        vector touchUV = llDetectedTouchUV(0);
+
+        integer columnIndex = (integer) (touchUV.x * numberOfColumns);
+        integer rowIndex    = (integer) (touchUV.y * numberOfRows);
+        integer cellIndex   = rowIndex * numberOfColumns + columnIndex;
+
+        llSay(PUBLIC_CHANNEL, "UV grid (" + (string)columnIndex + ", " + (string)rowIndex + ") --> cell " + (string)cellIndex);
+    }
+}
+```
+
+## See Also
+
+- [llDetectedLinkNumber](../lldetectedlinknumber/)
+- [llDetectedTouchFace](../lldetectedtouchface/)
+- [llDetectedTouchST](../lldetectedtouchst/)
+- [llDetectedTouchPos](../lldetectedtouchpos/)
+- [llDetectedTouchNormal](../lldetectedtouchnormal/)
+- [llDetectedTouchBinormal](../lldetectedtouchbinormal/)
+- touch_start event
+- touch event
+- touch_end event
+
+<WikiAttribution />

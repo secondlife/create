@@ -1,0 +1,39 @@
+---
+title: llParcelMediaQuery
+description: >-
+  Queries the media properties of the parcel containing the script, via one or
+  more PARCEL_MEDIA_COMMAND_* arguments specified in CommandList.
+
+  This function will only work if the script is contained within an object owned
+  by the land-owner (or if the land is owned by a group, only if the object has
+  been deeded to the group).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llParcelMediaQuery" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+//-- quick function to tell you the URL of the Media the Parcel is set for
+default {
+  touch_start( integer vIntNull ) { //-- named null because we're ignoring it
+    llSay( 0, "The Media URL is\n" + (string)llParcelMediaQuery( (list)PARCEL_MEDIA_COMMAND_URL ) );
+  }
+}
+```
+
+## Caveats
+
+- This script's object must be owned by the landowner or the function will silently fail.
+- If the script's object is over group owned land, then the object must be deeded to **that** group.
+
+## See Also
+
+- [llParcelMediaCommandList](../llparcelmediacommandlist/)
+
+<WikiAttribution />

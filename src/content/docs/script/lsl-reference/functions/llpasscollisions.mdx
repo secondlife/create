@@ -1,0 +1,45 @@
+---
+title: llPassCollisions
+description: >-
+  Configures how collision events are passed to scripts in the linkset.
+
+  If Pass == TRUE, collisions involving collision-handling scripted child prims
+  are also passed on to the root prim. If Pass == FALSE (default behavior), such
+  collisions will only trigger events in the affected child prim.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llPassCollisions" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    collision_start(integer num_detected) {
+        // Enable collision pass-through for child prims
+        llPassCollisions(TRUE);
+        llSay(0, "Collision pass-through enabled");
+    }
+}
+```
+
+## Notes
+
+- By default (`Pass` = FALSE), collisions are only reported in the script of the prim that actually collided
+- When `Pass` is set to TRUE, collisions involving child prims with collision handlers will also be passed to the root prim's scripts
+- Useful in linked object scenarios where you want the root prim to be aware of collisions happening to any part of the linkset
+- This function affects how collision events (`collision_start`, `collision`, `collision_end`) are propagated through the linkset
+
+## See Also
+
+- [llPassTouches](/script/reference/lsl/functions/llpasstouches/) - Pass touch events to parent prim
+- [llCollisionFilter](/script/reference/lsl/functions/llcollisionfilter/) - Filter which objects trigger collision events
+- [llCollisionSound](/script/reference/lsl/functions/llcollisionsound/) - Control collision sounds
+- [llCollisionSprite](/script/reference/lsl/functions/llcollisionsprite/) - Control collision sprites
+- [llVolumeDetect](/script/reference/lsl/functions/llvolumedetect/) - Make prim volume-detect
+
+<WikiAttribution />

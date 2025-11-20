@@ -1,0 +1,61 @@
+---
+title: llGetMass
+description: >-
+  Returns the mass of object that the script is attached to.
+
+  Returns the scripted object's mass. When called from a script in a link-set,
+  the parent will return the sum of the link-set weights, while a child will
+  return just its own mass. When called from a script inside an attachment, this
+  function will return the mass of the avatar it's attached to, not its own.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetMass" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+//A way of making a constant force that returns the same speed visually whatever the object is
+default
+{
+    touch_start()
+    {
+        llApplyImpulse(<0.0, 0.0, 5.0> * llGetMass(), FALSE);
+        // This fires the object up at the same m/s whatever the size (or difference!)
+    }
+}
+```
+
+## Caveats
+
+- The mass reported by this function is in **lindograms**, which function the same as kilograms within the bounds of Second Life, but not elsewhere.
+- Attachments do not affect an avatar's mass, only certain Appearance settings.
+- Avatar mass is reported to either be unexpectedly low (when measured using `llGetMass`) or unexpectedly high (when measured using `llGetMassMKS`). This is likely due to the weight being calculated based on a fixed value, with a modifier for height. The fixed value being used is incorrect, likely due to an incorrect density value being used.
+
+## Understanding Lindograms
+
+"Lindograms" is the name of the primary unit of mass used in Second Life.
+
+While Second Life primarily makes use of the SI system of units, mass seems to be an exception.
+
+Some speculate that lindograms were intended to be *kilograms*, but a mistake was made when factoring object density, causing the mass value returned to be 100 times less than the actual kilogram value. As a result, some new functions were implemented (such as `llGetMassMKS`) which report the correct kilogram weight of an object.
+
+Functionally speaking, lindograms can be used in the same way kilograms are used, however only within the bounds of Second Life. Trying to export mass values from Second Life will often run into issues, caused by the use of lindograms as a base unit of measurement.
+
+From a technical point-of-view, a lindogram is equivalent to a metric quintal, however it is not treated as such.
+
+## See Also
+
+- [llGetObjectMass](../llgetobjectmass/)
+- [llGetForce](../llgetforce/)
+- [llGetOmega](../llgetomega/)
+- [llGetVel](../llgetvel/)
+- [llGetTorque](../llgettorque/)
+- [llGetAccel](../llgetaccel/)
+- [llGetMassMKS](../llgetmassmks/)
+
+<WikiAttribution />

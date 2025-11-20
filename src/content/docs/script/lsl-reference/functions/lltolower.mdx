@@ -1,0 +1,30 @@
+---
+title: llToLower
+description: Returns a string that is Text with all lower-case characters.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llToLower" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+string msg = "I like CANDY!";
+string p = llToLower(msg);
+llOwnerSay(p); // Will say "i like candy!"
+```
+
+## Caveats
+
+- There is no Linden Library `llToProperCase` function that would return correctly capitalized strings. However, user functions exist that provide this functionality, such as [ToNormal](https://wiki.secondlife.com/wiki/User:Fred_Gandt/Scripts/Functions#ToNormal).
+- The function works for many characters outside the 7-bit ASCII range, especially Latin, Cyrillic, and Greek characters, but not all characters tagged as "uppercase" in the Unicode specification are converted.
+
+## See Also
+
+- [llToUpper](../llToUpper/) - Converts text to uppercase
+
+<WikiAttribution />

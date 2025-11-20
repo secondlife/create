@@ -1,0 +1,50 @@
+---
+title: llBreakAllLinks
+description: >-
+  De-links all prims in the link set (requires permission
+  PERMISSION_CHANGE_LINKS be set).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llBreakAllLinks" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+//-- requests permission to change links, then breaks all links on touch.
+default {
+  state_entry() {
+    llRequestPermissions(llGetOwner(), PERMISSION_CHANGE_LINKS);
+  }
+
+  run_time_permissions(integer vBitPermissions) {
+    if (PERMISSION_CHANGE_LINKS & vBitPermissions) {
+      state sMain;
+    } else {
+      llResetScript();
+    }
+  }
+}
+
+state sMain {
+  touch_start(integer vIntTouched) {
+    llBreakAllLinks();
+  }
+}
+```
+
+## Caveats
+
+- This function fails if the owner does not have edit permissions on the object containing the script. When this occurs, the owner receives the system message: "Delink failed because you do not have edit permission"
+
+## See Also
+
+- [llBreakLink](../llbreaklink/)
+- [llCreateLink](../llcreatelink/)
+- changed event with CHANGED_LINK parameter
+
+<WikiAttribution />

@@ -1,0 +1,72 @@
+---
+title: llList2List
+description: >-
+  Returns a subset of entries from ListVariable, in a range specified by the
+  Start and End indicies (inclusive).
+
+  Using negative numbers for Start and/or End causes the index to count
+  backwards from the length of the string, so 0, -1 would capture the entire
+  string.
+
+  If Start is greater than End, the sub string is the exclusion of the entries.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llList2List" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic List Slicing
+
+```lsl
+list numbers = [1, 2, 3, 4, 5];
+default
+{
+    state_entry()
+    {
+        integer index = llListFindList(numbers, [3]);
+        if (index != -1)
+        {
+            list three_four = llList2List(numbers, index, index + 1);
+            llOwnerSay(llDumpList2String(three_four, ","));
+            // Object: 3,4
+        }
+    }
+}
+```
+
+### Handling Out-of-Order Indices
+
+```lsl
+default
+{
+    state_entry()
+    {
+        //as shown below, there is no way to achieve a "wraparound" order of list elements [8,9,0,1]
+
+        list NUMBERS = [0,1,2,3,4,5,6,7,8,9];
+        list L2L;
+        L2L = llList2List(NUMBERS, 8, 1); // [0,1,8,9]
+        L2L = llList2List(NUMBERS, 8,-9); // [0,1,8,9]
+        L2L = llList2List(NUMBERS,-2,-9); // [0,1,8,9]
+        L2L = llList2List(NUMBERS,-2, 1); // [0,1,8,9]
+    }
+}
+```
+
+## Notes
+
+When Start is greater than End, the function returns the exclusion of the entries between them (instead of a wraparound). There is no built-in way to achieve a wraparound order of list elements using this function alone.
+
+## See Also
+
+- [llList2ListStrided](../lllist2liststrided/)
+- [llDeleteSubList](../lldeletesublist/)
+- [llListInsertList](../lllistinsertlist/)
+- [llListReplaceList](../lllistreplacelist/)
+
+<WikiAttribution />

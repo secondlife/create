@@ -1,0 +1,78 @@
+---
+title: llAdjustSoundVolume
+description: |-
+  Adjusts the volume (0.0 - 1.0) of the currently playing attached sound.
+  This function has no effect on sounds started with llTriggerSound.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAdjustSoundVolume" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- This function has no effect on sounds started with llTriggerSound or llCollisionSound
+
+## Examples
+
+### Example 1: Listen for volume commands
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llListen(42, "", llGetOwner(), "");
+    }
+
+    listen(integer chan, string name, key id, string msg)
+    {
+        float value = (float)msg;
+        llAdjustSoundVolume(value);
+        llOwnerSay("Volume set to: " + (string)value + " of 1.0");
+    }
+}
+```
+
+### Example 2: Adjust volume with timer delay
+
+```lsl
+default
+{
+    collision_start(integer p)
+    {
+        llPlaySound("5df2e97f-d3ab-9a80-7063-69007470a182", 1.0);
+        llAdjustSoundVolume(1.0);
+        llSetTimerEvent(0.2); //In 0.2 seconds, will reduce the volume of the currently playing audio.
+    }
+    timer(){
+        llAdjustSoundVolume(0.1);
+        llSetTimerEvent(0.0);
+    }
+}
+```
+
+## See Also
+
+- [llLinkPlaySound](../lllinkplaysound/)
+- [llLinkSetSoundQueueing](../lllinksetsoundqueueing/)
+- [llLinkSetSoundRadius](../lllinksetsoundradius/)
+- [llLinkStopSound](../lllinkstopsound/)
+- [llLoopSound](../llloopsound/)
+- [llLoopSoundMaster](../llloopsoundmaster/)
+- [llLoopSoundSlave](../llloopsoundslave/)
+- [llPlaySound](../llplaysound/)
+- [llPlaySoundSlave](../llplaysoundslave/)
+- [llPreloadSound](../llpreloadsound/)
+- [llSetSoundQueueing](../llsetsoundqueueing/)
+- [llSetSoundRadius](../llsetsoundradius/)
+- [llSound](../llsound/)
+- [llSoundPreload](../llsoundpreload/)
+- [llStopSound](../llstopsound/)
+- [llTriggerSound](../lltriggersound/)
+- [llTriggerSoundLimited](../lltriggersoundlimited/)
+
+<WikiAttribution />

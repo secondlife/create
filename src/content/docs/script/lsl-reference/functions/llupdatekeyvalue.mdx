@@ -1,0 +1,169 @@
+---
+title: llUpdateKeyValue
+description: |2-
+
+                     Starts an asychronous transaction to update the value associated with the key given. The dataserver callback will be executed with the key returned from this call and a string describing the result. The result is a two element commma-delimited list. The first item is an integer specifying if the transaction succeeded (1) or not (0). In the failure case, the second item will be an integer corresponding to one of the XP_ERROR_... constants. In the success case the second item will be the value associated with the key. If Checked is 1 the existing value in the data store must match the OriginalValue passed or XP_ERROR_RETRY_UPDATE will be returned. If Checked is 0 the key will be created if necessary.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llUpdateKeyValue" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Update with Checked Verification
+
+```lsl
+key trans;
+default
+{
+    state_entry()
+    {
+        trans = llUpdateKeyValue("FOO", "BLAH", TRUE, "BAR");
+    }
+
+    dataserver(key t, string value)
+    {
+        if (t == trans)
+        {
+            // our llUpdateKeyValue transaction is done
+            list result = llCSV2List(value);
+            if (llList2Integer(result, 0) == 1)
+            {
+                // the key-value pair was successfully updated
+                llSay(0, "New key-value pair was successfully updated");
+            }
+            else
+            {
+                integer error = llList2Integer(result, 1);
+                if(error == XP_ERROR_RETRY_UPDATE)
+                    llSay(0, "Key-value update failed, checked value is out of date");
+                else
+                    llSay(0, "Key-value update failed: " + llGetExperienceErrorMessage(error) );
+            }
+        }
+    }
+}
+```
+
+### Atomic Database Updates with Locking
+
+This example demonstrates how to avoid update conflicts when multiple scripts access the same key-value store. By using a virtual lock key (`$DB_Lock`), all writes become atomic:
+
+```lsl
+key tid;
+list tids;
+
+default {
+    state_entry() {
+        state lock_db;
+    }
+}
+
+state lock_db {
+    state_entry() {
+        tid = llUpdateKeyValue("$DB_Lock", "LOCK", TRUE, "unlock");
+    }
+    dataserver(key did, string value) {
+        if(did == tid) {
+            string payload = llDeleteSubString(value, 0, 1);
+            if(llGetSubString(value+",", 0, 1) == "1,"){
+                llUpdateKeyValue("$DB_LockedBy", llDumpList2String([llGetOwner(),llGetKey(),llGetLinkKey(!!llGetLinkNumber()),llGetRegionName(),llGetPos(),llGetAttached()],":"), FALSE, "");
+                state update_db;
+            } else {
+                integer err = (integer)payload;
+                if(err == XP_ERROR_RETRY_UPDATE) {
+                    llSay(0, "Database is already locked!");
+                } else {
+                    llSay(0, "Key-value update failed: " + llGetExperienceErrorMessage(err) );
+                }
+                state error;
+            }
+        }
+    }
+}
+
+state update_db {
+    state_entry() {
+        tids = [
+            llUpdateKeyValue("CatsPermissable", "5", FALSE, ""),
+            llUpdateKeyValue("MonkeyMutations", "3", FALSE, ""),
+            llUpdateKeyValue("CodFlavorSupport", "NEVER", FALSE, "")
+        ];
+    }
+    dataserver(key did, string value) {
+        integer i = llListFindList(tid, [did]);
+        if(~i) {
+            string payload = llDeleteSubString(value, 0, 1);
+            if(llGetSubString(value+",", 0, 1) == "1,"){
+                tids = llDeleteSubList(tids, i, i);
+                if(tids == []) {
+                    state unlock_db;
+                }
+            } else {
+                llSay(0, "Key-value update failed: " + llGetExperienceErrorMessage((integer)payload) );
+                state error;
+            }
+        }
+    }
+}
+
+state unlock_db {
+    state_entry() {
+        tid = llUpdateKeyValue("$DB_Lock", "unlock", TRUE, "LOCK");
+    }
+    dataserver(key did, string value) {
+        if(did == tid) {
+            string payload = llDeleteSubString(value, 0, 1);
+            if(llGetSubString(value+",", 0, 1) == "1,"){
+                state done;
+            } else {
+                integer err = (integer)payload;
+                if(err == XP_ERROR_RETRY_UPDATE) {
+                    llSay(0, "Someone has violated the database lock!");
+                } else {
+                    llSay(0, "Key-value update failed: " + llGetExperienceErrorMessage(err) );
+                }
+                state error;
+            }
+        }
+    }
+}
+
+state done {
+    state_entry(){;}
+}
+
+state error {
+    state_entry(){;}
+}
+```
+
+## Caveats
+
+- Keys should not contain commas, as `llKeysKeyValue` returns keys in CSV format and commas would interfere with parsing
+- Maximum key size: 1011 bytes (as of Jan 1, 2016)
+- Maximum value size: 4095 bytes (as of Jan 1, 2016)
+- These limits apply to both LSO and Mono scripts
+
+## Notes
+
+- When the `checked` parameter is `TRUE`, the update only succeeds if the `original_value` matches the current value in the key-value store. If the value doesn't match, a `dataserver` event will return `XP_ERROR_RETRY_UPDATE`
+- This checked-update mechanism enables atomicity for database operations
+- Unlike `llCreateKeyValue`, calling `llUpdateKeyValue` on a non-existent key will create that key automatically with the specified value
+- The dataserver callback returns a CSV string: `"success,result"` where success is 1 for success or 0 for failure, and result is either the updated value or an error code
+
+## See Also
+
+- [llCreateKeyValue](../llcreatekeyvalue/)
+- [llReadKeyValue](../llreadkeyvalue/)
+- [llDeleteKeyValue](../lldeletekeyvalue/)
+- [llDataSizeKeyValue](../lldatasizekeyvalue/)
+- [llKeyCountKeyValue](../llkeycountkeyvalue/)
+- [llKeysKeyValue](../llkeyskeyvalue/)
+- [llGetExperienceErrorMessage](../llgetexperienceerrormessage/)
+
+<WikiAttribution />

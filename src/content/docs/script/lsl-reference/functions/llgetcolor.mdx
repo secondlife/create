@@ -1,0 +1,51 @@
+---
+title: llGetColor
+description: >-
+  Returns the color on Face.
+
+  Returns the color of Face as a vector of red, green, and blue values between 0
+  and 1. If face is ALL_SIDES the color returned is the mean average of each
+  channel.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetColor" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Tells the owner the color on all sides
+default
+{
+    state_entry()
+    {
+        integer i = 0;
+        integer max = llGetNumberOfSides();
+        while(i < max)
+        {
+            llOwnerSay("Face " + (string) i + " color is " + (string) llGetColor(i));
+            ++i;
+        }
+    }
+}
+```
+
+## Notes
+
+- When face is `ALL_SIDES`, the returned color is the average of each channel across all faces. Since sRGB is nonlinear, this color may not be particularly meaningful in certain contexts.
+- Returns color as a vector with x, y, z components corresponding to red, green, and blue values between 0.0 and 1.0.
+
+## See Also
+
+- [llGetAlpha](../llgetalpha/)
+- [llSetAlpha](../llsetalpha/)
+- [llSetColor](../llsetcolor/)
+- [llSetLinkColor](../llsetlinkcolor/)
+- [llSetLinkAlpha](../llsetlinkalpha/)
+- [llGetNumberOfSides](../llgetnumberofsides/)
+
+<WikiAttribution />

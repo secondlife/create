@@ -1,0 +1,137 @@
+---
+title: llAddToLandBanList
+description: >-
+  Add avatar ID to the parcel ban list for the specified number of Hours.
+
+  A value of 0 for Hours will add the agent indefinitely.
+
+  The smallest value that Hours will accept is 0.01; anything smaller will be
+  seen as 0.
+
+  When values that small are used, it seems the function bans in approximately
+  30 second increments (Probably 36 second increments, as 0.01 of an hour is 36
+  seconds).
+
+  Residents teleporting to a parcel where they are banned will be redirected to
+  a neighbouring parcel.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAddToLandBanList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+- Must be owned by the land owner.
+- When values below 1 are used, it seems the function bans in approximately 30 second increments. (Probably 36 second increments, as 0.01 of an hour is 36 seconds)
+
+## Notes
+
+A value of 0 for `hours` will add the agent indefinitely. The smallest value that `hours` will accept is 0.01; anything smaller will be seen as 0.
+
+Residents teleporting to a parcel where they are banned will be redirected to a neighboring parcel.
+
+## Examples
+
+```lsl
+// This is not a complete solution, requires full avatar names to work - even for unbanning someone!
+// This is meant only as an example of the land ban and pass management functions.
+// free to copy, use, modify, distribute - just don't ask me to debug your modified code. ;-)
+//
+// Commands are:
+//   /5 ban:full_avatar_name
+//   /5 tempban:full_avatar_name
+//   /5 unban:full_avatar_name
+//   /5 pass:full_avatar_name
+//   /5 unpass:full_avatar_name
+//   /5 clearban
+//   /5 clearpass
+
+string command;
+
+default
+{
+    state_entry()
+    {
+        llListen(5, "", llGetOwner(), "");
+    }
+
+    on_rez(integer param)
+    {
+        llResetScript();
+    }
+
+    listen(integer chan, string name, key id, string message)
+    {
+        if (command != "")
+        {
+            llOwnerSay("Sorry, still processing last command, try again in a second.");
+        }
+
+        list args = llParseString2List(message,[":"],[]);
+        command = llToLower(llList2String(args,0));
+
+        if (command == "clearbans")
+        {
+            llResetLandBanList();
+        }
+        if (command == "clearpass")
+        {
+            llResetLandPassList();
+        }
+        else
+        {
+            llSensor(llList2String(args,1),NULL_KEY,AGENT,96,PI);
+        }
+    }
+
+    no_sensor()
+    {
+        command = "";
+    }
+
+    sensor(integer num)
+    {
+        integer i = 0;
+        for (; i < num; ++i)
+        {
+            if (command == "ban")
+            {
+                // Ban indefinetely
+                llAddToLandBanList(llDetectedKey(i),0.0);
+            }
+            if (command == "tempban")
+            {
+                // Ban for 1 hour.
+                llAddToLandBanList(llDetectedKey(i),1.0);
+            }
+            if (command == "unban")
+            {
+                llRemoveFromLandBanList(llDetectedKey(i));
+            }
+            if (command == "pass")
+            {
+                // Add to land pass list for 1 hour
+                llAddToLandPassList(llDetectedKey(i),1.0);
+            }
+            if (command == "unpass")
+            {
+                llRemoveFromLandPassList(llDetectedKey(i));
+            }
+        }
+        command = "";
+    }
+}
+```
+
+## See Also
+
+- [llAddToLandPassList](../lladdtolandpasslist/)
+- [llRemoveFromLandBanList](../llremovefromlandbanlist/)
+- [llRemoveFromLandPassList](../llremovefromlandpasslist/)
+- [llResetLandBanList](../llresetlandbanlist/)
+- [llResetLandPassList](../llresetlandpasslist/)
+
+<WikiAttribution />

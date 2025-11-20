@@ -1,0 +1,45 @@
+---
+title: llGetStatus
+description: >-
+  Returns boolean value of the specified status (e.g. STATUS_PHANTOM) of the
+  object the script is attached to.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetStatus" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        if (llGetStatus(STATUS_PHYSICS))
+        {
+            llSay(0, "This object is physical");
+        }
+        else
+        {
+            llSay(0, "This object is not physical");
+        }
+    }
+}
+```
+
+## Caveats
+
+- Status is an object attribute; all prims in an object share the same status.
+- STATUS_BLOCK_GRAB only really deals with the root prim. Try STATUS_BLOCK_GRAB_OBJECT instead.
+- Querying for STATUS_CAST_SHADOWS always returns FALSE regardless of the setting.
+- Only one flag should be specified at a time. As of Second Life Server 2022-09-09.574921, if more than one flag is specified, STATUS_DIE_AT_NO_ENTRY takes priority, followed by STATUS_BLOCK_GRAB_OBJECT, STATUS_DIE_AT_EDGE, STATUS_RETURN_AT_EDGE, STATUS_BLOCK_GRAB, STATUS_SANDBOX, STATUS_ROTATE_Z, STATUS_ROTATE_Y, STATUS_ROTATE_X, STATUS_PHANTOM, and STATUS_PHYSICS.
+
+## See Also
+
+- [llSetStatus] - Sets the object status.
+
+<WikiAttribution />

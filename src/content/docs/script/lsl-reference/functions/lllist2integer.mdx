@@ -1,0 +1,53 @@
+---
+title: llList2Integer
+description: >-
+  Copies the integer at Index in the list.
+
+  Returns the value at Index in the specified list. If Index describes a
+  location not in the list, or the value cannot be type-cast to an integer, then
+  zero is returned.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llList2Integer" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- A string of hexadecimal notation (e.g. "0x12A") will be cast as a decimal integer.
+
+## Examples
+
+```lsl
+// Best viewed in Chat History (ctrl-h)
+default
+{
+    state_entry()
+    {
+        list my_list = ["a", 1, 2.0, <1,2,3>, <1,2,3,4>, llGetOwner()];
+        integer i = ~llGetListLength(my_list);
+        while (++i)
+        {
+            llOwnerSay("string=" + llList2String(my_list,i)
+                        + "\n   integer=" + (string)llList2Integer(my_list,i)
+                        + "\n   float=" + (string)llList2Float(my_list,i)
+                        + "\n   vector=" + (string)llList2Vector(my_list,i)
+                        + "\n   rot=" + (string)llList2Rot(my_list,i)
+                        + "\n   key=" + (string)llList2Key(my_list,i) );
+        }
+    }
+}
+```
+
+This example demonstrates iterating through a mixed-type list and converting each element to different types using the `llList2*` family of functions.
+
+## See Also
+
+- [llGetListEntryType](../llgetlistentrytype/)
+- [llList2Float](../lllist2float/)
+- [llList2String](../lllist2string/)
+
+<WikiAttribution />

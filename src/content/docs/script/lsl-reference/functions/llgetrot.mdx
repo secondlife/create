@@ -1,0 +1,52 @@
+---
+title: llGetRot
+description: |-
+  Returns the rotation relative to the region's axes.
+  Returns the rotation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetRot" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- `llGetRot` incorrectly reports the avatar's rotation when called from the root of an attached object. Use `llGetLocalRot` for root prims instead.
+- `llGetRot` will return an accurate facing for avatars seated or in mouselook, but only a rough direction otherwise when called from an attached prim.
+- When called in an attachment's child prim, the reported rotation will only be visually correct if the object's root is attached to `ATTACH_AVATAR_CENTER` at `ZERO_ROTATION`. Moving the attachment's root or changing the attachment point will not affect the reported rotation. Avatar animation is invisible to the simulator, so it also does not affect the reported rotation.
+
+## Examples
+
+```lsl
+// Rotates an object to face the nearest cardinal direction (N,E,S,W)
+// Assumes build is aligned to root object facing
+
+default {
+  state_entry() {
+    llSay(0, "Rotate me in edit, then touch to make me face the nearest compass point");
+  }
+
+  touch_start(integer vIntTouches) {
+    // Convert our rotation to x/y/z radians
+    vector vRadBase = llRot2Euler(llGetRot());
+    // Round the z-axis to the nearest 90deg (PI_BY_TWO = 90deg in radians)
+    llSetRot(llEuler2Rot(<0.0, 0.0, llRound(vRadBase.z / PI_BY_TWO) * PI_BY_TWO>));
+  }
+}
+```
+
+## See Also
+
+- [llGetLocalRot](../llgetlocalrot/)
+- [llGetRootRotation](../llgetrootrotation/)
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+- [llSetRot](../llsetrot/)
+- [llSetLocalRot](../llsetlocalrot/)
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- [llSetLinkPrimitiveParamsFast](../llsetlinkprimitiveparamsfast/)
+
+<WikiAttribution />

@@ -1,0 +1,62 @@
+---
+title: llGetCenterOfMass
+description: >-
+  Returns the prim's centre of mass (unless called from the root prim, where it
+  returns the object's centre of mass).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetCenterOfMass" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The Center of Mass for a prim is only computed when an object is physical. When a value is computed, it is cached as a prim attribute. If the object is non-physical and there is a cached value, that value is returned; otherwise `llGetPos()` is returned (this value is not cached).
+
+When called from a child prim, the child's center of mass is returned instead (but still in region coordinates).
+
+## Caveats
+
+- **Works in physical objects only**
+  - The value is stored as a prim property and will only change when Center of Mass is computed
+  - If called from within a non-physical object, it will return the stored Center of Mass value or, in the absence of a stored COM value, it will return `llGetPos()`
+  - It will not compute or recompute the COM if the object is non-physical
+  - The stored value can only be updated when the object is physical. Neither moving nor changing the object's shape will update, invalidate, or remove the stored COM value when it is non-physical
+
+## Examples
+
+```lsl
+// This example script will not check for physical status
+// you'll usually need it though to get a correct vector
+
+default
+{
+    state_entry()
+    {
+        vector massCenter = llGetCenterOfMass();
+        integer link = llGetLinkNumber();
+
+        if (link == 0 || link == 1)
+            llSay(PUBLIC_CHANNEL,
+                "The center of the mass of the object is " + (string)massCenter);
+
+        else if (1 < link)
+            llSay(PUBLIC_CHANNEL,
+                "The center of the mass of link no. " + (string)link + " is " + (string)massCenter);
+
+        // This script was just a test, remove it again
+        string thisScript = llGetScriptName();
+        llRemoveInventory(thisScript);
+    }
+}
+```
+
+## See Also
+
+- [llGetPos](../llgetpos/)
+- [llGetGeometricCenter](../llgetgeometriccenter/)
+
+<WikiAttribution />

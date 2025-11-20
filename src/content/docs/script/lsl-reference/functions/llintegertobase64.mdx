@@ -1,0 +1,55 @@
+---
+title: llIntegerToBase64
+description: |-
+  Returns a string that is a Base64 big endian encode of Value.
+  Encodes the Value as an 8-character Base64 string.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llIntegerToBase64" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Converting ASCII Character to Base64
+
+```lsl
+string ASCII7ToString(integer letter)
+{
+    if(letter >= 0x80 || letter < 0) return "";//Not valid ascii7 character
+    return llBase64ToString(llIntegerToBase64(letter << 24));
+}
+```
+
+### Packing and Unpacking 24-bit Values
+
+```lsl
+// Packs a 24-bit unsigned integer value (0-16777215) to only 4 Base64 characters.
+string Int24ToBase64(integer value)
+{
+    return llGetSubString(llIntegerToBase64(value<<8), 0, 3);
+}
+
+// unpacks a 4-character Base64 value to a 24-bit unsigned integer
+integer Base64ToInt24(string value)
+{
+    return (llBase64ToInteger(value)>>8)&0xffffff; // Masking required to remove sign extension from bit-shifting
+}
+```
+
+## Notes
+
+- Only the first 6 of the 8 characters returned are needed to decode it back into an integer. The padding `==` can be safely removed for storage.
+- "Big-endian" refers to the fact that the most significant (highest byte) of the integer is processed first: the first characters in the returned Base64 string correspond to this byte, and the last characters correspond to the least significant byte.
+- Combined with bit-shifting, removing characters from the Base64 string allows more efficient packing of small values. For specifics, see the caveats section in `llBase64ToInteger`.
+
+## See Also
+
+- [llBase64ToInteger](/script/reference/lsl/functions/llbase64tointeger)
+- [llBase64ToString](/script/reference/lsl/functions/llbase64tostring)
+- [llStringToBase64](/script/reference/lsl/functions/llstringtobase64)
+
+<WikiAttribution />

@@ -1,0 +1,61 @@
+---
+title: llSetCameraAtOffset
+description: >-
+  Sets the camera used in this object, at offset, if an avatar sits on it.
+
+  Sets the offset that an avatar's camera will be moved to if the avatar sits on
+  the object.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetCameraAtOffset" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Set the seated avatar looking at an arbitrary direction
+// Look over the avatar's shoulders from behind once it sits down
+
+back_view(float degrees)
+{
+    rotation sitRot = llAxisAngle2Rot(<0, 0, 1>, degrees * DEG_TO_RAD);
+
+    llSitTarget(<0, 0, 0.1>, sitRot);
+
+    llSetCameraEyeOffset(<-2, 0, 1> * sitRot);
+    llSetCameraAtOffset(<2, 0, 1> * sitRot);
+}
+
+default
+{
+    state_entry()
+    {
+        back_view( 208 );
+        llSay(0, "Please sit down");
+    }
+}
+```
+
+## Caveats
+
+- Setting this will not update the cameras of seated avatars, it will only effect avatars that subsequently sit down. The camera settings have to be prepared in advance.
+- The `offset` is locally relative to the object. If you want it relative to the seated avatar (which likely has a custom sit rotation and offset) or the region, you must do the computation yourself.
+- `ZERO_VECTOR` offset will cancel any offset.
+- Camera focus set by this function is a **Prim Property**. It will survive the script and it will survive prim taking and prim rezzing.
+
+## Notes
+
+This is the point the camera looks at, not the position of the camera's eye (see `llSetCameraEyeOffset` for that).
+
+## See Also
+
+- [llSetLinkCamera](../llsetlinkcamera/)
+- [llSetCameraEyeOffset](../llsetcameraeyeoffset/)
+- [llForceMouselook](../llforcemouselook/)
+- [llSetCameraParams](../llsetcameraparams/)
+
+<WikiAttribution />

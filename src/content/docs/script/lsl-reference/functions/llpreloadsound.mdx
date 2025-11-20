@@ -1,0 +1,50 @@
+---
+title: llPreloadSound
+description: |-
+  Causes nearby viewers to preload the Sound from the object's inventory.
+  This is intended to prevent delays in starting new sounds when called upon.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llPreloadSound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This example demonstrates preloading a sound when the object is rezzed, then playing it when touched:
+
+```lsl
+string sound = "name or uuid"; // sound in inventory or UUID of a sound
+
+default
+{
+    on_rez(integer start_param)
+    {
+        llSetText("Preloading....", <1, 0, 0>, 1);
+        llPreloadSound(sound);
+        llSetText("Touch To Play", <1, 1, 1>, 1);
+    }
+
+    touch_start(integer num_detected)
+    {
+        llPlaySound(sound, 1.0);
+    }
+}
+```
+
+This pattern is useful for ensuring sounds are loaded on nearby viewers before they're needed, reducing startup delays when `llPlaySound` is called.
+
+## Notes
+
+This function is intended to prevent delays in starting new sounds. The preloading affects viewers within range of the object.
+
+## See Also
+
+- [llPlaySound](../llplaysound/)
+- [llLoopSound](../llloopsound/)
+- [llStopSound](../llstopsound/)
+
+<WikiAttribution />

@@ -1,0 +1,41 @@
+---
+title: llSound
+description: >-
+  Deprecated: Use llPlaySound instead.
+
+  Plays Sound at Volume and specifies whether the sound should loop and/or be
+  enqueued.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSound("sound", 1.0, TRUE, FALSE);
+        //Plays the sound once.
+    }
+}
+```
+
+## Notes
+
+- **Deprecated**: This function is deprecated. Use `llPlaySound` instead.
+- The `queue` parameter controls whether the sound is queued (TRUE) or interrupts the currently playing sound (FALSE).
+- The `loop` parameter controls whether the sound plays once (FALSE) or loops continuously (TRUE).
+- The volume ranges from 0.0 to 1.0, where 1.0 is full volume.
+
+## See Also
+
+- [llPlaySound](../llplaysound/)
+
+<WikiAttribution />

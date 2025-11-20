@@ -1,0 +1,53 @@
+---
+title: llCollisionSound
+description: >-
+  Suppress default collision sounds, replace default impact sounds with
+  ImpactSound.
+
+  The ImpactSound must be in the object inventory.
+
+  Supply an empty string to suppress collision sounds.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCollisionSound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Play Sound When Collision Occurs With Other Object Or An AGENT
+// Creator: TonyH Wrangler
+
+string sound = "ed124764-705d-d497-167a-182cd9fa2e6c"; // uuid or name of item in inventory
+
+default
+{
+    state_entry()
+    {
+        llCollisionSound(sound, 1.0);
+    }
+}
+```
+
+## Caveats
+
+- If this function is used to suppress collision sounds, NO sound will be generated even if the suppressed object collides with an unsuppressed object (there will be no sound from the unsuppressed object either).
+
+## Notes
+
+- If `impact_sound` is an empty string, the collision sound is suppressed.
+- If `impact_volume` is set to zero, the collision particles are suppressed.
+
+## See Also
+
+- [llCollisionFilter](../llcollisionfilter/)
+- [llCollisionSprite](../llcollisionsprite/)
+- collision_start
+- collision
+- collision_end
+
+<WikiAttribution />

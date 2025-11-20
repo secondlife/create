@@ -1,0 +1,68 @@
+---
+title: llGetRegionTimeDilation
+description: >-
+  Returns the current time dilation as a float between 0.0 (full dilation) and
+  1.0 (no dilation).
+
+  Returns the current time dilation as a float between 0.0 and 1.0.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetRegionTimeDilation" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Time dilation is a method the server uses to cope with simulator lag. Physics and script generated lag can result in time dilation. Time dilation slows script time and execution. When time dilation is zero, script execution halts.
+
+Time dilation is used as the ratio between the change of script time to that of real world time.
+
+### Affects
+
+- Intervals of sensor events queued as a result of `llSensorRepeat`
+
+## Examples
+
+```lsl
+// The beginnings of a region-info script.
+string region;
+string sim;
+
+default
+{
+    state_entry()
+    {
+        llSetTimerEvent(1.0);
+    }
+    timer()
+    {
+        string here = llGetRegionName();
+        if(region != here)
+        {
+            sim = llGetSimulatorHostname();
+            region = here;
+        }
+        llSetText(
+                "   REGION NAME : " + region +
+              "\n  SIM HOSTNAME : " + sim +
+              "\n TIME DILATION : " + (string)llGetRegionTimeDilation() +
+              "\n    REGION FPS : " + (string)llGetRegionFPS(),
+            <0,1,0>, 1.0);
+    }
+}
+```
+
+## Caveats
+
+- Region idling lowers a region's framerate when no avatars are currently on or looking into the region. Scripts measuring time dilation with `llGetRegionTimeDilation` may report significant time dilation if the region is idle.
+
+## See Also
+
+- [llGetRegionFPS](../llgetregionfps/)
+- [llGetTime](../llgettime/)
+- [llGetAndResetTime](../llgetandresettime/)
+
+<WikiAttribution />

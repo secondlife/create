@@ -1,0 +1,69 @@
+---
+title: llMakeSmoke
+description: >-
+  Make smoke like particles. Deprecated: Use llParticleSystem instead.
+
+  Make smoky particles using texture from the objects inventory. Deprecated: Use
+  llParticleSystem instead.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llMakeSmoke" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Beginning in version 1.14, the simulator uses `llParticleSystem` to emulate legacy `llMakeSmoke` particles.
+
+## Implementation Using llParticleSystem
+
+Since `llMakeSmoke` is deprecated, you can replicate its behavior using `llParticleSystem`. Here is an implementation reference:
+
+```lsl
+fakeMakeSmoke(integer particle_count, float particle_scale, float particle_speed,
+             float particle_lifetime, float source_cone, string source_texture_id,
+             vector local_offset)
+{
+    // Note: local_offset is ignored in this implementation
+    llParticleSystem([
+        PSYS_PART_FLAGS,            PSYS_PART_INTERP_COLOR_MASK | PSYS_PART_INTERP_SCALE_MASK | PSYS_PART_EMISSIVE_MASK | PSYS_PART_WIND_MASK,
+        PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_ANGLE_CONE,
+        PSYS_PART_START_COLOR,      <1.0, 1.0, 1.0>,
+        PSYS_PART_END_COLOR,        <1.0, 1.0, 1.0>,
+        PSYS_PART_START_ALPHA,      1.00,
+        PSYS_PART_END_ALPHA,        0.05,
+        PSYS_PART_START_SCALE,      <particle_scale, particle_scale, 0.0>,
+        PSYS_PART_END_SCALE,        <10, 10, 0.0>,
+        PSYS_PART_MAX_AGE,          3.0,
+        PSYS_SRC_ACCEL,             <0.0, 0.0, 0.0>,
+        PSYS_SRC_TEXTURE,           source_texture_id,
+        PSYS_SRC_BURST_RATE,        10.0 / particle_count,
+        PSYS_SRC_ANGLE_BEGIN,       0.0,
+        PSYS_SRC_ANGLE_END,         source_cone * PI,
+        PSYS_SRC_BURST_PART_COUNT,  1,
+        PSYS_SRC_BURST_RADIUS,      0.0,
+        PSYS_SRC_BURST_SPEED_MIN,   particle_speed,
+        PSYS_SRC_BURST_SPEED_MAX,   particle_speed,
+        PSYS_SRC_MAX_AGE,           particle_lifetime / 2,
+        PSYS_SRC_OMEGA,             <0.0, 0.0, 0.0>
+    ]);
+}
+```
+
+## Known Discrepancies
+
+When migrating to `llParticleSystem`, be aware of these differences from the original `llMakeSmoke`:
+
+1. The original `llMakeSmoke` has random particle lifetime, which cannot be created in the current particle system via a single call
+2. The original `llMakeSmoke` has continual particle growth throughout its lifetime, ending well past the 4m limit of the current system for long-lived particles
+3. Several values are not taken verbatim in the original particle system (velocity is not m/sec, for instance, and particle count can be wildly off); these are approximated in this implementation via basic divisors
+4. There is no way to duplicate the offset from the old function within the new particle system
+
+## See Also
+
+- [llParticleSystem](../llparticlesystem/)
+
+<WikiAttribution />

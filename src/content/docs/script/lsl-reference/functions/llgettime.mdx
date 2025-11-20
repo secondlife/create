@@ -1,0 +1,113 @@
+---
+title: llGetTime
+description: >-
+  Returns the time in seconds since the last region reset, script reset, or call
+  to either llResetTime or llGetAndResetTime.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetTime" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Script time is the amount of real-world time that the script has been in a running state. It is unaffected by time dilation, but it does not count time while the script is suspended, the user is offline (when in an attachment), the object is in inventory rather than rezzed, etc.
+
+Script time resets when:
+- Script reset (user, `llResetScript()`, or `llResetOtherScript()`)
+- Call to either `llResetTime()` or `llGetAndResetTime()`
+
+### Floating Point Precision
+
+Due to 32-bit floating point number limitations, the accuracy of this function decreases as the script runtime increases. The precision doubles approximately every 3 days of script runtime:
+
+- **0.016 seconds (2^-6)**: accurate up to ~3 days
+- **0.031 seconds (2^-5)**: accurate up to ~6 days
+- **0.063 seconds (2^-4)**: accurate up to ~12 days
+- **0.125 seconds (2^-3)**: accurate up to ~24 days
+- **0.250 seconds (2^-2)**: accurate up to ~48 days
+- **0.500 seconds (2^-1)**: accurate up to ~97 days
+- **1.000 seconds (2^0)**: accurate up to ~194 days
+
+Use `llResetTime()` or `llGetAndResetTime()` whenever practical to maintain the accuracy you require.
+
+## Examples
+
+### Measuring Elapsed Time Between Events
+
+```lsl
+default {
+    state_entry()
+    {
+        llResetTime();
+    }
+    touch_start(integer num_touch)
+    {
+        float time = llGetTime();
+        llResetTime();
+        llSay(0, (string)time + " seconds have elapsed since the last touch.");
+    }
+}
+```
+
+Note: You could also use `llGetAndResetTime()` to accomplish the same thing with a single function call.
+
+### Detecting Single vs Double Clicks
+
+```lsl
+float gHoldTime;
+
+default
+{
+    touch_start(integer total_number)
+    {
+        float now = llGetTime();
+        if (now - gHoldTime < 0.3)
+        {
+            llSay(PUBLIC_CHANNEL, "Double clicked");
+            // Trigger one sequence of actions
+        }
+        else
+        {
+            llSetTimerEvent(0.32);
+        }
+        gHoldTime = now;
+    }
+
+    timer()
+    {
+        llSetTimerEvent(0.0);
+        if (llGetTime() - gHoldTime > 0.3)
+        {
+            llSay(PUBLIC_CHANNEL, "Single clicked.");
+            // Trigger a different sequence of actions
+        }
+    }
+}
+```
+
+### Time-Dependent Movement
+
+```lsl
+// Move 2 meters within 5.0 seconds
+float time = 5.0;
+float i;
+llResetTime();
+do
+{
+    i = llGetTime() / time;
+    // move 2 meters * i
+}
+while (llGetTime() < time);
+```
+
+## See Also
+
+- [`llResetTime()`](../llresettime/) - Reset the script time counter
+- [`llGetAndResetTime()`](../llgetandresettime/) - Get the time and reset in one call
+- [`llGetRegionTimeDilation()`](../llgetregiontimedilation/) - Get the region's time dilation factor
+
+<WikiAttribution />

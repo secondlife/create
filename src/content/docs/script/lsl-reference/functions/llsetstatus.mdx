@@ -1,0 +1,42 @@
+---
+title: llSetStatus
+description: >-
+  Sets object status specified in Status bitmask (e.g.
+  STATUS_PHYSICS|STATUS_PHANTOM) to boolean Value.
+
+  For a full list of STATUS_* constants, see wiki documentation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetStatus" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetStatus( STATUS_DIE_AT_EDGE | STATUS_PHYSICS, TRUE);
+        llSetStatus( STATUS_ROTATE_X | STATUS_ROTATE_Y, FALSE);
+    }
+}
+```
+
+## Caveats
+
+- Status is an object attribute; all prims in an object share the same status.
+- Except for STATUS_BLOCK_GRAB, this only affects the prim the script is in. Child prims in linked objects will not be affected.
+  - Use STATUS_BLOCK_GRAB_OBJECT to block grabbing of a link_set.
+- Setting STATUS_PHYSICS fails silently in attached objects.
+- The STATUS_ROTATE_X, STATUS_ROTATE_Y and STATUS_ROTATE_Z flags all require that the object first be made physical to have any effect.
+
+## See Also
+
+- [llGetStatus](../llgetstatus/)
+
+<WikiAttribution />

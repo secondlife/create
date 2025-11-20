@@ -1,0 +1,46 @@
+---
+title: llSetSoundRadius
+description: >-
+  Limits radius for audibility of scripted sounds (both attached and triggered)
+  to distance Radius.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetSoundRadius" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Enable sound cutoff at 4 meters:
+
+```lsl
+llSetSoundRadius(4);
+```
+
+Disable sound cutoff:
+
+```lsl
+llSetSoundRadius(0);
+```
+
+## Caveats
+
+- This function is a prim property and will survive script resets.
+- Has no effect on `llTriggerSound` or `llLinkPlaySound` in triggered mode. Sounds will play regardless of camera position.
+  - `llTriggerSoundLimited` can be used instead for a similar effect, but the function depends on **avatar** position, not camera position.
+- When used with `llPlaySound` or `llLinkPlaySound` in non-looped mode, the sound will be played from the beginning only once when the observer's camera enters the radius for the first time. This can happen significantly later than when the one-off sound was actually played.
+- With `llLoopSound` or `llLinkPlaySound` in looped mode, the sound will be played from the beginning every time the observer's camera enters the radius.
+
+## Notes
+
+- Volume fading is still determined by the distance from camera, not the radius.
+- Pass 0 to this function to disable it.
+
+## See Also
+
+- [llTriggerSoundLimited](../lltriggersoundlimited/)
+
+<WikiAttribution />

@@ -1,0 +1,64 @@
+---
+title: llReadKeyValue
+description: |2-
+
+                     Starts an asychronous transaction to retrieve the value associated with the key given. Will fail with XP_ERROR_KEY_NOT_FOUND if the key does not exist. The dataserver callback will be executed with the key returned from this call and a string describing the result. The result is a two element commma-delimited list. The first item is an integer specifying if the transaction succeeded (1) or not (0). In the failure case, the second item will be an integer corresponding to one of the XP_ERROR_... constants. In the success case the second item will be the value associated with the key.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llReadKeyValue" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+key trans;
+default
+{
+    state_entry()
+    {
+        trans = llReadKeyValue("FOO");
+    }
+    dataserver(key t, string value)
+    {
+        if (t == trans)
+        {
+            // our llReadKeyValue transaction is done
+            if (llGetSubString(value, 0, 0) == "1")
+            {
+                // the key-value pair was successfully read
+                llSay(0, "New key-value pair value: " + llGetSubString(value, 2, -1));
+            }
+            else
+            {
+                // the key-value pair failed to read
+                integer error =  (integer)llGetSubString(value, 2, -1);
+                llSay(0, "Key-value failed to read: " + llGetExperienceErrorMessage(error));
+            }
+        }
+    }
+}
+```
+
+## Notes
+
+- If the key does not exist, the dataserver event will return a failure with the error `XP_ERROR_KEY_NOT_FOUND`.
+- The result from the dataserver callback is a comma-delimited string with two elements:
+  - First element: an integer (1 for success, 0 for failure)
+  - Second element: on success, the value associated with the key; on failure, an XP_ERROR_* error code
+- Use `llGetExperienceErrorMessage()` to convert error codes to human-readable messages.
+
+## See Also
+
+- [llCreateKeyValue](../llcreatekeyvalue/)
+- [llUpdateKeyValue](../llupdatekeyvalue/)
+- [llDeleteKeyValue](../lldeletekeyvalue/)
+- [llDataSizeKeyValue](../lldatasizekeyvalue/)
+- [llKeyCountKeyValue](../llkeycountkeyvalue/)
+- [llKeysKeyValue](../llkeyskeyvalue/)
+- [llGetExperienceErrorMessage](../llgetexperienceerrormessage/)
+
+<WikiAttribution />

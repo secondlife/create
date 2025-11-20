@@ -1,0 +1,55 @@
+---
+title: llGetExperienceDetails
+description: |2-
+
+                     Returns a list with the following Experience properties: [Experience Name, Owner ID, Group ID, Experience ID, State, State Message]. State is an integer corresponding to one of the constants XP_ERROR_... and State Message is the string returned by llGetExperienceErrorMessage for that integer.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetExperienceDetails" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The function returns a list with 6 components:
+1. `string experience_name` - The name of the experience
+2. `key owner_id` - The owner's key ID
+3. `key experience_id` - The experience's key ID
+4. `integer state` - An integer status code (corresponds to XP_ERROR_... constants)
+5. `string state_message` - A string describing the state
+6. `key group_id` - The group associated with the experience
+
+When `experience_id` is `NULL_KEY`, information about the script's own experience is returned. If the script isn't associated with an experience, an empty list is returned.
+
+## Examples
+
+```lsl
+default {
+    touch_start(integer total_number) {
+        key xp = "9170c22b-f445-ea5d-89fa-0f2f1e144f04";
+        llOwnerSay(llDumpList2String(llGetExperienceDetails(xp), "\n"));
+        // Prints:
+        // Linden Realms
+        // id
+        // status msg
+
+        llOwnerSay(llDumpList2String(llGetExperienceDetails(NULL_KEY), "\n"));
+        // Print nothing if not associated with an experience or info about the associated experience
+    }
+}
+```
+
+## Notes
+
+- If `experience_id` is `NULL_KEY`, the function returns details about the script's own experience
+- If the script isn't associated with an experience, an empty list is returned
+- Known issue: Returns 4 for `state` and "operation not permitted" for `state_message` while over mainland parcels that have the experience allowed (BUG-7048)
+
+## See Also
+
+- [llAgentInExperience](../llagentinexperience/)
+
+<WikiAttribution />

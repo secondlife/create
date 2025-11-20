@@ -1,0 +1,105 @@
+---
+/**
+ * FunctionReference component - Shared base for function documentation
+ *
+ * This component provides the core rendering logic for function reference pages.
+ * Language-specific components (LSLFunction, LuaFunction) use this as their base.
+ */
+
+import { Code } from '@astrojs/starlight/components';
+import type { FunctionDefinition, Argument } from '../utils/lsl-definitions';
+import '../styles/function-reference.css';
+
+export interface FunctionReference extends FunctionDefinition {
+  /** The programming language for syntax highlighting */
+  language: 'lsl' | 'lua';
+  /** The formatted function signature */
+  signature: string;
+  /** CSS class name for the root element */
+  className?: string;
+}
+
+
+export interface Props extends FunctionReference {}
+
+const {
+  tooltip,
+  returnType,
+  energy,
+  sleep,
+  deprecated,
+  experience,
+  lindenExperience,
+  godMode,
+  arguments: args = {},
+  language,
+  signature,
+  className = 'function-reference'
+} = Astro.props;
+
+// Split tooltip into paragraphs by newlines
+const tooltipParagraphs = tooltip ? tooltip.split('\n').filter((p: string) => p.trim()) : [];
+---
+
+<div class={className}>
+  <div class="function-header">
+    {deprecated && (
+      <div class="badge badge-warning">Deprecated</div>
+    )}
+    {experience && (
+      <div class="badge badge-info">Requires Experience</div>
+    )}
+    {lindenExperience && (
+      <div class="badge badge-info">Linden Experience Only</div>
+    )}
+    {godMode && (
+      <div class="badge badge-danger">God Mode Only</div>
+    )}
+  </div>
+
+  <div class="function-signature">
+    <Code code={signature} lang={language} />
+  </div>
+
+  <div class="function-description">
+    {tooltipParagraphs.map((paragraph: string) => (
+      <p>{paragraph}</p>
+    ))}
+  </div>
+
+  {Object.keys(args).length > 0 && (
+    <details class="function-parameters-details">
+      <summary>Parameters</summary>
+      <div class="function-parameters">
+        <dl>
+          <slot name="parameters">
+            {Object.values(args).map((arg: Argument) => (
+              <>
+                <dt>
+                  <code>{arg.name}</code>
+                  <span class="param-type">({arg.type})</span>
+                </dt>
+                <dd>{arg.tooltip}</dd>
+              </>
+            ))}
+          </slot>
+        </dl>
+      </div>
+    </details>
+  )}
+
+  <details class="function-metadata-details">
+    <summary>Technical Details</summary>
+    <div class="function-metadata">
+      <ul>
+        <li><strong>Return Type:</strong> <code>{returnType}</code></li>
+        {energy !== undefined && (
+          <li><strong>Energy:</strong> {energy}</li>
+        )}
+        {sleep !== undefined && sleep > 0 && (
+          <li><strong>Sleep:</strong> {sleep}s</li>
+        )}
+      </ul>
+    </div>
+  </details>
+</div>

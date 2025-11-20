@@ -1,0 +1,42 @@
+---
+title: llReturnObjectsByID
+description: >-
+  Return objects using their UUIDs.
+
+  Requires the PERMISSION_RETURN_OBJECTS permission and that the script owner
+  owns the parcel the returned objects are in, or is an estate manager or region
+  owner.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llReturnObjectsByID" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+If the script is owned by an estate owner or manager, this function works for objects located on any parcel in the region. Otherwise, the script can return objects located over land owned by the owner of the script.
+
+As a security measure, parcel owner, estate owner, and estate managers cannot have their objects returned by this method, except when the object returns itself.
+
+## Throttle
+
+Throttled at max parcel land impact capacity region-wide per hour.
+
+## Caveats
+
+- Objects owned by other groups will be returned to their previous owner if the object is transferable, deleted otherwise.
+
+## Error Flags
+
+The function returns the number of objects successfully returned to their owners, or a negative error flag if unsuccessful. Refer to the error constants for possible return values.
+
+## See Also
+
+- [llReturnObjectsByOwner]
+- [llGetParcelPrimOwners]
+- [llDie]
+
+<WikiAttribution />

@@ -1,0 +1,31 @@
+---
+title: llDetectedKey
+description: |-
+  Returns the key of detected object or avatar number.
+  Returns NULL_KEY if Number is not a valid index.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedKey" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llSay(0, "touch_start event: key of avatar touching: " + (string) llDetectedKey(0) );
+    }
+}
+```
+
+## Notes
+
+Returns an empty key if `number` does not correspond to a valid sensed object or avatar.
+
+<WikiAttribution />

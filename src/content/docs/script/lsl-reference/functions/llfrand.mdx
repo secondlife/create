@@ -1,0 +1,149 @@
+---
+title: llFrand
+description: |-
+  Returns a pseudo random number in the range [0, Magnitude] or [Magnitude, 0].
+  Returns a pseudo-random number between [0, Magnitude].
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llFrand" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Random Number Generator Limitations
+
+- The random number generator is **not a source of entropy**
+- The sequence of random numbers is shared across the entire simulator process, and not independently seeded. Therefore, the pseudo-random generation is not suitable for applications which require completely predictable or completely unpredictable results
+- When passing an integer to `llFrand` as the magnitude, it will be implicitly typecast to a float
+- Many integers outside the range `[-2^24, +2^24]` cannot be represented as a float (inherent limitation of the float type). For example, outside that range no odd integers will appear
+- For that reason, when converting the resulting float to integer, it is impossible to generate more than 2^24+1 uniformly distributed values, and it's also impossible to generate more than 9*2^23+1 (about 75 million) different integers in total
+
+### Type Casting for Integers
+
+When converting the float to an integer, **use an integer typecast `(integer)`**, not one of the rounding functions like `llRound()`, `llFloor()`, or `llCeil()`. The integer typecast is the only method guaranteed not to skew the distribution of integer values.
+
+## Examples
+
+### Basic Float Ranges
+
+Two equivalent methods to generate a float within (5.0, 10.0]:
+
+**Method One:** Using negative magnitude
+```lsl
+default
+{
+    state_entry()
+    {
+        float randomFloat = 10.0 + llFrand(-5.0);
+        llSay(0, (string) randomFloat);
+    }
+}
+```
+
+**Method Two:** Using subtraction
+```lsl
+default
+{
+    state_entry()
+    {
+        float randomFloat = 10.0 - llFrand(5.0);
+        llSay(0, (string) randomFloat);
+    }
+}
+```
+
+### Coin Toss (50/50 Chance)
+
+```lsl
+integer coin_toss()
+{
+    if (llFrand(1.0) < 0.5) return TRUE;
+    return FALSE;
+}
+```
+
+### Random Integer in a Range (Correct Method)
+
+This helper function generates a uniformly distributed random integer between min and max (inclusive):
+
+```lsl
+integer random_integer(integer min, integer max)
+{
+    return min + (integer)(llFrand(max - min + 1));
+}
+```
+
+**Rationale:** The function expands the range by 1.0 to ensure equal bin spacing on the ends relative to the middle of the range, then uses an integer cast to round towards zero. This avoids the bias that occurs when the first and last bins collect results from only half the float space.
+
+### Generating Large Integer Ranges (Millions of Values)
+
+For ranges requiring more than 16 million uniformly distributed values, divide the range into two parts:
+
+```lsl
+// Generate a random integer from 0 to 499,999,999 inclusive
+default
+{
+    state_entry()
+    {
+        integer rand = (integer)llFrand(500)*1000000 + (integer)llFrand(1000000);
+        llOwnerSay("Random number: " + (string)rand);
+    }
+}
+```
+
+For prime ranges or ranges with a prime factor greater than 2^24, use a rejection scheme: generate a number slightly above the target range, and reject and regenerate if it exceeds the maximum.
+
+### Negative Integer Ranges (e.g., for Channel Numbers)
+
+To generate the most possibilities for random negative integers:
+
+```lsl
+integer rand = 0x80000000 | (integer)llFrand(65536) | ((integer)llFrand(65536) << 16);
+```
+
+### Distribution Testing
+
+When testing random integer functions, watch for patterns in the distribution. If bins are under-represented at the edges, the function likely has a bias issue:
+
+```lsl
+integer random_integer(integer min, integer max)
+{
+    return min + (integer)llFrand(max - min + 1);  // Correct
+}
+
+integer silly_random_integer(integer min, integer max)
+{
+    return min + (integer)(llRound(llFrand(max - min)));  // Flawed - first and last bins under-represented
+}
+```
+
+### Exponential Distribution
+
+For simulating waiting times (e.g., "rain every ~7 days"):
+
+```lsl
+float random_exponential(float mean_value)
+{
+    return -mean_value * llLog(llFrand(1.0));
+}
+
+// Example usage in timer:
+default
+{
+    state_entry()
+    {
+        float time_between_rain = random_exponential(7.0 * 24.0 * 60.0 * 60.0);
+        llSetTimerEvent(time_between_rain);
+    }
+}
+```
+
+## See Also
+
+- [llListRandomize](../lllistrandomize/)
+
+<WikiAttribution />

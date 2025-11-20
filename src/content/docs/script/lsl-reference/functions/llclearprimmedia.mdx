@@ -1,0 +1,71 @@
+---
+title: llClearPrimMedia
+description: >-
+  Clears (deletes) the media and all parameters from the given Face.
+
+  Returns an integer that is a STATUS_* flag which details the success/failure
+  of the operation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llClearPrimMedia" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This example removes all media from all faces of the prim containing the script, then deletes the script itself:
+
+```lsl
+publish_returned_status_flag(integer inputLink, integer inputFace, integer inputStatus)
+{
+    /* if (inputInteger == 0) */ string outputStatus = "STATUS_OK";
+    if (inputStatus == 1000) outputStatus = "STATUS_MALFORMED_PARAMS";
+    else if (inputStatus == 1001) outputStatus = "STATUS_TYPE_MISMATCH";
+    else if (inputStatus == 1002) outputStatus = "STATUS_BOUNDS_ERROR";
+    else if (inputStatus == 1003) outputStatus = "STATUS_NOT_FOUND";
+    else if (inputStatus == 1004) outputStatus = "STATUS_NOT_SUPPORTED";
+    else if (inputStatus == 1999) outputStatus = "STATUS_INTERNAL_ERROR";
+    else if (inputStatus == 2001) outputStatus = "STATUS_WHITELIST_FAILED";
+
+    // PUBLIC_CHANNEL has the integer value 0
+    llSay(PUBLIC_CHANNEL, "llClearLinkMedia(link " + (string)inputLink
+        + ", face " + (string)inputFace + ") = " + outputStatus + ";");
+}
+
+default
+{
+    state_entry()
+    {
+        integer link = llGetLinkNumber();
+        integer numOfSides = llGetLinkNumberOfSides(link);
+        integer face;
+
+        do
+        {
+            integer clearMediaSucceeded = llClearPrimMedia(face);
+            publish_returned_status_flag(link, face, clearMediaSucceeded);
+
+            ++face;
+        }
+        while (face < numOfSides);
+
+        string thisScript = llGetScriptName();
+        llRemoveInventory(thisScript);
+    }
+}
+```
+
+## Notes
+
+The function returns a STATUS_* flag indicating success or failure of the operation. Check the return value against status constants like STATUS_OK, STATUS_MALFORMED_PARAMS, STATUS_BOUNDS_ERROR, etc. to determine if the media was successfully cleared.
+
+## See Also
+
+- [llClearLinkMedia](../llclearlinkmedia/)
+- [llSetPrimMediaParams](../llsetprimmediaparams/)
+- [llGetPrimMediaParams](../llgetprimmediaparams/)
+
+<WikiAttribution />

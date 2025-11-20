@@ -1,0 +1,274 @@
+---
+title: llCastRay
+description: >-
+  Casts a ray into the physics world from 'start' to 'end' and returns data
+  according to details in Options.
+
+  Reports collision data for intersections with objects.
+
+  Return value: [UUID_1, {link_number_1}, hit_position_1, {hit_normal_1},
+  UUID_2, {link_number_2}, hit_position_2, {hit_normal_2}, ... , status_code]
+  where {} indicates optional data.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCastRay" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The function returns a strided list with collision data. Each stride consists of:
+
+- **UUID** (key) - The object or avatar hit
+- **Position** (vector) - The location of the hit (always included)
+- **Link Number** (integer) - Optional, if RC_GET_LINK_NUM is set
+- **Normal** (vector) - Optional, if RC_GET_NORMAL is set
+
+A status code is always appended at the end of the list:
+- **>= 0**: Number of hits returned
+- **< 0**: Error code
+
+Example return with default options: `[key object_uuid, vector hit_position, integer status_code]`
+
+Example return on error: `[integer status_code]`
+
+### Status Code Error Codes
+
+| Code | Constant | Description |
+|------|----------|-------------|
+| -1 | RCERR_UNKNOWN | The raycast failed for an unspecified reason. Submit a bug report. |
+| -2 | RCERR_SIM_PERF_LOW | Simulator performance is too low. Wait and try again. Reduce scene complexity if possible. |
+| -3 | RCERR_CAST_TIME_EXCEEDED | Parcel or agent exceeded maximum raycasting time. Wait a few frames and retry. |
+
+## Options Parameters
+
+### RC_REJECT_TYPES
+
+Bitwise-OR combination of rejection flags:
+
+| Flag | Description |
+|------|-------------|
+| RC_REJECT_AGENTS | Avatars won't be detected |
+| RC_REJECT_PHYSICAL | Physical objects won't be detected |
+| RC_REJECT_NONPHYSICAL | Objects without physics won't be detected |
+| RC_REJECT_LAND | Land won't be detected |
+
+Note: Seated avatars are treated like unseated avatars. Setting the filter to reject everything generates a script runtime error.
+
+### RC_DATA_FLAGS
+
+Bitwise-OR combination of data flags:
+
+| Flag | Description |
+|------|-------------|
+| RC_GET_NORMAL | Stride includes the surface normal that was hit |
+| RC_GET_ROOT_KEY | UUID will be the object's root instead of any child |
+| RC_GET_LINK_NUM | Stride includes the link number that was hit |
+
+### Other Options
+
+- **RC_MAX_HITS** [integer] - Maximum number of hits to return (max 256, default 1). Keep small to avoid performance issues.
+- **RC_DETECT_PHANTOM** [integer] - Set to TRUE to detect phantom and volume-detect objects. When TRUE, these are always detected even if RC_REJECT_PHYSICAL/NONPHYSICAL are set.
+
+## Caveats
+
+- **Ray extending out-of-bounds**: Raycasts have been noted to be unreliable when the end point is out-of-bounds. Random failures occur if the ray begins or ends more than 8 meters outside current region bounds. The same ray cast again may return a different result.
+- **No physics shape**: llCastRay will not detect prims with no physics shape (PRIM_PHYSICS_SHAPE_NONE).
+- **Ray starts inside prim**: llCastRay will not detect a prim if the line starts inside it. This makes it safe to use the prim position as the start location.
+- **Self-detection**: llCastRay can detect the prim the script is in, if the start location is outside the prim.
+- **Avatar rotation**: llGetRot() will not return an avatar's exact visual rotation due to viewer thresholds. Use llGetCameraRot() to get exact looking direction in mouselook.
+
+## Tips for Efficient Raycasts
+
+- Keep the max number of hits returned as small as possible
+- Set as many RC_REJECT_TYPES as possible (this typically has the largest performance impact)
+- When possible, avoid raycasting through piles of prims and concave physics objects (objects with cut, hollow, twist, or mesh without decomposition)
+- Handle RCERR_CAST_TIME_EXCEEDED by sleeping briefly and waiting a few frames before retrying
+
+## Examples
+
+### Basic Raycast
+
+Cast a ray from the center of an object, 10 meters forward based on object rotation:
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        vector start = llGetPos();
+        vector end = start + <10,0,0> * llGetRot();
+
+        list data = llCastRay(start, end, []);
+        llOwnerSay(llList2CSV(data));
+    }
+}
+```
+
+### Mouselook Weapon
+
+Attachment that casts a ray based on the owner's camera direction in mouselook. Useful for weapons, scripted interactions, or HUD information displays:
+
+```lsl
+integer gTargetChan = -9934917;
+
+default
+{
+    attach(key id)
+    {
+        if (id != NULL_KEY)
+        {
+            llRequestPermissions(id, PERMISSION_TAKE_CONTROLS | PERMISSION_TRACK_CAMERA);
+        }
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TAKE_CONTROLS | PERMISSION_TRACK_CAMERA)
+        {
+            llTakeControls(CONTROL_LBUTTON | CONTROL_ML_LBUTTON, TRUE, FALSE);
+        }
+    }
+
+    control(key id, integer level, integer edge)
+    {
+        // User must be in mouselook to aim the weapon
+        if (level & edge & CONTROL_LBUTTON)
+        {
+            llSay(0, "You must be in Mouselook to shoot. Type CTRL+M or press Esc and scroll mouse wheel forward.");
+        }
+
+        // User is in mouselook
+        if (level & edge & CONTROL_ML_LBUTTON)
+        {
+            vector start = llGetCameraPos();
+            // Detect only non-physical, non-phantom objects. Report root prim UUID.
+            list results = llCastRay(start, start + <60.0, 0.0, 0.0> * llGetCameraRot(),
+                [RC_REJECT_TYPES, RC_REJECT_PHYSICAL | RC_REJECT_AGENTS | RC_REJECT_LAND,
+                 RC_DETECT_PHANTOM, FALSE,
+                 RC_DATA_FLAGS, RC_GET_ROOT_KEY,
+                 RC_MAX_HITS, 1]);
+
+            llTriggerSound(llGetInventoryName(INVENTORY_SOUND, 0), 1.0);
+            llSleep(0.03);
+
+            key target = llList2Key(results, 0);
+            // Tell target it has been hit
+            llRegionSayTo(target, gTargetChan, "HIT");
+        }
+    }
+}
+```
+
+### Region Edge Handling
+
+Handle the out-of-bounds caveat by calculating where the ray intersects the region edge:
+
+```lsl
+vector GetRegionEdge(vector start, vector dir)
+{
+    float scaleGuess;
+    float scaleFactor = 4095.99;
+    if (dir.x)
+    {
+        scaleFactor = ((dir.x > 0) * 255.99 - start.x) / dir.x;
+    }
+    if (dir.y)
+    {
+        scaleGuess = ((dir.y > 0) * 255.99 - start.y) / dir.y;
+        if (scaleGuess < scaleFactor) scaleFactor = scaleGuess;
+    }
+    if (dir.z)
+    {
+        scaleGuess = ((dir.z > 0) * 4095.99 - start.z) / dir.z;
+        if (scaleGuess < scaleFactor) scaleFactor = scaleGuess;
+    }
+    return start + dir * scaleFactor;
+}
+
+default
+{
+    touch_start(integer total_number)
+    {
+        vector start = llGetPos();
+        vector direction = <1, 0, 0> * llGetRot();
+        vector end = GetRegionEdge(start, direction);
+
+        list data = llCastRay(start, end, []);
+        llOwnerSay(llList2CSV(data));
+    }
+}
+```
+
+### Testing Different Reject Types
+
+Test each RC_REJECT_TYPES flag by cycling through them on touch:
+
+```lsl
+integer filter;  // default is 0
+
+default
+{
+    state_entry()
+    {
+        string ownerName = llKey2Name(llGetOwner());
+        llOwnerSay("Hello, " + ownerName + "!");
+    }
+
+    touch_start(integer total_number)
+    {
+        vector start = llGetPos();
+        vector end = start - <0.0, -25.0, 0.0>;
+
+        if (filter > 8)
+            filter = 0;
+
+        llOwnerSay("Filter " + (string)filter);
+
+        list results = llCastRay(start, end, [RC_REJECT_TYPES, filter, RC_MAX_HITS, 4]);
+
+        integer hitNum = 0;
+        // Check status code for error conditions
+        integer status = llList2Integer(results, -1);
+        if (status < 0)
+        {
+            llOwnerSay("Raycast error: " + (string)status);
+            ++filter;
+            return;
+        }
+
+        // Stride is 2 because we didn't request normals or link numbers
+        while (hitNum < status)
+        {
+            key uuid = llList2Key(results, 2 * hitNum);
+            string name = "Land";
+
+            if (uuid != NULL_KEY)
+                name = llKey2Name(uuid);
+
+            llOwnerSay("Hit " + name + ".");
+            ++hitNum;
+        }
+
+        ++filter;
+    }
+}
+```
+
+## Common Use Cases
+
+- **Weapons** - Raycasts are efficient for simulating projectile weapons, orders of magnitude better than rezzing and launching prims.
+- **AI and Line-of-Sight** - Detect avatars and objects for navigation or line-of-sight checks. Cast rays downward to determine floor height and angle.
+- **Intelligent Object Placement** - Objects can adjust themselves to their environment, e.g., placing at floor-level or changing avatar posture.
+- **Environment Analysis** - Determine surrounding limitations, detect if object is in a closed room, auto-adjust furniture to walls/floors/ceilings.
+
+## Debugging Tips
+
+Use `llDumpList2String()` to see what the output looks like with different flag combinations.
+
+To quickly get the status code, use: `llList2Integer(result, -1)`
+
+<WikiAttribution />

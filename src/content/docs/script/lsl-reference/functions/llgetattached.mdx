@@ -1,0 +1,68 @@
+---
+title: llGetAttached
+description: Returns the object's attachment point, or 0 if not attached.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAttached" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Example 1: Enforce Attachment Location
+
+This script validates that an object is attached to the left hand, and requests detachment if attached elsewhere:
+
+```lsl
+default
+{
+    attach(key id)
+    {
+        if(id)//it's attached
+        {
+            if(llGetAttached() != ATTACH_LHAND)
+            {
+                llOwnerSay("Please attach me only to the left hand");
+                llRequestPermissions(id, PERMISSION_ATTACH);
+            }
+        }
+    }
+    run_time_permissions(integer a)
+    {
+        if(a & PERMISSION_ATTACH)
+            llDetachFromAvatar();
+    }
+}
+```
+
+### Example 2: Toggle Visibility Based on Attachment State
+
+This snippet makes a prim invisible when attached, but visible when rezzed unattached:
+
+```lsl
+on_rez(integer p)
+{
+    // !llGetAttached() has the value 0 when attached, and 1 when unattached
+    llSetAlpha( !llGetAttached(), ALL_SIDES);
+}
+```
+
+## Notes
+
+- Returns the attachment point constant (e.g., `ATTACH_LHAND`, `ATTACH_HEAD`) when attached
+- Returns `0` when the object is not attached or is pending detachment
+- The return value can be used in boolean context: `!llGetAttached()` evaluates to `TRUE` when not attached and `FALSE` when attached
+
+## See Also
+
+- [llAttachToAvatar](../llattachtoavatar/)
+- [llDetachFromAvatar](../lldetachfromavatar/)
+- [llGetAttachedList](../llgetattachedlist/)
+- [llGetAttachedListFiltered](../llgetattachedlistfiltered/)
+- [llGetObjectDetails](../llgetobjectdetails/)
+- attach event
+
+<WikiAttribution />

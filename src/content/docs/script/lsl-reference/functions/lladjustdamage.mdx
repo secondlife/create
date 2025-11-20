@@ -1,0 +1,25 @@
+---
+title: llAdjustDamage
+description: Changes the amount of damage to be delivered by this damage event.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAdjustDamage" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Calling this function from any event handler other than `on_damage` results in an error message being shouted to the debug channel.
+- Requires the region to allow damage adjustment for the `on_damage` event to run.
+- Negative indexes are not supported.
+- Indexes that are out of range will silently fail.
+
+## See Also
+
+- [llDetectedDamage](../lldetecteddamage/)
+- `on_damage` event
+
+<WikiAttribution />

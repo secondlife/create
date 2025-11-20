@@ -1,0 +1,86 @@
+---
+title: llCSV2List
+description: Create a list from a string of comma separated values specified in Text.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCSV2List" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        string csv = "first,second,third";
+        list my_list = llCSV2List(csv);
+        llOwnerSay("CSV: " + csv);
+        integer i;
+        integer num_list = llGetListLength(my_list);
+        for (i = 0; i < num_list; ++i)
+        {
+            llOwnerSay("my_list[" + (string)i + "]: " + llList2String(my_list, i));
+        }
+    }
+}
+```
+
+## Vectors & Rotations
+
+Anything between `<` and `>` is considered a single value regardless of commas inside. This ensures vectors and rotations are treated as single values with no additional cleanup needed afterward.
+
+For every `<` there must be a corresponding `>` or it will consume the rest of the string:
+
+- `llCSV2List("<>,>,a")` returns `["<>", ">", "a"]` (second `>` is isolated)
+- `llCSV2List("<<>,>,a")` returns `["<<>,>", "a"]` (regularly paired)
+- `llCSV2List("<<<>,>,a")` returns `["<<<>,>,a"]` (third `<` lost its opposite)
+
+## Type Casting
+
+All elements in the resulting list are strings. The `llList2*` functions have implicit typecasts that don't work the same as explicit typecast. Use these patterns for best results:
+
+| Type | Code | Notes |
+|------|------|-------|
+| integer | `(integer)llList2String(mlist, mint)` | `llList2Integer` does not support hex format |
+| float | `(float)llList2String(mlist, mint)` | `llList2Float` does not support scientific or hexadecimal notation |
+| string | `llList2String(mlist, mint)` | Always safe |
+| key | `llList2Key(mlist, mint)` | Always safe |
+| vector | `(vector)llList2String(mlist, mint)` | `llList2Vector` will return a zero vector |
+| rotation | `(rotation)llList2String(mlist, mint)` | `llList2Rot` will return a zero rotation |
+
+## Whitespace Handling
+
+`llCSV2List` consumes the first leading space from all values:
+
+```lsl
+list tmp = llCSV2List("first , second , third");
+// returns ["first ", "second ", "third"]
+// not ["first ", " second ", " third"]
+```
+
+## Caveats
+
+- If a `<` does not have a matching `>`, the remainder of the string will be a single value, even if the `<` is in the middle of the value
+- All items in the returned list are strings
+- If an empty string is parsed, the result will be a list containing an empty string: `[""]` (not an empty list)
+- When used with lists generated from assets in inventory, do not use `llCSV2List` as inventory asset names can contain commas
+
+## Notes
+
+To use separators other than commas (especially if you can't predict when a user might include a comma in data), use `llParseString2List` instead, which allows you to specify separators other than commas. However, `llParseString2List` does not support the special parsing required for handling rotations and vectors, nor does it consume leading and trailing whitespace.
+
+To convert a list back into a comma-separated string, use `llList2CSV`.
+
+## See Also
+
+- [llList2CSV](../lllist2csv/)
+- [llDumpList2String](../lldumplist2string/)
+- [llParseString2List](../llparsestring2list/)
+- [llParseStringKeepNulls](../llparsestringkeepnulls/)
+
+<WikiAttribution />

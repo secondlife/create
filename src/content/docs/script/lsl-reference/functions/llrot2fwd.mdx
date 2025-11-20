@@ -1,0 +1,65 @@
+---
+title: llRot2Fwd
+description: |-
+  Returns the forward vector defined by Rotation.
+  Returns the forward axis represented by the Rotation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRot2Fwd" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function computes the orientation of the local x-axis (front-direction of prim) relative to the parent (the root prim or the world). It returns the forward vector defined by the rotation - a unit vector pointing in the local positive X direction.
+
+## Technical Details
+
+Mathematically equivalent to:
+
+```lsl
+ret = llVecNorm(<1., 0., 0.> * q);
+```
+
+If `q` is known to be a unit quaternion, it can be simplified as:
+
+```lsl
+ret = <1., 0., 0.> * q;
+```
+
+Keep in mind that object and agent rotations will always be unit quaternions.
+
+## Performance Optimization
+
+For repeated operations, direct quaternion multiplication can be significantly faster than calling this function. For example, `<1.0, 0.0, 0.0>*llGetRot()` is about 25-30% faster than `llRot2Fwd(llGetRot())` depending on the VM used. If done often and at extremely fast rates, it can be advantageous to even save `<1.0, 0.0, 0.0>` to a local or global variable and reuse it.
+
+## Examples
+
+Move an object 5 metres forwards along its x-axis when touched, regardless of the object's orientation in world. Works for both root and child prims:
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        vector v = llRot2Fwd( llGetLocalRot() );
+        llSetPos( llGetLocalPos() + v * 5 );
+    }
+}
+```
+
+## Notes
+
+This function can be useful to identify the orientation of the local frontal-plane of the prim, since its x-axis is always perpendicular to this local frontal plane.
+
+## See Also
+
+- [llRot2Left](../llrot2left/)
+- [llRot2Up](../llrot2up/)
+- [llRot2Axis](../llrot2axis/)
+- [llRot2Angle](../llrot2angle/)
+
+<WikiAttribution />

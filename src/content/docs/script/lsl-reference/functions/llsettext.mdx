@@ -1,0 +1,230 @@
+---
+title: llSetText
+description: Causes Text to float above the prim, using the specified Color and Opacity.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetText" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If more than one `llSetText` is called (by reset, interaction, or script state change) within a prim, the latest call takes priority over previous ones.
+- Text is limited to 254 bytes in UTF-8 encoding. If the string is longer, it will be truncated to 254 bytes, and any multibyte characters that are split will be removed entirely.
+- An unbroken line of text of great length may be automatically broken into two lines (one above the other).
+- Text can be seen through walls and other objects. Be considerate of neighbors in malls and apartment buildings.
+  - Visibility distance increases with prim size.
+- Removing the script or deactivating it **will not remove** a prim's text property. Floating text is not dependent on a script for its continued existence, only for changing it.
+- Vertical whitespace is removed from the end of the text string. To preserve vertical spacing, put a character (like a space) on the last line.
+- Multiple linebreaks with empty lines are converted to a single linebreak. Add a whitespace character on every line you want to skip.
+- **High performance impact when updating text in loops**: Measurements showed significant process time overhead when doing numerous iterations in a while loop. For approximately 65,000 iterations: ~5 seconds without floating text, ~24 seconds with `llSetText`, and ~96 seconds when using `llSetPrimitiveParams`/`llSetLinkPrimitiveParamsFast` with `PRIM_TEXT`. Avoid excessive text updates within tight iterations.
+
+## Examples
+
+### Basic usage - Display prim name in green
+
+```lsl
+default
+{
+    state_entry()
+    {
+        vector COLOR_GREEN = <0.0, 1.0, 0.0>;
+        float  OPAQUE      = 1.0;
+
+        // prim's name (not necessarily object's)
+        llSetText(llGetObjectName(), COLOR_GREEN, OPAQUE);
+
+        // delete the script as we only needed it to change the floating text property
+        llRemoveInventory(llGetScriptName());
+    }
+}
+```
+
+### Removing floating text
+
+**Preferred method:**
+```lsl
+// empty string & black & transparent
+llSetText("", ZERO_VECTOR, 0);
+```
+
+**Alternative method (same effect):**
+```lsl
+// empty string & black & transparent
+llSetText("", <0.0, 0.0, 0.0>, 0.0);
+```
+
+### Color and opacity examples
+
+```lsl
+// white & opaque
+llSetText("I am white", <1.0, 1.0, 1.0>, 1.0);
+```
+
+```lsl
+vector myColor;  // defaults to ZERO_VECTOR or <0.0, 0.0, 0.0> which is black
+
+llSetText("I am black and 30% transparent.", myColor, 0.7);
+
+llSleep(7.5);     // before: <0.0, 0.0, 0.0> black
+myColor.x = 1.0;  // now:    <1.0, 0.0, 0.0> red
+
+llSetText("I am now red and 10% transparent.", myColor, 0.9);
+```
+
+```lsl
+llSetText("green text with alpha 0.7", <0.0, 1.0, 0.0>, 0.7);
+
+llSetText("white text with alpha 0.4\n60% transparent", <1.0, 1.0, 1.0>, 0.4);
+llSetText("white text with alpha 1.0\nfully opaque", <1.0, 1.0, 1.0>, 1.0);
+
+// next two lines have the same effect
+llSetText("invisible black text with alpha 0.0\nfully transparent", ZERO_VECTOR, 0);
+llSetText("invisible black text with alpha 0.0\nfully transparent", <0.0, 0.0, 0.0>, 0.0);
+```
+
+### Multiple lines of text
+
+```lsl
+// two lines of orange text
+llSetText("I am\non two lines!", <1.0, 0.4, 0.0>, 1.0);
+```
+
+### Multiple lines with proper spacing
+
+Good approach (preserves blank lines):
+```lsl
+vector COLOR_WHITE = <1.0, 1.0, 1.0>;
+float  OPAQUE      = 1.0;
+
+llSetText("Monkeys\n \n \n \n \n ", COLOR_WHITE, OPAQUE);
+```
+
+Bad approach (blank lines get collapsed):
+```lsl
+vector COLOR_WHITE = <1.0, 1.0, 1.0>;
+float  OPAQUE      = 1.0;
+
+llSetText("Monkeys\n\n\n\n\n", COLOR_WHITE, OPAQUE);
+```
+
+## Color reference
+
+The RGB color vector components (x, y, z) range from 0 to 1, unlike traditional RGB which uses 0-255. `<1.0, 1.0, 1.0>` represents white and `<0.0, 0.0, 0.0>` represents black.
+
+Common colors:
+- **Navy**: `<0.000, 0.122, 0.247>`
+- **Blue**: `<0.000, 0.455, 0.851>`
+- **Aqua**: `<0.498, 0.859, 1.000>`
+- **Teal**: `<0.224, 0.800, 0.800>`
+- **Olive**: `<0.239, 0.600, 0.439>`
+- **Green**: `<0.180, 0.800, 0.251>`
+- **Lime**: `<0.004, 1.000, 0.439>`
+- **Yellow**: `<1.000, 0.863, 0.000>`
+- **Orange**: `<1.000, 0.522, 0.106>`
+- **Red**: `<1.000, 0.255, 0.212>`
+- **Maroon**: `<0.522, 0.078, 0.294>`
+- **Fuchsia**: `<0.941, 0.071, 0.745>`
+- **Purple**: `<0.694, 0.051, 0.788>`
+- **White**: `<1.000, 1.000, 1.000>`
+- **Silver**: `<0.867, 0.867, 0.867>`
+- **Gray**: `<0.667, 0.667, 0.667>`
+- **Black**: `<0.000, 0.000, 0.000>`
+
+## String escape codes
+
+LSL supports four string escape codes:
+- `\n` - new line
+- `\\` - backslash
+- `\t` - tab
+- `\"` - double quote
+
+## Helper scripts
+
+### Erase text from an object
+
+Drag this script out of inventory onto an object to remove its floating text:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        // remove floating text (empty string & black & 100% transparent)
+        llSetText("", ZERO_VECTOR, 0.0);
+
+        // delete the script as we only needed it to change the floating text property
+        llRemoveInventory(llGetScriptName());
+    }
+}
+```
+
+### Color constants helper
+
+Code to easily specify appearance of hovertext:
+
+```lsl
+vector NAVY    = <0,     0.122, 0.247>;
+vector BLUE    = <0,     0.455, 0.851>;
+vector AQUA    = <0.498, 0.859, 1    >;
+vector TEAL    = <0.224, 0.8,   0.8  >;
+vector OLIVE   = <0.239, 0.6,   0.439>;
+vector GREEN   = <0.18,  0.8,   0.251>;
+vector LIME    = <0.004, 1    , 0.439>;
+vector YELLOW  = <1    , 0.863, 0    >;
+vector ORANGE  = <1    , 0.522, 0.106>;
+vector RED     = <1    , 0.255, 0.212>;
+vector MAROON  = <0.522, 0.078, 0.294>;
+vector FUCHSIA = <0.941, 0.071, 0.745>;
+vector PURPLE  = <0.694, 0.051, 0.788>;
+vector WHITE   = <1    , 1    , 1    >;
+vector SILVER  = <0.867, 0.867, 0.867>;
+vector GRAY    = <0.667, 0.667, 0.667>;
+vector BLACK   = <0.000, 0.000, 0.000>;
+
+string  hoverText   = "TEXT GOES HERE";
+vector  hoverColor  = LIME;     // set predefined color or any RGB color vector in float form
+float   hoverAlpha  = 1.0;      // Sets the text's transparency, 1.0 being opaque, while 0.0 would be transparent
+
+default
+{
+    state_entry()
+    {
+        llSetText(hoverText, hoverColor, hoverAlpha);
+    }
+}
+```
+
+### Hovertext for linked prims
+
+To make hovertext when using linked prims:
+
+```lsl
+mySetLinkText(integer linknum, string text, vector color, float alpha) {
+    llSetLinkPrimitiveParamsFast(linknum, [PRIM_TEXT, text, color, alpha]);
+}
+
+// For example:
+default
+{
+    touch_start(integer total_number)
+    {
+        mySetLinkText(LINK_SET, "TEST", <0, 1, 0>, 0.5);
+    }
+}
+```
+
+## Notes
+
+- Text hovers above the prim's center at the prim position. The height of the text above the center is proportional to the prim's Z-dimension exclusively.
+- Rotation of the prim does not affect text positioning: if Z is smaller than X and Y, the text may appear on the prim itself.
+- To actually display text on a prim (rendered as part of the prim's surface), see XyzzyText or consider using parcel prim media options (useful only if you have control over the land's media settings).
+
+## See Also
+
+- `PRIM_TEXT` - Primitive text property used with llSetPrimitiveParams
+
+<WikiAttribution />

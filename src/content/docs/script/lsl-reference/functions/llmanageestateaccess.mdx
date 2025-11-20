@@ -1,0 +1,49 @@
+---
+title: llManageEstateAccess
+description: >-
+  Adds or removes agents from the estate's agent access or ban lists, or groups
+  to the estate's group access list. Action is one of the
+  ESTATE_ACCESS_ALLOWED_* operations to perform.
+
+  Returns an integer representing a boolean, TRUE if the call was successful;
+  FALSE if throttled, invalid action, invalid or null id or object owner is not
+  allowed to manage the estate.
+
+  The object owner is notified of any changes, unless
+  PERMISSION_SILENT_ESTATE_MANAGEMENT has been granted to the script.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llManageEstateAccess" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Calls are throttled at a rate of 30 calls per 30 seconds.
+- FALSE will be returned if:
+  - The call is throttled
+  - The object owner doesn't have power to perform the action
+  - The avatar ID is invalid or null
+- If used on mainland, the message "llManageEstateAccess does not work on mainland" is shouted on DEBUG_CHANNEL.
+- If the object owner is not allowed to manage the estate, the message "llManageEstateAccess object owner must manage estate." is shouted on DEBUG_CHANNEL.
+- If a legitimate estate manager tries to exceed the maximum number of entries in the list, the call will return TRUE but the operation will be truncated at the limit.
+
+## Notes
+
+- Only works for objects owned by the Estate Owner or an Estate Manager.
+- By default, the object owner is notified of every change made using this function.
+- If the owner grants PERMISSION_SILENT_ESTATE_MANAGEMENT to the script, the owner will not be notified.
+
+## See Also
+
+- [llAddToLandPassList](../lladdtolandpasslist/)
+- [llAddToLandBanList](../lladdtolandbanlist/)
+- [llRemoveFromLandBanList](../llremovefromlandbanlist/)
+- [llRemoveFromLandPassList](../llremovefromlandpasslist/)
+- [llResetLandBanList](../llresetlandbanlist/)
+- [llResetLandPassList](../llresetlandpasslist/)
+
+<WikiAttribution />

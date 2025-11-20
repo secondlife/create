@@ -1,0 +1,70 @@
+---
+title: llRemoveInventory
+description: |-
+  Remove the named inventory item.
+  Remove the named inventory item from the object inventory.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRemoveInventory" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Remove the current script from the object:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llRemoveInventory(llGetScriptName());
+    }
+}
+```
+
+Delete all other contents of any type except the script itself:
+
+```lsl
+delete_all_other_contents()
+{
+    string thisScript = llGetScriptName();
+    string inventoryItemName;
+
+    integer index = llGetInventoryNumber(INVENTORY_ALL);
+    while (index)
+    {
+        --index;        // (faster than index--;)
+
+        inventoryItemName = llGetInventoryName(INVENTORY_ALL, index);
+
+        if (inventoryItemName != thisScript)
+            llRemoveInventory(inventoryItemName);
+    }
+}
+
+default
+{
+    state_entry()
+    {
+        delete_all_other_contents();
+    }
+}
+```
+
+## Caveats
+
+- If the current script is removed it will continue to run for a short period of time after this call.
+- With multiple executions an `llSleep(0.1)` after `llRemoveInventory` will allow edit window contents to refresh correctly and avoid errors on phantom contents.
+- `llRemoveInventory` will not trigger a changed event.
+
+## See Also
+
+- [llGetScriptName](../llgetscriptname/)
+- [llGetInventoryNumber](../llgetinventorynumber/)
+- [llGetInventoryName](../llgetinventoryname/)
+
+<WikiAttribution />

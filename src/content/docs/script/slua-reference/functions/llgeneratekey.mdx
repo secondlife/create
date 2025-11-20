@@ -1,0 +1,32 @@
+---
+title: llGenerateKey
+description: >-
+  Generates a key (SHA-1 hash) using UUID generation to create a unique key.
+
+  As the UUID produced is versioned, it should never return a value of NULL_KEY.
+
+  The specific UUID version is an implementation detail that has changed in the
+  past and may change again in the future. Do not depend upon the UUID that is
+  returned to be version 5 SHA-1 hash.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llGenerateKey" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.GenerateKey()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llGenerateKey](/script/reference/lsl/functions/llGenerateKey/)
+
+

@@ -1,0 +1,62 @@
+---
+/**
+ * LuaFunction component - Displays SLua/Luau function documentation
+ *
+ * This component loads function data from lsl_definitions.yaml at build time.
+ * It only requires the function name as a prop (with or without 'll' prefix).
+ */
+
+import FunctionReference from './FunctionReference.astro';
+import { type Argument, getFunction } from '../utils/lsl-definitions';
+import { toLuauType } from '../utils/slua';
+
+export interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+
+// Ensure we have the full function name with 'll' prefix for lookup
+const fullName = name.startsWith('ll') ? name : `ll${name}`;
+
+// Load function definition from YAML
+const funcDef = getFunction(fullName);
+
+if (!funcDef) {
+  throw new Error(`Function "${fullName}" not found in lsl_definitions.yaml`);
+}
+
+// Extract and convert function data
+const args = Object.values(funcDef.arguments);
+
+// Build function signature with Luau typing
+const luauReturnType = toLuauType(funcDef.returnType);
+const params = args.map((arg: Argument) => `${arg.name}: ${toLuauType(arg.type)}`).join(', ');
+const displayName = name.startsWith('ll') ? name.substring(2) : name;
+const signature = `function ll.${displayName}(${params})${luauReturnType !== '()' ? `: ${luauReturnType}` : ''}`;
+
+// Map arguments to Luau types for display
+const luauArgs: Record<string, Argument> = {};
+for (const arg of args) {
+  luauArgs[arg.name] = {
+    ...arg,
+    type: toLuauType(arg.type)
+  };
+}
+---
+
+<FunctionReference
+  name={displayName}
+  returnType={luauReturnType}
+  arguments={luauArgs}
+  signature={signature}
+  language="lua"
+  className="function-reference lua-function-reference"
+  tooltip={funcDef.tooltip}
+  energy={funcDef.energy}
+  sleep={funcDef.sleep}
+  deprecated={funcDef.deprecated}
+  experience={funcDef.experience}
+  lindenExperience={funcDef.lindenExperience}
+  godMode={funcDef.godMode}
+/>

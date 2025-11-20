@@ -1,0 +1,68 @@
+---
+title: llMoveToTarget
+description: >-
+  Critically damp to Target in Tau seconds (if the script is physical).
+
+  Critically damp to position target in tau-seconds if the script is physical.
+  Good tau-values are greater than 0.2. A tau of 0.0 stops the critical damping.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llMoveToTarget" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Drop this script in a prim to have it follow the prim owner.
+
+```lsl
+default
+{
+    state_entry()
+    {
+        vector pos = llGetPos();
+        llSetStatus(STATUS_PHYSICS, TRUE);
+        // Little pause to allow server to make potentially large linked object physical.
+        llSleep(0.1);
+        llMoveToTarget(pos,0.4);
+        // Look for owner within 20 meters in 360 degree arc every 1 seconds.
+        llSensorRepeat("", llGetOwner(), AGENT, 20.0, PI,1.0);
+    }
+    sensor(integer total_number)
+    {
+        // Get position of detected owner
+        vector pos = llDetectedPos(0);
+        // Offset back one meter in X and up one meter in Z based on world coordinates.
+        vector offset =<-1,0,1>;
+//        offset = offset*llDetectedRot(0);  //Adding this line will orient the follower relative to the owner's position.
+        pos+=offset;
+        llMoveToTarget(pos,0.4);
+    }
+}
+```
+
+## Caveats
+
+- When slowly moving to a lower Z value, beware of SVC-2441: the sim will incorrectly move the object down faster than it should. For example, if you try moving to `llGetPos() + <10, 10, -10>`, you can end up at `.z-10` several meters before getting to `.x-10` and `.y-10`.
+- A `llMoveToTarget` call seems to persist even if physics is turned off. This is a useful trick on sluggish sims where the object can drop a bit between the call to enable physics and the call to `llMoveToTarget` - just do the `llMoveToTarget` before setting the object to physical.
+- `llVecDist(llGetPos(), target)` must be *less than* 65, or no movement will occur.
+- Calling `llMoveToTarget` with a `tau` of 0.0 or less will silently fail and do nothing. The smallest functional `tau` is 0.044444444 (two physics frames, 2/45).
+
+## Notes
+
+- The function uses critical damping to move the object to the target position over `tau` seconds (only if the script is physical).
+- Good tau values are greater than 0.2.
+- To stop the object from maintaining the target position, use `llStopMoveToTarget`.
+- To change the rotation in the same manner, use `llLookAt` or `llRotLookAt`.
+
+## See Also
+
+- [llStopMoveToTarget](../llstopmovetotarget/)
+- [llLookAt](../lllookat/)
+- [llRotLookAt](../llrotlookat/)
+- [llTarget](../lltarget/)
+
+<WikiAttribution />

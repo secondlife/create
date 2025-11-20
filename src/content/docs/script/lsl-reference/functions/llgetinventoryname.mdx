@@ -1,0 +1,61 @@
+---
+title: llGetInventoryName
+description: >-
+  Returns the name of the inventory item of a given type, specified by index
+  number.
+
+  Use the inventory constants INVENTORY_* to specify the type.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetInventoryName" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Box Unpacker
+
+Give all prim contents to anyone touching the object, excluding the script itself:
+
+```lsl
+// Give all prim contents to anyone touching this object,
+// But don't give this script itself.
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        list    InventoryList;
+        integer count = llGetInventoryNumber(INVENTORY_ALL);  // Count of all items in prim's contents
+        string  ItemName;
+        while (count--)
+        {
+            ItemName = llGetInventoryName(INVENTORY_ALL, count);
+            if (ItemName != llGetScriptName() )
+                InventoryList += ItemName;   // add all contents except this script, to a list
+        }
+        // Give all the items to the toucher, in a folder named as per this prim's name
+        llGiveInventoryList(llDetectedKey(0), llGetObjectName(), InventoryList);
+    }
+}
+```
+
+## Notes
+
+- Inventory items are sorted in alphabetical order, not chronological order
+- The maximum number of characters for an object inventory item name is currently 63 characters
+- Returns an empty string if no item of the specified type is found, or if the index number is greater than or equal to the count of items of that type
+
+## See Also
+
+- [llGetInventoryNumber](../llgetinventorynumber/)
+- [llGetInventoryType](../llgetinventorytype/)
+- [llGetInventoryKey](../llgetinventorykey/)
+- [llGetInventoryCreator](../llgetinventorycreator/)
+- [llGetInventoryPermMask](../llgetinventorypermmask/)
+- [llGetInventoryAcquireTime](../llgetinventoryacquiretime/)
+
+<WikiAttribution />

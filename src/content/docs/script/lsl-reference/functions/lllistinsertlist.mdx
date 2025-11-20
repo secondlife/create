@@ -1,0 +1,61 @@
+---
+title: llListInsertList
+description: >-
+  Returns a list that contains all the elements from Target but with the
+  elements from ListVariable inserted at Position start.
+
+  Returns a new list, created by inserting ListVariable into the Target list at
+  Position. Note this does not alter the Target.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListInsertList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+list numbers = [3, "three", 2, "two", 1, "one"];
+default
+{
+    state_entry()
+    {
+        llOwnerSay(llDumpList2String(numbers, ","));
+        // Object: 3,three,2,two,1,one
+        integer index = llListFindList(numbers, [2]);
+        if (index != -1)
+        {
+            numbers = llListInsertList(numbers, [2.5, "two and a half"], index);
+            llOwnerSay(llDumpList2String(numbers, ","));
+            // Object: 3,three,2.500000,two and a half,2,two,1,one
+        }
+    }
+}
+```
+
+## Behavior Notes
+
+- If `start` is past the end of `dest`, then `src` is appended to `dest` and will not add null entries. To avoid this, create empty elements in the list first.
+- A similar outcome occurs when using negative indexes.
+- The source list will remain unchanged. Instead, a new list will be produced. It's important that you capture this with a variable (unless you are acting directly on the results).
+
+## Tips
+
+**Inserting at the start of a list:** You can simply add the two lists together, putting the list with the new item(s) first:
+
+```lsl
+list oldList = ["B", "C", "D"];
+list newItem = ["A"];
+list newlist = newItem + oldList;
+```
+
+## See Also
+
+- [llDeleteSubList](../lldeletesublist/)
+- [llList2List](../lllist2list/)
+- [llListReplaceList](../lllistreplacelist/)
+
+<WikiAttribution />

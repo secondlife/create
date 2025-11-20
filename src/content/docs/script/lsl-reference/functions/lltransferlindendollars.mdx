@@ -1,0 +1,99 @@
+---
+title: llTransferLindenDollars
+description: >-
+  Transfer Amount of linden dollars (L$) from script owner to AvatarID. Returns
+  a key to a corresponding transaction_result event for the success of the
+  transfer.
+
+  Attempts to send the amount of money to the specified avatar, and trigger a
+  transaction_result event identified by the returned key.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llTransferLindenDollars" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Pay 100 L$ to Fred Bloggs when he touches this prim
+// Die if the transfer of funds was successful, else keep running
+
+string  Recipient = "Fred Bloggs";      // Authorised recipient
+integer Amount = 100;                   // Amount to pay Fred when he touches the prim
+
+integer DebitPerms;
+key     TransactionID=NULL_KEY;
+
+default
+{
+    state_entry()
+    {
+        // Ask the owner for permission to debit their account
+        llRequestPermissions(llGetOwner(), PERMISSION_DEBIT);
+    }
+
+    run_time_permissions (integer perm)
+    {
+        if  (perm & PERMISSION_DEBIT)
+            DebitPerms = TRUE;
+    }
+
+    touch_start(integer num_detected)
+    {
+        if (!DebitPerms)
+            return;  // Cannot proceed - debit permissions not granted
+        if (llDetectedName(0) != Recipient)
+            return;  // unauthorised person is touching - ignore
+        if (TransactionID != NULL_KEY)
+            return;  // waiting on previous transaction to complete/fail
+
+        key id = llDetectedKey(0);
+        TransactionID = llTransferLindenDollars(id, Amount);
+    }
+
+    transaction_result(key id, integer success, string data)
+    {
+        if (id != TransactionID)
+            return;          // Ignore if not the expected transaction
+
+        if (success)
+        {
+            llOwnerSay( "Transfer of L$ to " + Recipient + " was successful");
+            llSleep(1.0);
+            llDie();          // Die so Fred can't keep taking money
+        }
+        else
+        {
+            llOwnerSay( "Transfer of L$ failed");
+            TransactionID = NULL_KEY;
+            // Keep the script running so Fred can try again, clear TransactionID to allow a new attempt
+        }
+    }
+}
+```
+
+## Caveats
+
+- An object cannot pay another object.
+- Objects deeded to groups cannot give money (the permission cannot be granted).
+- Use is limited to 30 payments in a 30 second interval for all scripts owned by that resident on a region. Sustained overage will produce a script error and halt payments while the rate remains excessive. Historically, faster payments have failed intermittently.
+- Once a script has the `PERMISSION_DEBIT` permission it can empty an account of L$.
+  - **Fraud & theft are both Terms of Service violations and crimes.** Misuse this function and you risk being banned and legal action. In addition Linden Lab may freeze the accounts of anyone the money is transferred to and restore it to its rightful owners. This may involve retrieving it from third party exchanges and accounts on those exchanges being frozen. The system is not designed to be friendly towards fraud.
+
+## Notes
+
+- The return value is used in a matching `transaction_result` event for the success or failure of the transfer. If the transaction is successful, this key will show in the [transaction history](https://secondlife.com/my/account/transactions.php).
+- If you aren't going to use the return value or the resulting `transaction_result` event, consider using `llGiveMoney` instead of this function.
+
+## See Also
+
+- [llGiveMoney](../llgivemoney/)
+- [llSetPayPrice](../llsetpayprice/)
+- transaction_result event
+- money event
+
+<WikiAttribution />

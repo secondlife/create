@@ -1,0 +1,38 @@
+---
+title: llGetExperienceErrorMessage
+description: |2-
+
+                     Returns a string describing the error code passed or the string corresponding with XP_ERROR_UNKNOWN_ERROR if the value is not a valid Experience error code.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetExperienceErrorMessage" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llOwnerSay(llGetExperienceErrorMessage(XP_ERROR_NONE));
+    }
+}
+```
+
+## See Also
+
+- [llCreateKeyValue](../llcreatekeyvalue/)
+- [llReadKeyValue](../llreadkeyvalue/)
+- [llUpdateKeyValue](../llupdatekeyvalue/)
+- [llDeleteKeyValue](../lldeletekeyvalue/)
+- [llDataSizeKeyValue](../lldatasizekeyvalue/)
+- [llKeyCountKeyValue](../llkeycountkeyvalue/)
+- [llKeysKeyValue](../llkeyskeyvalue/)
+- experience permissions_denied (event)
+
+<WikiAttribution />

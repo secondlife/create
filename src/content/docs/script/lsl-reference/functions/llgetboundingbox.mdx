@@ -1,0 +1,162 @@
+---
+title: llGetBoundingBox
+description: >-
+  Returns the bounding box around the object (including any linked prims)
+  relative to its root prim, as a list in the format [ (vector) min_corner,
+  (vector) max_corner ].
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetBoundingBox" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The bounding box is the smallest possible cuboid that can contain the physical representation of the object and have its faces aligned to the object's local axes. The physical representation is made up of the shape of the prims and avatars seated upon it.
+
+## Caveats
+
+- Regardless of whether the object parameter is a non-root prim, the bounding box of the entire object is returned. This also applies if the object is an agent sitting on an object—the bounding box of the sat-upon object (including the agent's shape) is returned.
+- The bounding box is determined by the physics models, not the visual representation.
+  - A child prim with its physics mode set to none will not affect the bounding box.
+  - Phantom and volume detect objects do have physics interactions, which is why they still have bounding boxes.
+  - Attachments have no bounding boxes of their own as they have no physics interaction; instead the bounding box of the avatar is returned.
+- Returns an empty list `[]` if the object is not found.
+
+## Examples
+
+### Avatar Bounding Box Ruler
+
+This example creates a visual representation of an avatar's bounding box by resizing itself to match the bounding box dimensions:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetStatus(STATUS_PHANTOM, TRUE);
+    }
+
+    touch_start(integer total_number)
+    {
+        key target = llDetectedKey(0);
+        list box = llGetBoundingBox(target);
+        vector center = llDetectedPos(0) + (llList2Vector(box, 0) + llList2Vector(box, 1)) * 0.5;
+        vector size = llList2Vector(box, 1) - llList2Vector(box, 0);
+        llSetPrimitiveParams([PRIM_POSITION, center, PRIM_SIZE, size]);
+        llSetText("Name: " + llDetectedName(0) + ", UUID: " + (string)target +
+                "\nBounding Box Size: " + (string)size, <1.0, 1.0, 1.0>, 1.0);
+    }
+}
+```
+
+### Enclose an Object in a Tight Box
+
+This example uses bounding box to enclose a named object in the tightest possible box aligned with the object's root prim axes:
+
+```lsl
+// Enclose a named object in the tightest possible box
+// that is aligned with the object's root prim axes.
+// Drop this script in a box near the object to enclose
+// (must be in a 10m range)
+
+string ObjectNameToEnclose = "SearchMe";
+key UUID;
+
+default
+{
+    state_entry()
+    {
+        llSensor(ObjectNameToEnclose, "", ACTIVE | PASSIVE, 10, PI);
+    }
+
+    sensor(integer n)
+    {
+        UUID = llDetectedKey(0);
+        llSetTimerEvent(1);
+    }
+
+    timer()
+    {
+        list info = llGetObjectDetails(UUID, [OBJECT_POS, OBJECT_ROT]) + llGetBoundingBox(UUID);
+        vector pos = llList2Vector(info, 0);
+        rotation rot = llList2Rot(info, 1);
+        vector corner1 = llList2Vector(info, 2) * rot + pos;
+        vector corner2 = llList2Vector(info, 3) * rot + pos;
+        vector size = llList2Vector(info, 3) - llList2Vector(info, 2);
+
+        llSetPos((corner1 + corner2) * 0.5); // Set position to the midpoint (average) of the corners
+        llSetRot(rot);
+        llSetScale(size);
+    }
+}
+```
+
+## Helper Functions
+
+### Check if a Position is Inside the Bounding Box
+
+This helper function determines whether a given vector position in the region is within the borders of a cuboid, respecting the cuboid's rotation:
+
+```lsl
+integer isInPrim(vector vPos)
+{
+    list bb = llGetBoundingBox(llGetKey());
+    vector min = llList2Vector(bb, 0);
+    vector max = llList2Vector(bb, 1);
+    vPos = (vPos - llGetPos()) / llGetRot();
+    float fTemp;
+    if (min.x > max.x)
+    {
+        fTemp = max.x;
+        max.x = min.x;
+        min.x = fTemp;
+    }
+    if (min.y > max.y)
+    {
+        fTemp = max.y;
+        max.y = min.y;
+        min.y = fTemp;
+    }
+    if (min.z > max.z)
+    {
+        fTemp = max.z;
+        max.z = min.z;
+        min.z = fTemp;
+    }
+    if (vPos.x < min.x)
+    {
+        return FALSE;
+    }
+    if (vPos.y < min.y)
+    {
+        return FALSE;
+    }
+    if (vPos.z < min.z)
+    {
+        return FALSE;
+    }
+    if (vPos.x > max.x)
+    {
+        return FALSE;
+    }
+    if (vPos.y > max.y)
+    {
+        return FALSE;
+    }
+    if (vPos.z > max.z)
+    {
+        return FALSE;
+    }
+    return TRUE;
+}
+```
+
+## See Also
+
+- [llGetAgentSize](../llgetagentsize/)
+
+<WikiAttribution />

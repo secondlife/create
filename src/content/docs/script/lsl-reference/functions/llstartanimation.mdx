@@ -1,0 +1,143 @@
+---
+title: llStartAnimation
+description: >-
+  This function plays the specified animation from playing on the avatar who
+  received the script's most recent permissions request.
+
+  Animation may be an animation in task inventory or a built-in animation.
+
+  Requires PERMISSION_TRIGGER_ANIMATION.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStartAnimation" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Only 30 animations can be played at a time (prior to version 1.25.4 the limit was 15, and prior to 1.25.3 there was no limit)
+- Requires PERMISSION_TRIGGER_ANIMATION; the animation will not play if the permission has been revoked
+
+## Examples
+
+### Basic Animation Control
+
+```lsl
+default
+{
+    touch_start(integer detected)
+    {
+        llRequestPermissions(llDetectedKey(0), PERMISSION_TRIGGER_ANIMATION);
+    }
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {
+            llStartAnimation("sit");
+            llOwnerSay("animation will end in 5 seconds");
+            llSetTimerEvent(5.0);
+        }
+    }
+    timer()
+    {
+        llSetTimerEvent(0.0);
+        llStopAnimation("sit");
+    }
+}
+```
+
+### Playing Custom Animation from Inventory
+
+```lsl
+string animation; // the first animation in inventory will automatically be used
+// the animation name must be stored globally to be able to stop the animation when standing up
+
+default
+{
+    state_entry()
+    {
+        // set sit target, otherwise this will not work
+        llSitTarget(<0.0, 0.0, 0.1>, ZERO_ROTATION);
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK)
+        {
+            key av = llAvatarOnSitTarget();
+            if (av) //evaluated as true if not NULL_KEY or invalid
+                llRequestPermissions(av, PERMISSION_TRIGGER_ANIMATION);
+            else // avatar is standing up
+            {
+                if (animation)
+                    llStopAnimation(animation); // stop the started animation
+                llResetScript(); // release the avatar animation permissions
+            }
+        }
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {
+            animation = llGetInventoryName(INVENTORY_ANIMATION,0); // get the first animation from inventory
+            if (animation)
+            {
+                llStopAnimation("sit"); // stop the default sit animation
+                llStartAnimation(animation);
+            }
+        }
+    }
+}
+```
+
+### Playing Hold Animation on Attached Objects
+
+```lsl
+string animation_name = "hold";
+
+default
+{
+    // Whenever this object is attached or detached...
+    attach(key id)
+    {
+        if (id)
+        {   // If it was just attached, request permission to animate.
+            llRequestPermissions(llGetOwner(), PERMISSION_TRIGGER_ANIMATION);
+        }
+        else
+        {   // It's being detached...
+            if (llGetPermissions() & PERMISSION_TRIGGER_ANIMATION)
+            {   // If we have permission to animate, stop the animation.
+                llStopAnimation(animation_name);
+            }
+        }
+    }
+
+    // Whenever permissions change...
+    run_time_permissions(integer permissions)
+    {
+        if (permissions & PERMISSION_TRIGGER_ANIMATION)
+        {   // If permission to animate was granted, start the animation.
+            llStartAnimation(animation_name);
+        }
+    }
+}
+```
+
+## Notes
+
+- Animations can be from inventory or built-in animations
+- Always use llStopAnimation to stop animations you start
+- Remember to release animation permissions when appropriate
+- For attached objects, handle the attach and detach events to manage animation permissions
+
+## See Also
+
+- [llStopAnimation](../llstopanimation/)
+- Internal Animations - List of built-in animations always available in Second Life
+
+<WikiAttribution />

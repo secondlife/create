@@ -1,0 +1,211 @@
+---
+title: llApplyImpulse
+description: >-
+  Applies impulse to the object.
+
+  If Local == TRUE, apply the Force in local coordinates; otherwise, apply the
+  Force in global coordinates.
+
+  This function only works on physical objects.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llApplyImpulse" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function applies an instantaneous impulse to a physical object. The momentum parameter should be expressed in **Lindograms × meters per second** (not kilogram-meters per second). For continuous force application, use `llSetForce` instead.
+
+## Important Notes
+
+- The momentum parameter is applied to the center of mass
+- Momentum represents `mass × velocity` needed to achieve an initial velocity when no other forces (gravity, collisions) are present
+- The magnitude of momentum may be **scaled back by the object's available energy**:
+  - For heavy objects: momentum is capped at 20,000 (not 20)
+  - For fast objects: velocity is capped at ~202 meters/second, so momentum reflects this velocity cap
+- The function uses the legacy script "energy budget" system, which can cause unpredictable attenuation if the scripted object doesn't have enough energy budget
+- The function has **high griefing potential**, so it was deliberately hobbled with high energy consumption
+
+## Momentum vs. Force vs. Velocity
+
+- **Momentum**: `mass × velocity` (used here)
+- **Parameter units**: Lindograms × m/s (where Lindograms are Second Life's mass unit)
+- Use `llGetMass()` to get object mass in Lindograms
+- Use `llGetMassMKS()` to get object mass in Kilograms
+
+## Examples
+
+### Example 1: Reach Target Velocity Regardless of Mass
+
+```lsl
+//This script will apply an impulse to reach a target velocity value, regardless of object mass.
+vector start;
+rotation startRot;
+
+float Velocity = 13.0; //meters / second.
+
+default
+{
+    touch_start(integer total_number)
+    {
+        llSay(0, "Launching!");
+        start = llGetPos();
+        startRot = llGetRot();
+        llSetStatus(STATUS_PHYSICS, TRUE);     // Make sure prim has physics enabled
+
+        vector adjVelo = <0,0,Velocity>*llGetMass(); //Factor object mass (in Lindograms) into velocity calc. Lg*m/s
+        llApplyImpulse(adjVelo, TRUE);
+        llSetTimerEvent(0.1);
+    }
+
+    land_collision_start(vector start)
+    {
+        llSetLinkPrimitiveParamsFast(LINK_ROOT,[PRIM_PHYSICS,FALSE,PRIM_POSITION,start,PRIM_ROTATION,startRot]);
+        llSetTimerEvent(0);
+    }
+
+    timer()
+    {
+        llOwnerSay((string)llGetVel()); //Report velocity value back to owner.
+    }
+}
+```
+
+### Example 2: Launch Object at Owner
+
+```lsl
+//  Rez an object, and drop this script in it.
+//  This will launch it at the owner.
+
+default
+{
+    state_entry()
+    {
+        key ownerKey = llGetOwner();
+        vector ownerPosition = llList2Vector(llGetObjectDetails(ownerKey, [OBJECT_POS]), 0);
+
+        //  if the owner is not in the sim, stop fooling around
+        if (llGetAgentSize(ownerKey) == ZERO_VECTOR)
+            return;
+
+        //  else
+        llSetStatus(STATUS_PHYSICS, TRUE);
+
+        vector objectPosition = llGetPos();
+        vector direction = llVecNorm(ownerPosition - objectPosition);
+
+        llApplyImpulse(direction * llGetMass(), 0);
+    }
+}
+```
+
+### Example 3: Interactive Target Practice (Beer Can)
+
+Make yourself a beer can, drop this script into it, and have some target practice.
+
+```lsl
+vector gHome;
+integer gHit;
+
+default
+{
+    collision_start(integer num)
+    {
+        if (!gHit)
+        {
+            llSetTimerEvent(15.0);
+            gHome = llGetPos();
+            gHit = TRUE;
+        }
+        llSetStatus(STATUS_PHYSICS, TRUE);
+        llTriggerSound("b90ed62a-2737-b911-bb53-6b9228bbc933",1.0);
+        llApplyImpulse(llGetMass()*<0,0,5.0>,TRUE);
+        llApplyRotationalImpulse(llGetMass()*<llFrand(1.0),llFrand(1.0),llFrand(1.0)>,TRUE);
+        llResetTime();
+    }
+
+    land_collision(vector where)
+    {
+        if (llGetTime() < 0.5)
+        {
+            llResetTime();
+            llApplyImpulse(llGetMass()*<0,0,llFrand(1.0)>,TRUE);
+            llApplyRotationalImpulse(llGetMass()*<llFrand(1.0),llFrand(1.0),llFrand(1.0)>,TRUE);
+        }
+    }
+
+    timer()
+    {
+        llSetStatus(STATUS_PHYSICS,FALSE);
+        gHit = FALSE;
+        llSetRegionPos(gHome);  // Send the can home, even if more than 10m away
+        llSetRot(ZERO_ROTATION);
+        llSetTimerEvent(0.0);
+    }
+}
+```
+
+### Example 4: Demonstrating Momentum vs. Velocity Cap
+
+```lsl
+// Demonstrates that:
+// - The parameter is momentum, not force
+// - Initial velocity * mass = momentum when no other forces act
+// - Momentum is capped at 20,000
+// - Velocity is capped around 200 m/s (so momentum reflects this)
+
+integer tid;
+vector initPos;
+vector Impulse;
+default
+{
+    state_entry()
+    {
+        llSetPhysicsMaterial(GRAVITY_MULTIPLIER,0,0,0,0);
+        llSetStatus(STATUS_PHANTOM, TRUE);
+        llSetStatus(STATUS_PHYSICS, TRUE);
+    }
+
+    touch_end(integer n)
+    {
+        tid=llTarget(initPos=llGetPos(),30);
+        llSetStatus(STATUS_PHYSICS, TRUE);
+        Impulse = llGetMass()*<0,0,25>;
+        llOwnerSay(llList2Json(JSON_ARRAY, [ "Setup a Momentum=", Impulse  ]));
+        llApplyImpulse( Impulse , FALSE);
+    }
+    moving_start()
+    {
+        llOwnerSay(llList2Json(JSON_ARRAY, [ "Velocity= ", llGetVel(), "Force=",llGetMass()*llGetAccel(), "Momentum=", llGetVel()*llGetMass()]));
+    }
+    not_at_target()
+    {
+        llSetTimerEvent(0.0);
+        llTargetRemove(tid);
+        llSetStatus(STATUS_PHYSICS, FALSE);
+        llSetRegionPos(initPos);
+    }
+}
+
+// Example output from light object:
+//  ["Setup a Momentum=","<0.000000, 0.000000, 183.181381>"]
+//  ["Velocity=","<0.000000, 0.000000, 25.000002>","Force=","<0.000000, 0.000000, -0.171902>","Momentum=","<0.000000, 0.000000, 183.181396>"]
+
+// Example output from heavy object (momentum capped at 20000):
+//  ["Setup a Momentum=","<0.000000, 0.000000, 28244.332031>"]
+//  ["Velocity=","<0.000000, 0.000000, 17.702671>","Force=","<0.000000, 0.000000, -28.363781>","Momentum=","<0.000000, 0.000000, 20000.005859>"]
+```
+
+## See Also
+
+- [llApplyRotationalImpulse](../llapplyrotationalimpulse/)
+- [llSetForce](../llsetforce/)
+- [llSetVelocity](../llsetvelocity/)
+- [llGetMass](../llgetmass/)
+- [llGetMassMKS](../llgetmassmks/)
+
+<WikiAttribution />

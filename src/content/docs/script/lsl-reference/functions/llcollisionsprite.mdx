@@ -1,0 +1,32 @@
+---
+title: llCollisionSprite
+description: >-
+  Suppress default collision sprites, replace default impact sprite with
+  ImpactSprite; found in the object inventory (empty string to just suppress).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCollisionSprite" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+## Important Warning
+
+**This function is broken** as reported in [VWR-322](https://jira.secondlife.com/browse/VWR-322) and does not work in newer releases of the Second Life viewer.
+
+## Usage
+
+To suppress the default collision sprite altogether, use an empty string as the value for the `impact_sprite` parameter.
+
+## See Also
+
+- [llCollisionFilter] - Filter collisions
+- [llCollisionSound] - Set collision impact sound
+- [collision_start] event
+- [collision] event
+- [collision_end] event
+
+<WikiAttribution />

@@ -1,0 +1,92 @@
+---
+title: llGetTimestamp
+description: >-
+  Returns a time-stamp (UTC time zone) in the format:
+  YYYY-MM-DDThh:mm:ss.ff..fZ.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetTimestamp" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Reset Tracker
+
+This example demonstrates capturing the script boot time and displaying it when touched:
+
+```lsl
+// Reset tracker
+
+string BOOT_TIME;
+
+default
+{
+    state_entry()
+    {
+        BOOT_TIME = llGetTimestamp(); // state_entry is triggered on script reset.
+    }
+
+    touch_start(integer num)
+    {
+        llSay(PUBLIC_CHANNEL, "The last script was last reset @ " + BOOT_TIME);
+        llSay(PUBLIC_CHANNEL, "Right now it is " + llGetTimestamp());
+    }
+}
+```
+
+### Greeting with Time-based Responses
+
+This example parses the timestamp to determine the time of day and greet the user appropriately:
+
+```lsl
+// Greeting
+
+default
+{
+    state_entry()
+    {
+        llSetTouchText("Greet");
+    }
+    touch_start(integer num)
+    {
+        list TimeStamp = llParseString2List(llGetTimestamp(),["-",":"],["T"]); //Get timestamp and split into parts in a list
+        integer Hour = llList2Integer(TimeStamp,4);
+        if(Hour<12)
+            llSay(PUBLIC_CHANNEL,"Good Morning, Oliver Sintim-Aboagye!");
+        else if(Hour<17)
+            llSay(PUBLIC_CHANNEL,"Good Afternoon, " + llDetectedName(0));
+        else
+            llSay(PUBLIC_CHANNEL,"Good Evening, " + llKey2Name(llDetectedKey(0)));
+    }
+}
+```
+
+## Notes
+
+- The timestamp appears to be accurate to milliseconds.
+- The format follows the ISO 8601 standard: `YYYY-MM-DDThh:mm:ss.ff..fZ`
+- Time is always in the UTC time zone.
+- `llParseString2List()` can be used to parse the timestamp into individual components (year, month, day, hour, minute, second, fractional seconds).
+
+## Helper Functions
+
+The following community-created helper functions may be useful when working with timestamps:
+
+- **Stamp2UnixInt** - Convert timestamp list format to Unix timestamp. Example: [2009, 2, 13, 3, 31, 30] to 1234567890 (compatible with `llParseString2List( llGetTimestamp(), ["-", "T", ":", "."], [] )`)
+- **Stamp2WeekdayStr** - Get the weekday string from (Y, M, D). Example: "Friday" from (2009, 2, 13)
+- **Millisec** - Convert a timestamp string to integer milliseconds
+- **Unix2PST_PDT** - Convert Unix timestamp to SLT date/time string with PST or PDT indication
+- **Unix2GMTorBST** - Convert Unix timestamp to UK date/time string with GMT or BST indication
+
+## See Also
+
+- [llGetDate](/script/reference/lsl/functions/llgetdate/) - Same format but without the time
+- [llGetUnixTime](/script/reference/lsl/functions/llgetunixtime/) - Time in seconds since the epoch
+- [llGetTime](/script/reference/lsl/functions/llgettime/) - Elapsed script-time
+- [ISO 8601](http://www.cl.cam.ac.uk/~mgk25/iso-time.html) - ISO 8601 time format specification
+
+<WikiAttribution />

@@ -1,0 +1,78 @@
+---
+title: llGetListLength
+description: |-
+  Returns the number of elements in the list.
+  Returns the number of elements in ListVariable.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetListLength" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Usage
+
+```lsl
+//Basic usage
+default
+{
+    state_entry()
+    {
+        list testList = ["one", "two", "three"];
+        integer length = llGetListLength(testList);
+        llOwnerSay("There are " + (string)length + " entries in the list.");
+    }
+}
+```
+
+## Best Practices
+
+When using list length to help you loop through a list, it is better to determine the length first, then start your loop:
+
+```lsl
+integer length = llGetListLength(mylist);
+
+integer index;// default is 0
+while (index < length)
+{
+    llSay(0, llList2String(mylist, index));
+    ++index;
+}
+```
+
+The following example is to illustrate what not to do, it calculates the length in the "while" loop and is inefficient because the length gets recalculated at each pass through the loop. This should only ever be done if the list is in fact changing (in length) with each iteration of the loop. Recalculating the length is slow because the VM duplicates the entire list (including the values) when it is pushed on the stack (so it can be popped off the stack when the length is calculated).
+
+```lsl
+integer index;// default is 0
+while (index < llGetListLength(mylist))
+{
+    llSay(0, llList2String(mylist, index));
+    ++index;
+}
+```
+
+## LSO Optimizations
+
+A faster and lighter (in bytecode) way to determine the length of a list is to do a not-equals compare with a null list. This works because the list not-equals compare returns the difference between the lengths, meaning that it returns the same result as `llGetListLength()`, minus the overhead in bytecode and the performance penalty of calling a non-native function. Note: This optimization is much less beneficial time-wise in Mono as Mono's llGetListLength function is almost twice as fast, however the bytecode saving is still about 30 bytes.
+
+```lsl
+list in;
+integer len_in = llGetListLength(in);
+integer flen_in = (in != []);
+//flen_in and len_in will be the same
+
+integer neg_len_in = -llGetListLength(in);
+integer fneg_len_in = ([] != in);
+//fneg_len_in and neg_len_in will be the same
+```
+
+## See Also
+
+- [llListStatistics](/script/reference/lsl/functions/llliststatistics/) – Returns the number of integers and floats in the list
+- [llStringLength](/script/reference/lsl/functions/llstringlength/) – Returns the number of characters in a string
+
+<WikiAttribution />

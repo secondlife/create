@@ -1,0 +1,57 @@
+---
+title: llSetSitText
+description: Displays Text rather than 'Sit' in the viewer's context menu.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetSitText" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Usage
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetSitText("Be Seated");
+    }
+}
+```
+
+### Removing Sit Text
+
+There is no way to stop a pie menu from having a "Sit Here" space reserved on it. Although by setting the string to a space no text will be shown.
+
+To remove custom text that you have placed there, set the text as an empty string like this: `""`.
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetSitText("");
+    }
+}
+```
+
+Upon your having done so, the text that appears will revert to "Sit Here."
+
+## Caveats
+
+- **Text** will only be displayed if set by a script calling this function in the root. If **text** is set by a script in a child the **text** will only be displayed after unlinking it or relinking it as the root. If either a child or the root is selected as an individual prim and right clicked, the **text** displayed will be the default even if a script in the root has set **text**. More simply - The **text** property displayed on right click will always be that of the root unless, right clicking a prim under individual edit when it will always be the LL default.
+- Note that like particles, and the other set text functions, all **text** set via llSetSitText becomes a property of a prim, not a script. For that reason, the **text** will remain if the script that set it is deactivated or even removed.
+- You have no control over the face, size or colour of the displayed **text**.
+- **Text** is limited to 9 characters.
+
+## See Also
+
+- [llSitTarget](../llsittarget/)
+- [llSetTouchText](../llsettouchtext/)
+
+<WikiAttribution />

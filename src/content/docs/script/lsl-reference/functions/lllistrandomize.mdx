@@ -1,0 +1,73 @@
+---
+title: llListRandomize
+description: >-
+  Returns a version of the input ListVariable which has been randomized by
+  blocks of size Stride.
+
+  If the remainder from the length of the list, divided by the stride is
+  non-zero, this function does not randomize the list.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListRandomize" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Randomization
+
+```lsl
+list dice = ["2", "4", "1", "6", "3", "5"];
+
+default
+{
+    touch_start(integer num_detected) {
+        list shuffled = llListRandomize(dice, 1);
+        llOwnerSay(llList2CSV(shuffled));
+    }
+}
+```
+
+### Stride of 2
+
+```lsl
+list list01 = ["Cold", "pizza", "in", "the", "early", "morning"];
+
+list list_random = llListRandomize(list01, 2);
+```
+
+With a stride of 2, `list_random` could be any of these permutations:
+
+1. `["Cold", "pizza", "in", "the", "early", "morning"]`
+2. `["Cold", "pizza", "early", "morning", "in", "the"]`
+3. `["in", "the", "Cold", "pizza", "early", "morning"]`
+4. `["in", "the", "early", "morning", "Cold", "pizza"]`
+5. `["early", "morning", "Cold", "pizza", "in", "the"]`
+6. `["early", "morning", "in", "the", "Cold", "pizza"]`
+
+Notice that two adjacent elements from the original list are always kept together, because the stride of 2 was specified.
+
+### Stride Equals List Length
+
+```lsl
+list list_random = llListRandomize(list01, 6);
+```
+
+In this case, `list_random` is the original list in its original order, because we told it to keep every set of six elements together, and there are only six elements in the list.
+
+## Notes
+
+- The source list will remain unchanged. A new list is produced and returned. Capture this with a variable unless you are acting directly on the results.
+- When you want to randomize the position of every list element, specify a stride of 1.
+- If the stride is not a factor of the list length, the source list is returned unchanged. In other words, `llGetListLength(src) % stride` must equal 0.
+- Conceptually, the algorithm selects `llGetListLength(src) / stride` buckets, then swaps the contents of buckets with one another.
+
+## See Also
+
+- [llListSort](/script/reference/lsl/functions/llListSort/)
+- [llFrand](/script/reference/lsl/functions/llFrand/)
+
+<WikiAttribution />

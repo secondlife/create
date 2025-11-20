@@ -1,0 +1,74 @@
+---
+title: llSleep
+description: Put script to sleep for Time seconds.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSleep" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The script will sleep at least until the next server-frame, which happen every (1/45 = ~0.02222) seconds under normal conditions.
+
+If `sec` is zero or less, the script will not sleep at all.
+
+## Examples
+
+### Basic Sleep Example
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSay(0, "I going to take a nap for 5 seconds.");
+        llSleep(5.0);
+        llSay(0, "I feel so refreshed!");
+    }
+}
+```
+
+### Measuring Sleep Duration
+
+This example demonstrates the actual sleep duration between iterations:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llOwnerSay("Time between sleeps:");
+
+        integer loops = 10;
+        float last_time = 0.0;
+
+        llResetTime();
+        llSleep(0.02);
+
+        while (--loops)
+        {
+            float time = llGetTime();
+            llOwnerSay((string)(time - last_time));
+            last_time = time;
+            llSleep(0.0); // Try a value above zero
+        }
+    }
+}
+```
+
+## Notes
+
+- The actual sleep duration may be longer than requested due to server-frame timing constraints
+- Sleeping with a value of 0.0 or less does not suspend execution
+- During sleep, the script will not process any events or execute any code
+
+## See Also
+
+- [llSetTimerEvent](../llsettimerevent/)
+- timer event
+
+<WikiAttribution />

@@ -1,0 +1,217 @@
+---
+title: llAttachToAvatarTemp
+description: >-
+  Follows the same convention as llAttachToAvatar, with the exception that the
+  object will not create new inventory for the user, and will disappear on
+  detach or disconnect.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAttachToAvatarTemp" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Unlike llAttachToAvatar, this function has the exception that the object will not create new inventory for the user and will disappear on detach or disconnect. Additionally, this function can be used on avatars other than the owner (if granted permission) in which case ownership is changed to the new wearer.
+
+When an object is attached temporarily, a user cannot 'take' or 'drop' the object. The user does not have to be the owner of the object in advance; this function transfers ownership automatically (the usual permissions required to transfer objects apply).
+
+If the attach_point is zero, then the object attaches to the attach point it was most recently attached to.
+
+## Examples
+
+### Basic Attachment with Permission Request
+
+```lsl
+// Rez object on ground, drop in this script, it will request permissions to attach,
+// and then attach to the left hand if permission is granted. If permission is denied,
+// then the script complains.
+default
+{
+    state_entry()
+    {
+        llRequestPermissions( llGetOwner(), PERMISSION_ATTACH );
+    }
+
+    run_time_permissions( integer vBitPermissions )
+    {
+        if( vBitPermissions & PERMISSION_ATTACH )
+        {
+            llAttachToAvatarTemp( ATTACH_LHAND );
+        }
+        else
+        {
+            llOwnerSay( "Permission to attach denied" );
+        }
+    }
+
+    on_rez(integer rez)
+    {
+        if(!llGetAttached())
+        { //reset the script if it's not attached.
+            llResetScript();
+        }
+    }
+
+    attach(key AvatarKey)
+    {
+        if(AvatarKey)
+        {//event is called on both attach and detach, but Key is only valid on attach
+            integer test = llGetAttached();
+            if (test) {
+                llOwnerSay( "The object is attached" );
+            } else {
+                llOwnerSay( "The object is not attached");
+            }
+        }
+    }
+}
+```
+
+### Ownership Transfer on Touch
+
+```lsl
+// This example can demonstrate ownership transfer of an object on a temporary basis using llAttachToAvatarTemp()
+// Whoever touches will be asked for permission to attach, and upon granting permission will have the item attach,
+// but not appear in Inventory.
+default
+{
+    touch_start(integer num_touches)
+    {
+        llRequestPermissions( llDetectedKey(0), PERMISSION_ATTACH );
+    }
+
+    run_time_permissions( integer vBitPermissions )
+    {
+        if( vBitPermissions & PERMISSION_ATTACH )
+        {
+            llAttachToAvatarTemp( ATTACH_LHAND );
+        }
+        else
+        {
+            llOwnerSay( "Permission to attach denied" );
+        }
+    }
+
+    on_rez(integer rez)
+    {
+        if(!llGetAttached())
+        { //reset the script if it's not attached.
+            llResetScript();
+        }
+    }
+}
+```
+
+### Handling Permission Changes After Attachment
+
+Because ownership changes when the object is attached, the initial PERMISSION_ATTACH is revoked, and new permissions need to be requested.
+
+```lsl
+integer gAttach = TRUE;
+
+default
+{
+
+    touch_start(integer num)
+    {
+        if (gAttach)  // Object has not been attached yet
+        {
+            llRequestPermissions(llDetectedKey(0),PERMISSION_ATTACH);
+            gAttach = FALSE;
+        }
+        else   // Object has been attached, but you still need PERMISSION_ATTACH in order to detach the object
+        {
+            if (llGetPermissions() & PERMISSION_TRIGGER_ANIMATION | PERMISSION_ATTACH)
+            {
+                llDetachFromAvatar();  // Note that the object vanishes when detached, so there is no need to set gAttach = TRUE again
+            }
+        }
+    }
+
+    attach(key id)
+    {
+        if (id)  // Object has been attached, so request permissions again
+        {
+            llRequestPermissions(id,PERMISSION_ATTACH | PERMISSION_TRIGGER_ANIMATION);
+        }
+    }
+
+    run_time_permissions (integer perm)
+    {
+        if (!gAttach)  //First time
+        {
+            if (perm & PERMISSION_ATTACH)
+            {
+                gAttach = TRUE;
+                llAttachToAvatarTemp(ATTACH_HEAD);  // Initial PERMISSION_ATTACH is revoked at this point
+            }
+        }
+        else  // Second time
+        {
+            if (perm & PERMISSION_ATTACH | PERMISSION_TRIGGER_ANIMATION)
+            {
+                llStartAnimation(llGetInventoryName(INVENTORY_ANIMATION,0));
+            }
+        }
+    }
+}
+```
+
+### Alternative Simplified Pattern
+
+```lsl
+// Because ownership changes when the object is attached, the initial PERMISSION_ATTACH is revoked, and new permissions need to be requested.
+
+default
+{
+    touch_start(integer num)
+    {
+        if (!llGetAttached()) llRequestPermissions( llDetectedKey(0), PERMISSION_ATTACH);
+        else if ( llGetPermissions() & PERMISSION_ATTACH) llDetachFromAvatar();
+    }
+    attach(key id)
+    {
+        if (id) llRequestPermissions( id, PERMISSION_ATTACH | PERMISSION_TRIGGER_ANIMATION);
+    }
+    run_time_permissions (integer perm)
+    {
+        if (!llGetAttached() && (perm & PERMISSION_ATTACH)) llAttachToAvatarTemp( ATTACH_NOSE);
+        if (perm & PERMISSION_TRIGGER_ANIMATION) llStartAnimation( llGetInventoryName( INVENTORY_ANIMATION, 0));
+    }
+}
+```
+
+## Caveats
+
+- When object ownership changes, any granted permissions are reset. After a successful attach, you will need a fresh call to llRequestPermissions to allow llDetachFromAvatar and other permission-required functions to work. Until successful attachment via this method, previously granted permissions are retained as normal.
+
+- The attach step is not guaranteed to succeed, and this function should not be relied on as a security measure. Use the same permission and script precautions you would use with conventional inventory transfers.
+
+- If you use llAttachToAvatarTemp in an object that you do not have permission to transfer, the function will fail with a script error "No permission to transfer", even if you are trying to attach it to yourself.
+
+- Temporary attachments cannot request the permission PERMISSION_TELEPORT; the following error will be returned: "Temporary attachments cannot request runtime permissions to teleport"
+
+- Attach points can be occupied by multiple attachments. This was not always the case; previously if the attach_point was occupied, the existing object was detached and the new attachment took its place.
+
+- Objects attached to the head (and any attachment position within the head) will not be visible in First Person view (Mouselook) if "show attachments in mouselook" is disabled.
+
+- If attach_point is zero but the object was never previously attached, it defaults to the right hand (ATTACH_RHAND).
+
+- If the object is already attached the function fails silently, regardless of the attach_point being a different attach point.
+
+- If attached via a Land Scope Experience script, the object will be force-detached by the server if the owner enters a parcel that does not have the Experience allowed.
+
+- If the target agent is already wearing the maximum number of attachments, the object will remain on the ground with the target agent as owner. Scripters may wish to do one or more workarounds:
+  - Check for successful attachment and call llDie() after a timeout or if the object is manipulated while unattached
+  - Check llGetObjectDetails(avatarKey, [OBJECT_ATTACHED_SLOTS_AVAILABLE]) beforehand, and avoid attaching if zero slots available
+
+## See Also
+
+- [llDetachFromAvatar](../lldetachfromavatar/)
+- [llGetAttached](../llgetattached/)
+
+<WikiAttribution />

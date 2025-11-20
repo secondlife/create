@@ -1,0 +1,62 @@
+---
+title: llPlaySound
+description: >-
+  Plays Sound once, at Volume (0.0 - 1.0) and attached to the object.
+
+  Only one sound may be attached to an object at a time, and attaching a new
+  sound or calling llStopSound will stop the previously attached sound.
+
+  A second call to llPlaySound with the same sound will not restart the sound,
+  but the new volume will be used, which allows control over the volume of
+  already playing sounds.
+
+  To restart the sound from the beginning, call llStopSound before calling
+  llPlaySound again.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llPlaySound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    state_entry() {
+        llPlaySound("some_sound", 1.0);
+    }
+}
+```
+
+## Caveats
+
+- A call to `llPlaySound` replaces any other sound, so only one sound can be played at the same time from the same prim (except sounds started with the deprecated `llSound`, which always plays until the end)
+- Sound files must be 30 seconds or shorter
+- Sounds are always sampled at 44.1KHz, 16-bit (unsigned), mono. Stereo files will have one channel dropped when uploading
+- If the object playing the sound is a HUD (Heads Up Display), the sound is only heard by the user the HUD is attached to
+  - To play a sound inworld from a HUD, use `llTriggerSound`
+- It is impossible to play two or more sounds at the same time and have them start playing at exactly the same time
+  - If multiple sound emitters play the same exact sound within range of the viewer at the same time, they are usually not in sync due to latency between the server/client and script execution delays. This can produce echoes, odd resonance, and other strange effects
+- When used with `llSetSoundQueueing`, sounds may play more than once. This can be fixed by disabling the sound queue if only a single sound sample is to be played
+- Playing sounds is throttled. If the average number of played sounds per second exceeds the limit (22 sounds/s), all sounds from the object are suppressed until the average falls sufficiently
+  - The throttle is per object, not per link or per script, so multiple links cannot be used to overcome the throttle
+  - When throttled, the following error appears in debug channel: "Too many sound requests. Throttled until average falls."
+
+## See Also
+
+- [llTriggerSound](../lltriggersound/)
+- [llTriggerSoundLimited](../lltriggersoundlimited/)
+- [llLoopSound](../llloopsound/)
+- [llLoopSoundMaster](../llloopsoundmaster/)
+- [llLoopSoundSlave](../llloopsoundslave/)
+- [llPlaySoundSlave](../llplaysoundslave/)
+- [llSetSoundQueueing](../llsetsoundqueueing/)
+- [llStopSound](../llstopsound/)
+- [llLinkPlaySound](../lllinkplaysound/)
+- [llPreloadSound](../llpreloadsound/)
+- [llAdjustSoundVolume](../lladjustsoundvolume/)
+
+<WikiAttribution />

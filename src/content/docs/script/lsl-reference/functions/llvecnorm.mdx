@@ -1,0 +1,37 @@
+---
+title: llVecNorm
+description: Returns normalized vector.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llVecNorm" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    state_entry()
+    {
+        vector input = <1.0,2.0,3.0>;
+        llSay(0,"The unit vector on "+(string)input+" is: "+(string)llVecNorm(input) );
+    }
+}
+```
+
+## Notes
+
+- Mathematically equivalent to:
+  - `vec / llVecMag(vec)`
+  - `vec / llSqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z)`
+- If `vec` is a ZERO_VECTOR, the value returned is a ZERO_VECTOR
+
+## See Also
+
+- [llVecMag](../llvecmag/)
+- [llVecDist](../llvecdist/)
+
+<WikiAttribution />

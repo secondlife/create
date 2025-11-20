@@ -1,0 +1,40 @@
+---
+title: llApplyRotationalImpulse
+description: >-
+  Applies rotational impulse to the object.
+
+  If Local == TRUE, apply the Force in local coordinates; otherwise, apply the
+  Force in global coordinates.
+
+  This function only works on physical objects.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llApplyRotationalImpulse" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llApplyRotationalImpulse(<0,5,0>,TRUE); //Rotates object.
+    }
+}
+```
+
+## Caveats
+
+- It does not work on attachments.
+
+## See Also
+
+- [llApplyImpulse](../llapplyimpulse/)
+- [llSetAngularVelocity](../llsetangularvelocity/)
+
+<WikiAttribution />

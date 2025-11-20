@@ -1,0 +1,46 @@
+---
+title: llGetInventoryCreator
+description: >-
+  Returns a key for the creator of the inventory item.
+
+  This function returns the UUID of the creator of item. If item is not found in
+  inventory, the object says "No item named 'name'".
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetInventoryCreator" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- If the inventory item has multiple creators, this function will return `NULL_KEY`. For example, if an object created by Lex contains a script created by Strife. See SVC-6985 and SVC-6820 for more information.
+
+## Examples
+
+Add an object to a prim's inventory, as well as this script, to get the name of the creator:
+
+```lsl
+default {
+    state_entry() {
+        llRequestAgentData(llGetInventoryCreator(llGetInventoryName(INVENTORY_OBJECT, 0)), DATA_NAME);
+    }
+
+    dataserver(key qid, string data) {
+        llOwnerSay(data);
+    }
+}
+```
+
+## See Also
+
+- [llGetInventoryAcquireTime](../llgetinventoryacquiretime/)
+- [llGetInventoryName](../llgetinventoryname/)
+- [llGetInventoryType](../llgetinventorytype/)
+- [llGetInventoryNumber](../llgetinventorynumber/)
+- [llGetInventoryPermMask](../llgetinventorypermmask/)
+- [llGetInventoryKey](../llgetinventorykey/)
+
+<WikiAttribution />

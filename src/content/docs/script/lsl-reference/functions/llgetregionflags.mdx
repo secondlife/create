@@ -1,0 +1,51 @@
+---
+title: llGetRegionFlags
+description: >-
+  Returns the region flags (REGION_FLAG_*) for the region the object is in.
+
+  Returns a bit-field specifying the region flags (REGION_FLAG_*) for the region
+  the object is in.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetRegionFlags" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        if( llGetRegionFlags() & REGION_FLAG_SANDBOX )
+        {
+            llOwnerSay("Region is a sandbox.");
+        }
+        else
+        {
+            llOwnerSay("Region is not a sandbox.");
+        }
+    }
+}
+```
+
+## Notes
+
+Only a small number of flags are actually used; the rest are always zero. In particular, it is not possible to detect:
+- "Allow Land Resell" status
+- "Allow Land Join/Divide" status
+- "Block Land Show in Search" status
+
+Additionally, it is not possible for a script to detect that "Disable Scripts" has been set.
+
+## See Also
+
+- [llGetEnv](/script/reference/lsl/functions/llgetenv/) - for region settings that don't fit in a flag
+- [llGetParcelFlags](/script/reference/lsl/functions/llgetparcelflags/)
+- [llRequestSimulatorData](/script/reference/lsl/functions/llrequestsimulatordatata/)
+
+<WikiAttribution />

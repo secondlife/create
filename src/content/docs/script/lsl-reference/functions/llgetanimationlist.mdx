@@ -1,0 +1,86 @@
+---
+title: llGetAnimationList
+description: |-
+  Returns a list of keys of playing animations for an avatar.
+  Returns a list of keys of all playing animations for the specified avatar ID.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAnimationList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Simple Animation Override for Walk
+
+This example demonstrates how to override a standard walk animation with a custom animation. It shows practical use of `llGetAnimationList` to detect when a specific animation is playing and swap it for another.
+
+```lsl
+//Simple Animation Override for Walk
+key old_anim = "6ed24bd8-91aa-4b12-ccc7-c97c857ab4e0";
+string new_anim="yoga_float";
+integer status;
+list check;
+key owner;
+
+default
+{
+    state_entry()
+    {
+        owner = llGetOwner();
+        llRequestPermissions(owner, PERMISSION_TRIGGER_ANIMATION);
+        check = [old_anim];
+    }
+
+    run_time_permissions(integer p)
+    {
+        if(p & PERMISSION_TRIGGER_ANIMATION)
+        {
+            llSetTimerEvent(0.2);
+        }
+    }
+
+    timer()
+    {
+        if(llGetAgentInfo(owner) & AGENT_WALKING)
+        {
+            list anims = llGetAnimationList(owner);
+            if(~llListFindList(anims, check))
+            {
+                status = 1;
+                llStartAnimation(new_anim);
+                llStopAnimation(old_anim);
+            }
+        }
+        else if(status)
+        {
+            llStopAnimation(new_anim);
+            status = 0;
+        }
+    }
+
+    on_rez(integer p)
+    {
+        llResetScript();
+    }
+}
+```
+
+## Caveats
+
+- There is no internal mechanism to get the name of the animations playing. You can only work with animation keys.
+- Standard animations can be started and stopped by scripts, so the list returned may not accurately reflect the avatar's state. Use `llGetAgentInfo` and `llGetAnimation` when this matters.
+- Some motions are local to the viewer and cannot be detected by scripts.
+- Animations that are triggered by other animations are local to the viewer and cannot be detected by scripts.
+
+## See Also
+
+- [llGetAgentInfo](../llgetagentinfo/)
+- [llGetAnimation](../llgetanimation/)
+- [llStartAnimation](../llstartanimation/)
+- [llStopAnimation](../llstopanimation/)
+
+<WikiAttribution />

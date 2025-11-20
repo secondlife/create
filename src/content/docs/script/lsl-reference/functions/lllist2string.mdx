@@ -1,0 +1,59 @@
+---
+title: llList2String
+description: >-
+  Copies the string at Index in the list.
+
+  Returns the value at Index in the specified list as a string. If Index
+  describes a location not in the list then null string is returned.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llList2String" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- When using this function to typecast a list element to a string, floats will be truncated to 6 decimal places.
+
+## Examples
+
+```lsl
+// This code demonstrates the differences in typecasting in LSL
+// and demonstrates how to use the llList2* functions.
+// Best viewed in Chat History (Ctrl+H)
+
+default {
+    state_entry() {
+        list my_list = ["a", "0xFF", "0xFF.FF", "1.0e3", 1, 2.0, <1,2,3>, <1,2,3,4>, llGetOwner()];
+        integer i = 0;
+        integer end = llGetListLength(my_list);
+
+        for (; i < end; ++i) {
+            llOwnerSay("string=" + llList2String(my_list, i)
+                        + "\n   integer=" + (string)llList2Integer(my_list, i) + " OR " + (string)((integer)llList2String(my_list, i))
+                        + "\n   float=" + (string)llList2Float(my_list, i) + " OR " + (string)((float)llList2String(my_list, i))
+                        + "\n   vector=" + (string)llList2Vector(my_list, i) + " OR " + (string)((vector)llList2String(my_list, i))
+                        + "\n   rot=" + (string)llList2Rot(my_list, i) + " OR " + (string)((rotation)llList2String(my_list, i))
+                        + "\n   key=" + (string)llList2Key(my_list, i) + " OR " + (string)((key)llList2String(my_list, i)));
+        }
+    }
+}
+```
+
+## Notes
+
+- If you're extracting a string from a single-entry list, using `(string)myList` may be more efficient than `llList2String(myList, 0)` as it produces the same result with less memory overhead by avoiding a function call.
+- To convert a string of hexadecimal notation to an integer, call `llList2Integer` and it will automatically cast the value as a decimal integer. To convert that integer back to a string of hexadecimal notation, use a user function like `hex()`.
+
+## See Also
+
+- [llDumpList2String](../lldumplist2string/)
+- [llGetListEntryType](../llgetlistentrytype/)
+- [llList2Float](../lllist2float/)
+- [llList2Integer](../lllist2integer/)
+- [llList2Key](../lllist2key/)
+
+<WikiAttribution />

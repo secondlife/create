@@ -1,0 +1,68 @@
+---
+title: llSitOnLink
+description: >-
+  If agent identified by AvatarID is participating in the experience, sit them
+  on the specified link's sit target.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSitOnLink" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+integer gLinkId = LINK_THIS;
+
+default
+{
+    touch_start(integer total_number)
+    {
+        llRequestExperiencePermissions(llDetectedKey(0), "");
+    }
+
+    experience_permissions(key agent_id)
+    {
+        integer sitTest = llSitOnLink(agent_id, gLinkId);
+        if (sitTest != 1)
+        {
+            llInstantMessage(agent_id, "Cannot force agent " + (string)agent_id + " to sit due to reason id: " + (string)sitTest);
+        }
+    }
+
+    experience_permissions_denied(key agent_id, integer reason)
+    {
+        llInstantMessage(agent_id, "Denied experience permissions for " + (string)agent_id + " due to reason id: " + (string)reason);
+    }
+}
+```
+
+## Notes
+
+- This function must be called from an experience-enabled script running on land that has enabled the experience key. If these conditions are not met, the function returns a `NOT_EXPERIENCE` error.
+
+- The targeted avatar must also have accepted the experience. If the user is not participating in the experience, the function returns `NO_EXPERIENCE_PERMISSION`. If the avatar ID cannot be found or is not over land that has enabled the experience, the function returns `INVALID_AGENT`.
+
+- If the specified link is already occupied, the simulator searches down the chain of prims in the link set looking for an available sit target.
+
+- Link constants that indicate a single prim may be used for the link parameter. These are `LINK_ROOT` and `LINK_THIS`. Other constants such as `LINK_SET`, `LINK_CHILDREN`, `LINK_ALL_OTHERS` will return an `INVALID_LINK` error.
+
+- If there are no valid sit targets remaining in the linkset, the function returns `NO_SIT_TARGET` and no action is taken with the avatar.
+
+- If the avatar does not have access to the parcel containing the prim running this script, the call fails.
+
+- Related primitive parameter constants: `PRIM_ALLOW_UNSIT`, `PRIM_SCRIPTED_SITS_ONLY`, and `PRIM_SIT_TARGET`.
+
+## See Also
+
+- [llLinkSitTarget](../lllinksittarget/)
+- [llSitTarget](../llsittarget/)
+- [llSetSitText](../llsetsittext/)
+- [llAvatarOnLinkSitTarget](../llavataronlinksittarget/)
+- [llAvatarOnSitTarget](../llavataronsittarget/)
+- [llUnSit](../llunsit/)
+
+<WikiAttribution />

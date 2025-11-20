@@ -1,0 +1,49 @@
+---
+title: llSHA256String
+description: >-
+  Returns a string of 64 hex characters that is the SHA256 security hash of
+  text.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSHA256String" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+llSay(0, llSHA256String("Hello, Avatar!")); // returns 3a9f9d2e4360319a62139d19bd425c16fb8439b832d74d5221ca75b54c35b4f2
+```
+
+### Linux Verification
+
+You can verify SHA-256 hashes using OpenSSL:
+
+```bash
+$ echo -n 'Hello, Avatar!' | openssl sha256
+3a9f9d2e4360319a62139d19bd425c16fb8439b832d74d5221ca75b54c35b4f2
+```
+
+## Caveats
+
+- There is no way to input a zero-byte value into this function, nor any byte value from 128-255, making it currently broken for many purposes (like HMAC-SHA1).
+- LSL strings cannot contain a Unicode null character (U+0000), and LSL has no escape code for the null character (unlike many programming languages that use `\0`).
+- `llEscapeURL("%00")` yields an empty string, providing no workaround.
+- Characters with a Unicode integer value over U+0127 (127 decimal) are handled in UTF-8 fashion: in the hex values, `0xC2` is prepended to the byte value (hence `0x0080-0x00FF` become `0xC280-0xC2FF` inside the function).
+
+## Notes
+
+LSL strings are stored in UTF-8 format, which affects how byte values are encoded when passed to this function.
+
+Prior to this function's availability, the only way to get a SHA-256 hash was to use the LSL SHA-256 port implementation.
+
+## See Also
+
+- [llMD5String](../llmd5string/)
+- [llSHA1String](../llsha1string/)
+- SHA-2
+
+<WikiAttribution />

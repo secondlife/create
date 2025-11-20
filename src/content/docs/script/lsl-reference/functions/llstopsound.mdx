@@ -1,0 +1,42 @@
+---
+title: llStopSound
+description: Stops playback of the currently attached sound.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStopSound" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llLoopSound("string soundname if in object inventory or UUID", 1.0);
+    }
+    touch_start(integer total_number)
+    {
+        llStopSound();//As if by magic the sound stops!!
+    }
+}
+```
+
+## Caveats
+
+- There is no way to stop a specific sound.
+- In a linked set use llLinkStopSound to stop sound in a specific prim.
+
+## See Also
+
+- [llPlaySound](../llplaysound/)
+- [llPlaySoundSlave](../llplaysoundslave/)
+- [llLoopSound](../llloopsound/)
+- [llLoopSoundMaster](../llloopsoundmaster/)
+- [llLoopSoundSlave](../llloopsoundslave/)
+
+<WikiAttribution />

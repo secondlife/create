@@ -1,0 +1,35 @@
+---
+title: llManageEstateAccess
+description: >-
+  Adds or removes agents from the estate's agent access or ban lists, or groups
+  to the estate's group access list. Action is one of the
+  ESTATE_ACCESS_ALLOWED_* operations to perform.
+
+  Returns an integer representing a boolean, TRUE if the call was successful;
+  FALSE if throttled, invalid action, invalid or null id or object owner is not
+  allowed to manage the estate.
+
+  The object owner is notified of any changes, unless
+  PERMISSION_SILENT_ESTATE_MANAGEMENT has been granted to the script.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llManageEstateAccess" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.ManageEstateAccess()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llManageEstateAccess](/script/reference/lsl/functions/llManageEstateAccess/)
+
+

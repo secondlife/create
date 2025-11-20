@@ -1,0 +1,50 @@
+---
+title: llStopHover
+description: Stop hovering to a height (due to llSetHoverHeight()).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStopHover" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Put in an attached prim and touch to start floating in air without flying.
+// Touch again to drop to the ground.
+
+integer gHovering = FALSE; // are we supposd to be hovering now?
+
+default {
+    touch_start(integer total_number) {
+        if (!llGetAttached()) {
+            llWhisper(0, "Wear me to play.");
+            return;
+        }
+
+        if (gHovering) {
+            llOwnerSay("Releasing you.");
+            llStopHover();
+        }
+        else {
+            llOwnerSay("Making you float...");
+
+            // Start hovering 5 meters over our current location.
+            vector myPosition = llGetPos();
+            llSetHoverHeight(myPosition.z - llGround(ZERO_VECTOR) + 5.0, FALSE, 1.0);
+        }
+
+        gHovering = !gHovering; // flip the switch
+    }
+}
+```
+
+## See Also
+
+- [llSetHoverHeight](../llsethoverheight/)
+- [llGroundRepel](../llgroundrepel/)
+
+<WikiAttribution />

@@ -1,0 +1,125 @@
+---
+title: llListSortStrided
+description: >-
+  Returns the specified list, sorted by the specified element into blocks of
+  stride in ascending order (if Ascending is TRUE, otherwise descending). Note
+  that sort only works if the first entry of each block is the same datatype.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListSortStrided" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Sorting Strided Lists
+
+When working with strided lists (data grouped in chunks), you must specify the correct stride to keep related data together:
+
+```lsl
+list demographics = ["John Adams", "male", "2007-06-22",
+                     "Shirley Bassey", "female", "2005-11-02",
+                     "Matt Damon", "male", "2008-05-19"];
+
+// BAD: Sorts each element individually, destroying the stride structure
+list tmplist_1 = llListSortStrided(demographics, 1, 0, TRUE);
+// Result: ["2005-11-02", "2007-06-22", "2008-05-19", "John Adams",
+//          "Matt Damon", "Shirley Bassey", "female", "male", "male"]
+
+// GOOD: Sorts by stride while keeping 3-element chunks together
+list tmplist_2 = llListSortStrided(demographics, 3, 0, TRUE);
+// Result: ["John Adams", "male", "2007-06-22",
+//          "Matt Damon", "male", "2008-05-19",
+//          "Shirley Bassey", "female", "2005-11-02"]
+```
+
+### Sorting by Different Fields
+
+```lsl
+list score_board = ["Awesome", "Resident", 200,
+                    "Star", "Marxman", 999,
+                    "Happy2", "Survive", 1];
+
+default {
+    state_entry() {
+        // Sort by first names (stride_index = 0)
+        list by_first = llListSortStrided(score_board, 3, 0, TRUE);
+
+        // Sort by last names (stride_index = 1)
+        list by_last = llListSortStrided(score_board, 3, 1, TRUE);
+
+        // Sort by score (stride_index = 2)
+        list by_score = llListSortStrided(score_board, 3, 2, TRUE);
+    }
+}
+```
+
+### Type-Specific Sorting
+
+```lsl
+// Strings sort case-sensitively by Unicode character code
+llListSortStrided(["a", "á", "B", "C", "d", "e"], 1, 0, TRUE)
+// Returns: ["B", "C", "a", "d", "e", "á"]
+
+// In ascending sort, types are sorted individually then "feathered" together
+llListSortStrided([1, "C", 3, "A", 2, "B"], 1, 0, TRUE)
+// Returns: [1, "A", 2, "B", 3, "C"]
+
+llListSortStrided([1, 3, 2, "C", "A", "B"], 1, 0, TRUE)
+// Returns: [1, 2, 3, "A", "B", "C"]
+```
+
+## Caveats
+
+- **Algorithm**: Uses the same unoptimized selection sort algorithm as `llListSort`, with O(N²) complexity. See [SVC-2988](https://jira.secondlife.com/browse/SVC-2988) for improvement tracking.
+
+- **Ascending Parameter**: The value must be exactly `TRUE` (or 1) for ascending sort. Non-zero values other than 1 do not produce ascending sort.
+
+- **Vectors**: Vectors are sorted by magnitude, not component-wise.
+
+- **Rotations**: Rotations are not sorted in any meaningful order. Sorting a list of only rotations in ascending order returns it unchanged.
+
+- **Mixed Types Descending**: Descending sort with mixed types produces deterministic but potentially useless results:
+  ```lsl
+  llListSortStrided([2, "B", "C", 3, 1, "A"], 1, 0, FALSE)
+  // Returns: ["A", 3, 1, "C", "B", 2]
+  ```
+
+- **Stride Mismatch**: If stride is greater than 1 and the list length is not a multiple of the stride, the list is returned unchanged.
+
+- **Invalid Stride Index**: If `stride_index` is not less than `stride` and not greater than or equal to `-stride`, an empty list is returned.
+
+- **String Number Sorting**: Numbers in strings are sorted left-to-right by character, not numerically:
+  ```lsl
+  llListSortStrided(["127", "3", "25"], 1, 0, TRUE)
+  // Returns: ["127", "25", "3"]  (not numeric order!)
+
+  // Workaround: pad numbers with zeros
+  llListSortStrided(["127", "003", "025"], 1, 0, TRUE)
+  // Returns: ["003", "025", "127"]  (correct numeric order)
+  ```
+
+- **Unstable Sort**: The algorithm is not stable. You cannot chain multiple sorts on different columns to achieve multi-key sorting:
+  ```lsl
+  list input = [1, "b", 0, "c", 1, "a", 0, "b", 1, "c", 0, "a"];
+  list partialSort = llListSortStrided(input, 2, 1, TRUE);
+  list fullSort = llListSortStrided(partialSort, 2, 0, TRUE);
+  // Result will not have correct multi-key sort
+  ```
+
+- **Source Unchanged**: The original list remains unchanged. You must capture the return value.
+
+## Notes
+
+- Best used with homogeneous data types (all strings, all integers, etc.)
+- For mixed data types, results are usually meaningless due to the sorting algorithm treating different types separately
+- Remember to capture the returned sorted list; the function does not modify the original
+
+## See Also
+
+- [llListSort](../lllistsort/)
+
+<WikiAttribution />

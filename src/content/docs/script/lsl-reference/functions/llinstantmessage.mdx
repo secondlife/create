@@ -1,0 +1,72 @@
+---
+title: llInstantMessage
+description: |-
+  IMs Text to the user identified.
+  Send Text to the user as an instant message.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llInstantMessage" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Tell the owner when an object is touched:
+
+```lsl
+default
+{
+    touch_start( integer total_num )
+    {
+        llInstantMessage( llGetOwner(), "Someone touched me" );
+    }
+}
+```
+
+Send an IM to a detected avatar only:
+
+```lsl
+default
+{
+    touch_start( integer total_num )
+    {
+        llInstantMessage( llDetectedKey(0), "Hands Off!");
+    }
+}
+```
+
+## Caveats
+
+- All object IMs are throttled at a maximum of 2500 per 30 minutes, per owner, per region, in a rolling window. Throttled IMs are dropped.
+- Messages longer than 1023 bytes will be truncated to 1023 bytes. This can convey 1023 ASCII characters, or fewer (around 512 UTF-8 characters) if non-ASCII characters are present.
+- If the specified user is logged in, the message will appear in their chat window and will not be logged by the InstantMessage logging facility.
+- If the specified user is not signed in, messages will be delivered to their email just like a regular instant message, if the user has enabled email for their account.
+- If messages are sent to the same user by the same object within about 65 seconds, they will be bundled together in a single email.
+
+## Notes
+
+- llRegionSayTo may be a better choice if the target is in the same region as the object sending the message, as it has no built-in delay and can communicate directly with objects, as well as with avatars and their attachments.
+- Instant Messaging allows communication from an object to an avatar anywhere on the Grid. However, an object cannot receive an Instant Message.
+- Using llInstantMessage from one or more child scripts will avoid delays in the main script. Child scripts will still be subject to delays, message queue limits, and region throttles.
+
+### Throttling Implementation Details
+
+- The throttle is on all IMs from the object owner. It does not disable all IMs in the region, but does disable all IMs from the owner of the object.
+- The throttle is not per object, but per owner. Splitting the spamming object into multiple objects will not help unless owned by different people.
+- 2500 IMs in 30 minutes will trigger the block.
+- IMs that are blocked continue to count against the throttle. The IM count must drop below 2500 before any IMs will be delivered.
+- The IM count of the previous window is used to approximate the rolling window. If it is 20% into the current window, the IM count will be the current count + 80% of the previous count. This allows approximation of a rolling average, but results in a flood of IMs affecting the throttle for double the window length. In practice, the throttle behaves more like 5k in 1hr than 2.5k in 30 minutes.
+
+## See Also
+
+- [llOwnerSay](../llownersay/)
+- [llRegionSay](../llregionsay/)
+- [llRegionSayTo](../llregionsayto/)
+- [llWhisper](../llwhisper/)
+- [llSay](../llsay/)
+- [llShout](../llshout/)
+
+<WikiAttribution />

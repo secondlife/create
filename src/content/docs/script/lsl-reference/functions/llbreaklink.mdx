@@ -1,0 +1,53 @@
+---
+title: llBreakLink
+description: >-
+  De-links the prim with the given link number (requires permission
+  PERMISSION_CHANGE_LINKS be set).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llBreakLink" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+//-- requests permission to change links, then breaks the link
+//-- between the prim and the rest of the object, on touch.
+default
+{
+    touch_start(integer vIntTouched)
+    {
+        llRequestPermissions(llGetOwner(), PERMISSION_CHANGE_LINKS);
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_CHANGE_LINKS)
+        {
+            llBreakLink(llGetLinkNumber());
+        }
+    }
+}
+```
+
+## Caveats
+
+- This function removes sitting avatars from the object, even if not sitting on the unlinked prim.
+- This function silently fails if called from a script inside an attachment.
+- This function fails if the owner does not have edit permissions on the object containing the script. The owner receives the system message "Delink failed because you do not have edit permission".
+- A prim with `PERMISSION_CHANGE_LINKS` can delink any prim in the linked object set, including itself or the root.
+- The only `LINK_*` flag that `link` currently supports is `LINK_ROOT`. See [SVC-3510](https://jira.secondlife.com/browse/SVC-3510).
+  - Use `llGetLinkNumber()` as the parameter to unlink the script's prim, not `LINK_THIS`.
+  - Use `llBreakAllLinks()` instead of using `LINK_SET`, `LINK_ALL_CHILDREN`, or `LINK_ALL_OTHERS` as the parameter for `llBreakLink`.
+
+## See Also
+
+- [llBreakAllLinks](../llbreakalllinks/)
+- [llCreateLink](../llcreatelink/)
+- `changed` event with `CHANGED_LINK` flag
+
+<WikiAttribution />

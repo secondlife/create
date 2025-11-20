@@ -1,0 +1,71 @@
+---
+title: llGetFreeMemory
+description: >-
+  Returns the number of free bytes of memory the script can use.
+
+  Returns the available free space for the current script. This is inaccurate
+  with LSO.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetFreeMemory" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The behavior of this function depends on which VM (Virtual Machine) the script is using:
+
+### Mono
+
+In Mono, the value returned is the amount of free memory available to the script **prior to garbage collection being run**. This means that memory awaiting garbage collection counts against the script's 64KiB allotment. Additionally, Mono does not enforce memory restrictions as strictly as LSO did, so it is possible to utilize more of the free memory than the theoretical limit would suggest.
+
+### LSO
+
+In LSO, the value returned by this function is the amount of memory that the Stack can use after the Heap has allocated for itself.
+
+**LSL Memory Layout (LSO):**
+
+The LSL memory space is divided into four sections:
+- Byte-code
+- Stack
+- Free Memory (the space between Stack and Heap)
+- Heap
+
+The total size of all four sections combined is **16,384 bytes (16 KiB)**.
+
+**Data Storage:**
+- Strings, lists, and keys are stored in the Heap
+- Heap pointers (for strings, lists, and keys), integers, floats, vectors, and rotations are temporarily stored in the stack as the script executes
+
+**Memory Dynamics:**
+- The Stack grows and shrinks as the script executes
+- The Heap grows as the script executes but never shrinks in size
+- When free memory runs out, the Stack and Heap collide, causing a Stack-Heap Collision error and script crash
+- The Heap can become fragmented; blocks may become unusable due to their size (no defragmentation function exists)
+
+## Examples
+
+```lsl
+llOwnerSay((string)llGetFreeMemory() + " bytes of free memory available for allocation.");
+```
+
+## Caveats
+
+- The number of free bytes the Heap can use may be greater but not less
+- "Free memory the script can use" means that if a memory limit is set via `llSetMemoryLimit`, this function reports the free space between the script's current memory usage and the defined limit, **not** the uncapped memory limit
+- The amount of free memory is updated only at the start of a server frame, meaning values can fluctuate. To ensure stable values, use a single-frame sleep before calling (e.g., `llSleep(0.01)`)
+
+## LSO Note
+
+In LSO, this function does not count free memory in the traditional sense. The value returned is actually the "historic lowest heap pointer minus the stack end pointer" — it counts all bytes never yet used, not bytes that have been freed. This is why the function may be considered for redefinition when the LSL VM transitions to Mono.
+
+## See Also
+
+- [llGetUsedMemory](/script/reference/lsl/functions/llgetusedmemory/) - Returns memory currently in use
+- [llSetMemoryLimit](/script/reference/lsl/functions/llsetmemorylimit/) - Define a memory limit lower than the maximum
+- [llScriptProfiler](/script/reference/lsl/functions/llscriptprofiler/) - Advanced function for analyzing script performance and memory usage
+
+<WikiAttribution />

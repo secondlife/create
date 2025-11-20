@@ -1,0 +1,60 @@
+---
+title: llGetRootRotation
+description: >-
+  Returns the rotation (relative to the region) of the root prim of the object
+  which the script is attached to.
+
+  Gets the global rotation of the root object of the object script is attached
+  to.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetRootRotation" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Returns an accurate facing for avatars seated or in mouselook, but only a rough direction otherwise when called from an attached prim.
+- When a seated avatar is in mouselook, its rotation is affected by the camera's rotation. There is no way to get the actual rotation of an avatar while seated in mouselook.
+- This function incorrectly (but usefully) returns the avatar's region rotation when called in an attachment. Use the following alternatives instead:
+
+```lsl
+// if called only from the root
+llGetLocalRot();
+
+// if called from in a linked object
+llList2Rot( llGetLinkPrimitiveParams( LINK_ROOT, [PRIM_ROT_LOCAL] ), 0 );
+
+// this alternative works correctly in all scenarios
+llList2Rot( llGetLinkPrimitiveParams( !!llGetLinkNumber(), [PRIM_ROT_LOCAL] ), 0 );
+```
+
+## Examples
+
+Rotate a child prim to match a global rotation in an unattached link set:
+
+```lsl
+default {
+  state_entry() {
+    // Rotate 45 degrees about Y-axis
+    rotation globalRot = llEuler2Rot(<0.0, 45.0, 0.0> * DEG_TO_RAD);
+    llSetLocalRot(globalRot / llGetRootRotation());
+  }
+}
+```
+
+## Notes
+
+In an attached object, this function returns the region rotation of the avatar, not of the object's root prim. See special cases of rotation for more details.
+
+## See Also
+
+- [llGetRot](../llgetrot/)
+- [llGetLocalRot](../llgetlocalrot/)
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+- [llGetLinkPrimitiveParams](../llgetlinkprimitiveparams/)
+
+<WikiAttribution />

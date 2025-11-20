@@ -1,0 +1,79 @@
+---
+title: llSetColor
+description: >-
+  Sets the color, for the face.
+
+  Sets the color of the side specified. If Face is ALL_SIDES, sets the color on
+  all faces.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetColor" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- `llSetColor` will have no visible effect on faces with a PBR material. To work on faces both with and without a PBR material, use this snippet:
+
+```lsl
+llSetColor(color, ALL_SIDES);
+llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_GLTF_BASE_COLOR, ALL_SIDES, "", "", "", "", llsRGB2Linear(color), "", "", "", ""]);
+```
+
+## Examples
+
+```lsl
+integer face = -1;
+vector color = <1.0, 1.0, 1.0>;
+
+default
+{
+    touch_start(integer num)
+    {
+        if(~face)       //quick & dirty but efficient way of testing if face is not equal to -1
+            llSetColor(color, face); //restore the color
+        face = (face + 1) % llGetNumberOfSides(); //increment and keep the face number in range
+        color = llGetColor(face); //save the face's color
+        llSetColor(<0.5, 0.0, 0.0>, face );  //change the face's color
+    }
+}
+```
+
+## Common Colors Reference
+
+| Color | Hex | LSL Vector |
+|-------|-----|-----------|
+| NAVY | #001f3f | `<0.000, 0.122, 0.247>` |
+| BLUE | #0074d9 | `<0.000, 0.455, 0.851>` |
+| AQUA | #7fdbff | `<0.498, 0.859, 1.000>` |
+| TEAL | #39cccc | `<0.224, 0.800, 0.800>` |
+| OLIVE | #3d9970 | `<0.239, 0.600, 0.439>` |
+| GREEN | #2ecc40 | `<0.180, 0.800, 0.251>` |
+| LIME | #01ff70 | `<0.004, 1.000, 0.439>` |
+| YELLOW | #ffdc00 | `<1.000, 0.863, 0.000>` |
+| ORANGE | #ff851b | `<1.000, 0.522, 0.106>` |
+| RED | #ff4136 | `<1.000, 0.255, 0.212>` |
+| MAROON | #85144b | `<0.522, 0.078, 0.294>` |
+| FUCHSIA | #f012be | `<0.941, 0.071, 0.745>` |
+| PURPLE | #b10dc9 | `<0.694, 0.051, 0.788>` |
+| WHITE | #ffffff | `<1.000, 1.000, 1.000>` |
+| SILVER | #dddddd | `<0.867, 0.867, 0.867>` |
+| GRAY | #aaaaaa | `<0.667, 0.667, 0.667>` |
+| BLACK | #111111 | `<0.067, 0.067, 0.067>` |
+
+## See Also
+
+- [llGetColor](../llgetcolor/)
+- [llSetAlpha](../llsetalpha/)
+- [llGetAlpha](../llgetalpha/)
+- [llSetLinkColor](../llsetlinkcolor/)
+- [llSetLinkAlpha](../llsetlinkalpha/)
+- PRIM_COLOR - The equivalent parameter for llSetPrimitiveParams
+- PRIM_GLTF_BASE_COLOR - The equivalent PBR parameter for llSetPrimitiveParams
+- changed event with CHANGED_COLOR
+- Color and Scripting
+
+<WikiAttribution />

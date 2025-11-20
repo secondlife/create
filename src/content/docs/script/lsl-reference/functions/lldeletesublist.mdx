@@ -1,0 +1,71 @@
+---
+title: llDeleteSubList
+description: >-
+  Removes the slice from start to end and returns the remainder of the list.
+
+  Remove a slice from the list and return the remainder, start and end are
+  inclusive.
+
+  Using negative numbers for start and/or end causes the index to count
+  backwards from the length of the list, so 0, -1 would delete the entire list.
+
+  If Start is larger than End the list deleted is the exclusion of the entries;
+  so 6, 4 would delete the entire list except for the 5th list entry.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDeleteSubList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Usage
+
+```lsl
+src = llDeleteSubList( src, start, end )
+```
+
+### Comprehensive Example
+
+```lsl
+default
+{
+    state_entry()
+    {
+        // Create a list of names
+        list names = ["Anthony", "Bob", "Charlie", "Diane", "Edgar", "Gabriela"];
+
+        // Now let's remove values at position 1 through 2.
+        names = llDeleteSubList(names, 1, 2);
+
+        // Result:
+        // list names = ["Anthony", "Diane", "Edgar", "Gabriela"];
+
+        // Now let's use an start number higher then our end number
+        names = llDeleteSubList(names, 3, 1);
+
+        // Result:
+        // list names = ["Edgar"];
+        // If start number higher then our end number, then we should imagine that the start and the end are missing before start and end.
+        // Imagine it should be FROM_THE_LISTSTART_CUT: start, AND_FROM_THE_LISTEND_CUT: end ... more or less :))
+        // names = llDeleteSubList(names, 3 -> , <- 1);
+    }
+}
+```
+
+## Notes
+
+- The function returns a modified copy of the source list; the original `src` list is not modified. Remember to use or store the result of this function.
+- When start is larger than end, the list deleted is the exclusion of the entries (inverse selection). For example, `llDeleteSubList(list, 3, 1)` deletes everything except positions 2 and 3.
+- The opposite function is `llListInsertList`, which inserts elements rather than removing them.
+
+## See Also
+
+- [llListInsertList](../lllistinsertlist/)
+- [llListReplaceList](../lllistreplacelist/)
+- [llList2List](../lllist2list/)
+
+<WikiAttribution />

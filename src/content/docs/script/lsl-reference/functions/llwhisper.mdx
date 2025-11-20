@@ -1,0 +1,53 @@
+---
+title: llWhisper
+description: >-
+  Whispers Text on Channel.
+
+  This chat method has a range of 10m radius.
+
+  PUBLIC_CHANNEL is the public chat channel that all avatars see as chat text.
+  DEBUG_CHANNEL is the script debug channel, and is also visible to nearby
+  avatars. All other channels are are not sent to avatars, but may be used to
+  communicate with scripts.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llWhisper" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Text can be a maximum of 1024 bytes. This can convey 1024 ASCII characters, or 512 UTF-8 characters such as á
+- Whispers can only be heard within 10 meters of the speaking prim (rather than the root). This is contrary to how listens work, where a message can only be heard by any prim in the object if and only if the root prim is capable of hearing it.
+- A prim can **not** hear itself, this to prevent problems with recursion. It can however hear other prims within the same object. Use llMessageLinked instead for intra-prim messaging.
+
+## Examples
+
+If you prefer, you can make use of certain mnemonic constants such as PUBLIC_CHANNEL instead of channel 0 and DEBUG_CHANNEL instead of channel +2,147,483,647.
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llWhisper(0, "This is an incredibly useless program.");
+    }
+}
+```
+
+For communicating with the user or owner it is preferable to use llOwnerSay or llInstantMessage or llRegionSayTo as they won't spam other users.
+
+## See Also
+
+- listen
+- [llListen](../lllisten/)
+- [llOwnerSay](../llownersay/)
+- [llRegionSay](../llregionsay/)
+- [llSay](../llsay/)
+- [llShout](../llshout/)
+- [llInstantMessage](../llinstantmessage/)
+
+<WikiAttribution />

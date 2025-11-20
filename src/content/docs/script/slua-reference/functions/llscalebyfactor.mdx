@@ -1,0 +1,34 @@
+---
+title: llScaleByFactor
+description: >-
+  Attempts to resize the entire object by ScalingFactor, maintaining the
+  size-position ratios of the prims.
+
+
+  Resizing is subject to prim scale limits and linkability limits. This function
+  can not resize the object if the linkset is physical, a pathfinding character,
+  in a keyframed motion, or if resizing would cause the parcel to overflow.
+
+  Returns a boolean (an integer) TRUE if it succeeds, FALSE if it fails.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llScaleByFactor" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.ScaleByFactor()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llScaleByFactor](/script/reference/lsl/functions/llScaleByFactor/)
+
+

@@ -1,0 +1,61 @@
+---
+title: llAcos
+description: Returns the arc-cosine of Value, in radians.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llAcos" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Triggers a Math Error for complex results if not compiled in Mono.
+
+## Examples
+
+### Basic Example - Valid Range
+
+```lsl
+//  This example exercises the full valid range of argument from -1.0 to +1.0
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        float random = llFrand(2.0) - 1.0;
+
+        llOwnerSay("The arccosine of " + (string)random + " is " + (string)llAcos(random));
+    }
+}
+```
+
+### Law of Cosines - Triangle Angle Calculation
+
+```lsl
+//An example for the Law of Cosines to calculate any angle of a triangle from 3 known side lengths.
+
+default
+{
+    touch_start(integer num_detected)
+    {
+        vector t=< llFrand(9.0)+1.0 , llFrand(9.0)+1.0 , llFrand(9.0)+1.0 >; //the 3 values of this vector are used to set the lengths of 3 sides of a triangle.
+
+        float anglexy=llAcos( (t.x*t.x+t.y*t.y-(t.z*t.z)) / ( 2*t.x*t.y) ) //Law Of Cosines
+
+        llOwnerSay("Using the Law Of Cosines, the angle of a triangle between side a="+(string)t.x+"and side b="+(string)t.y+"is = "+(string)anglexy+" radians="+(string)(anglexy*RAD_TO_DEG)+"° and that angle is not on side c="+(string)t.z);
+    }
+}
+```
+
+## See Also
+
+- [llSin](/script/lsl-reference/functions/llsin/) - sine function
+- [llAsin](/script/lsl-reference/functions/llasin/) - inverse sine function
+- [llCos](/script/lsl-reference/functions/llcos/) - cosine function
+- [llTan](/script/lsl-reference/functions/lltan/) - tangent function
+- [llAtan2](/script/lsl-reference/functions/llatan2/) - inverse tangent function
+
+<WikiAttribution />

@@ -1,0 +1,84 @@
+---
+title: llRotTarget
+description: >-
+  Set rotations with error of LeeWay radians as a rotational target, and return
+  an ID for the rotational target.
+
+  The returned number is a handle that can be used in at_rot_target and
+  llRotTargetRemove.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRotTarget" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The following example demonstrates a simple two-state rotation target detection and rotation system:
+
+```lsl
+vector standrot = <0.0, 0.0, 0.0>;
+vector fliprot = <45.0, 0.0, 0.0>;
+
+// simple two-state rot target detection and rotation by Hypatia Callisto
+// works to detect a rotation target. An example demonstrating
+// at_rot_target, not_at_rot_target, llRotTarget, and llRotTargetRemove
+
+integer rottarget;
+
+default
+{
+    state_entry(){
+        rottarget = llRotTarget(llEuler2Rot(fliprot*DEG_TO_RAD), 0.1);
+        llSetPrimitiveParams ([PRIM_ROTATION, llEuler2Rot(standrot*DEG_TO_RAD)]); // rotate to starting point
+    }
+
+    not_at_rot_target()
+    {
+        llRotTargetRemove( rottarget );
+        llOwnerSay("not there"); //not at target
+    }
+
+    touch_start (integer total_number)
+    {
+        state rotatestate; // change to state for new position
+    }
+}
+
+state rotatestate
+{
+    state_entry(){
+        rottarget = llRotTarget(llEuler2Rot(fliprot*DEG_TO_RAD), 0.1);
+        llSetPrimitiveParams ([PRIM_ROTATION, llEuler2Rot(fliprot*DEG_TO_RAD)]); // rotate to new point
+    }
+
+    at_rot_target(integer tnum, rotation targetrot, rotation ourrot)
+    {
+        llRotTargetRemove( rottarget );
+        llOwnerSay("there"); //reached the target
+    }
+
+    touch_start(integer touched){
+        state default;
+    }
+}
+```
+
+## Notes
+
+- This function does not rotate the object directly. To rotate the object, use `llSetRot`, `llRotLookAt`, or `llLookAt`.
+- The function registers a rotation target with an error tolerance that triggers `at_rot_target` and `not_at_rot_target` events continuously until the target is unregistered.
+- Use the returned handle with `llRotTargetRemove` to unregister the target.
+
+## See Also
+
+- `at_rot_target` - Triggered when the object reaches the rotation target
+- `not_at_rot_target` - Triggered when the object is not at the rotation target
+- [llRotTargetRemove](../llrottargetremove/)
+- [llTarget](../lltarget/)
+- [llTargetRemove](../lltargetremove/)
+
+<WikiAttribution />

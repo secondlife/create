@@ -1,0 +1,57 @@
+---
+title: llSetScale
+description: Sets the prim's scale (size) to Scale.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetScale" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- This function only changes the size of the *prim* that the script is in. **Not** the entire object.
+- If the prim is part of a link set, rescaling will fail if the new size is too large or small to satisfy the linkability rules.
+- Does not work on physical prims.
+
+## Examples
+
+A basic door that opens and closes when an avatar collides with it:
+
+```lsl
+//A basic door that opens and closes when an avatar collides with it.
+//Not very effective, as it would be better to use llSetStatus(STATUS_PHANTOM, 1)...
+//But, it works.
+vector startingSize;
+default {
+     state_entry() {
+          startingSize = llGetScale();
+     }
+     collision_start(integer i) {
+          llSetScale(<0.1, 0.1, 0.1>); //Shrink
+          llSetPos(llGetPos() + <0.0,0.0,10.0>); //Hide us
+          llSetTimerEvent(3.0);
+     }
+     timer() {
+          llSetTimerEvent(0.0);
+          llSetScale(startingSize); //Go back to normal size
+          llSetPos(llGetPos() - <0.0,0.0,10.0>); //And where we started
+     }
+} //Code by Xaviar Czervik.
+```
+
+## Notes
+
+- The components of the size vector (x, y, and z) each need to be in the range 0.01 to 64.0. If they are out of range, they are rounded to the nearest endpoint.
+- For a flexible curtain or door script using llSetScale(), see the Curtain script documentation.
+
+## See Also
+
+- [llGetScale](../llgetscale/)
+- [llScaleByFactor](../llscalebyfactor/)
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+
+<WikiAttribution />

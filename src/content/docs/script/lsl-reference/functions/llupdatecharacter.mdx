@@ -1,0 +1,80 @@
+---
+title: llUpdateCharacter
+description: Updates settings for a pathfinding character.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llUpdateCharacter" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llCreateCharacter([CHARACTER_DESIRED_SPEED, 10.0]);
+
+        list points = [llGetPos() + <5,0,0>, llGetPos() - <5,0,0>];
+        llPatrolPoints(points, []);
+    }
+
+    touch_start(integer total_number)
+    {
+        llUpdateCharacter([CHARACTER_DESIRED_SPEED, 50.0]);
+    }
+}
+```
+
+## Parameters
+
+### CHARACTER_DESIRED_SPEED
+- Ranges from 0.2 to 40.0
+
+### CHARACTER_RADIUS
+- Ranges from 0.1 to 5.0
+
+### CHARACTER_LENGTH
+- Ranges from 0.0 to 10.0
+
+### TRAVERSAL_TYPE
+- Use one of: `TRAVERSAL_TYPE_SLOW`, `TRAVERSAL_TYPE_FAST`, `TRAVERSAL_TYPE_NONE`
+- Defaults to `TRAVERSAL_TYPE_NONE` if omitted
+- Controls how a character moves on terrain with less than 100% walkability (e.g., SLOW for a cat crossing a street, FAST for a car in a swamp)
+
+### CHARACTER_TYPE
+- Use one of: `CHARACTER_TYPE_A`, `CHARACTER_TYPE_B`, `CHARACTER_TYPE_C`, `CHARACTER_TYPE_D`, `CHARACTER_TYPE_NONE`
+- Defaults to `CHARACTER_TYPE_NONE` if omitted
+- Determines which of the 4 walkability coefficients the character uses
+
+## Caveats
+
+- This function is subject to change
+- Character shape is a capsule (cylinder with spherical ends) defined by `CHARACTER_LENGTH` (tip to tip) and `CHARACTER_RADIUS` (circular cross-section)
+- The character's true length cannot be smaller than twice the radius; however, you can specify a value lower than that (but greater than zero) and the script won't complain
+- The capsule is usually oriented vertically; you can make it horizontal by using an object long in its local X-axis, but horizontal capsules may become stuck more easily
+- **Use a vertical capsule whenever possible**
+- Removing the script from a prim will not stop pathing behavior (similar to particles and hover text). To stop a pathing command, use `llExecCharacterCmd(CHARACTER_CMD_STOP, [])`
+
+## See Also
+
+- [llCreateCharacter](../llcreatecharacter/)
+- [llDeleteCharacter](../lldeletecharacter/)
+- [llEvade](../llevade/)
+- [llExecCharacterCmd](../llexeccharactercmd/)
+- [llGetClosestNavPoint](../llgetclosestnavpoint/)
+- [llFleeFrom](../llfleefrom/)
+- [llNavigateTo](../llnavigateto/)
+- [llPatrolPoints](../llpatrolpoints/)
+- [llPursue](../llpursue/)
+- [llWanderWithin](../llwanderwithin/)
+
+## Related Events
+
+- path_update
+
+<WikiAttribution />

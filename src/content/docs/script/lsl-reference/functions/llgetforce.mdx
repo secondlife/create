@@ -1,0 +1,52 @@
+---
+title: llGetForce
+description: |-
+  Returns the force (if the script is physical).
+  Returns the current force if the script is physical.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetForce" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSetForce(<0,llFrand(10),0>,FALSE); //Sets the force in a frand of 10 in Y axis.
+        llSetTimerEvent(1); //Resets the force every second.
+    }
+    touch_start(integer total_num)
+    {
+        llOwnerSay((string)llGetForce()); //Says the force.
+    }
+    timer()
+    {
+        llResetScript();
+    }
+}
+```
+
+This example demonstrates:
+- Setting a force on a physical object with `llSetForce()`
+- Using a timer to reset the force periodically
+- Retrieving and converting the force vector to a string with `llGetForce()`
+
+## See Also
+
+- [llGetOmega](../llgetomega/)
+- [llGetVel](../llgetvel/)
+- [llGetTorque](../llgettorque/)
+- [llGetMass](../llgetmass/)
+- [llGetAccel](../llgetaccel/)
+- [llSetForce](../llsetforce/)
+- [llSetTorque](../llsettorque/)
+- [llSetForceAndTorque](../llsetforceandtorque/)
+
+<WikiAttribution />

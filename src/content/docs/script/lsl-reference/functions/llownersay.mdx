@@ -1,0 +1,79 @@
+---
+title: llOwnerSay
+description: >-
+  says Text to owner only (if owner is in region).
+
+  Says Text to the owner of the object running the script, if the owner has been
+  within the object's simulator since logging into Second Life, regardless of
+  where they may be in-world.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llOwnerSay" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer num_detected)
+    {
+        llOwnerSay("Ouch!");
+    }
+}
+```
+
+## Caveats
+
+- If the message is longer than 1024 bytes, it will be truncated to 1024 bytes. This can convey 1024 ASCII characters, or fewer if non-ASCII characters are present.
+- Silently fails approximately 45 seconds after the owner leaves the region the object is in.
+- Silently fails when the object to which the script is attached is deeded to a group.
+- Some viewers do not display `llOwnerSay` text when the message is empty (empty string).
+- Produces swirly particle effects visible only to the owner (who sees the message); these effects do not appear to other avatars.
+
+## Robust Alternative
+
+For better reliability when the owner may not be in the region or the object is group-owned, consider this helper function:
+
+```lsl
+uOwnerSayPlus(string inputString)
+{
+    key owner = llGetOwner();
+
+    // single owner that the region still has a handle for
+    if (llKey2Name(owner))
+    {
+        llOwnerSay(inputString);
+    }
+    // group owned, must send the message publicly
+    else if (llList2Key(llGetObjectDetails(llGetKey(), [OBJECT_GROUP]), 0) == owner)
+    {
+        llWhisper(0, "/me : " + inputString);
+    }
+    // single owner, not present, send them an IM
+    else
+    {
+        llInstantMessage(owner, inputString);
+    }
+}
+```
+
+This helper prevents silent failures by:
+- Using `llOwnerSay` if the owner is present in the region
+- Using `llWhisper` with an emote prefix for group-owned objects
+- Using `llInstantMessage` to reach the owner if they're offline or in a different region
+
+## See Also
+
+- [llRegionSay] - Sends chat region wide
+- [llWhisper] - Sends chat limited to 10 meters
+- [llSay] - Sends chat limited to 20 meters
+- [llShout] - Sends chat limited to 100 meters
+- [llRegionSayTo] - Sends private chat region wide
+- [llInstantMessage] - Sends private chat anywhere on the grid
+
+<WikiAttribution />

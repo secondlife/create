@@ -1,0 +1,42 @@
+---
+title: llDetectedLinkNumber
+description: >-
+  Returns the link position of the triggered event for touches and collisions
+  only.
+
+  0 for a non-linked object, 1 for the root of a linked object, 2 for the first
+  child, etc.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedLinkNumber" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+// Drop this script into the root prim of of a build
+// Touch any prim to learn its link number
+    touch_start(integer num_detected)
+    {
+        llOwnerSay("Link number clicked: " + (string)llDetectedLinkNumber(0) );
+    }
+}
+```
+
+## See Also
+
+- [llDetectedTouchFace](../lldetectedtouchface/)
+- touch_start
+- touch
+- touch_end
+- collision_start
+- collision
+- collision_end
+
+<WikiAttribution />

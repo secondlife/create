@@ -1,0 +1,39 @@
+---
+title: llPow
+description: >-
+  Returns the Value raised to the power Exponent, or returns 0 and triggers Math
+  Error for imaginary results.
+
+  Returns the Value raised to the Exponent.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llPow" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default {
+    state_entry() {
+        llOwnerSay("llPow(5, .5) (" + (string)llPow(5, .5) + ") is equal to llSqrt(5) ("
+                    + (string)llSqrt(5) + ").");
+    }
+}
+```
+
+## Caveats
+
+- If exponent is a static integer and not a variable, llPow is dramatically slower than simple repeated multiplication. For example, it's much faster to use `val = base*base*base` instead of `val = llPow(base, 3)`.
+- Triggers a Math Error for imaginary results if not compiled in Mono.
+
+## See Also
+
+- [llLog](../lllog/)
+- [llLog10](../lllog10/)
+- [llSqrt](../llsqrt/)
+
+<WikiAttribution />

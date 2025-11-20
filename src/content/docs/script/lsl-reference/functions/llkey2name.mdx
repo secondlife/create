@@ -1,0 +1,73 @@
+---
+title: llKey2Name
+description: >-
+  Returns the name of the prim or avatar specified by ID. The ID must be a valid
+  rezzed prim or avatar key in the current simulator, otherwise an empty string
+  is returned.
+
+  For avatars, the returned name is the legacy name
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llKey2Name" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Best viewed in Chat History (ctrl-h)
+
+default
+{
+    collision_start(integer num_detected)
+    {
+        key id = llDetectedKey(0);
+        string name = llKey2Name(id);
+
+        string detectedName = llDetectedName(0);
+
+        llSay(0, "llKey2Name: " + name
+            + "\nllDetectedName: " + detectedName);
+    }
+
+    touch_start(integer num_detected)
+    {
+        key id = llDetectedKey(0);
+        string name = llKey2Name(id);
+
+        string detectedName = llDetectedName(0);
+
+        llSay(0, "llKey2Name: " + name
+            + "\nllDetectedName: " + detectedName);
+    }
+}
+```
+
+## Caveats
+
+- It is difficult to tell the difference between a prim that has a name that is an empty string and a prim that is not in the sim, or because an invalid key was specified. Use `llGetObjectDetails` to avoid this problem.
+- To get around the "avatar must be present" limitation, you can use the `llRequestAgentData` function and the `dataserver` event to obtain the avatar's name from a key.
+- If an avatar is "ghosted" (which occasionally happens due to a longstanding server bug), an empty string is returned even though the avatar is seemingly present and shows up in `llSensor` and the Mini-Map. This fact can be used as the basis of a Ghost Detector script.
+- Unlike the related functions `llGetUsername` and `llRequestUsername`, this function returns a 'nice' name in proper case and - if applicable - with a space, e.g. "Peter Stindberg", instead of "peter.stindberg" (or "Josh" instead of "josh.resident") as returned by the other two functions.
+
+## Notes
+
+- This function must specify a valid rezzed prim or avatar key, present in or otherwise known to the sim in which the script is running. If not, an empty string is returned.
+- In the case of an avatar, this function will still return a valid name if the avatar is a child agent of the sim (i.e., in an adjacent sim, but presently able to see into the one the script is in), or for a short period after the avatar leaves the sim (specifically, when the client completely disconnects from the sim, either as a main or child agent).
+- Keys of inventory items will not work; use `llGetInventoryName` instead.
+- This function returns the legacy name of the prim or avatar specified by the key.
+
+## See Also
+
+- [llGetUsername](../llgetusername/)
+- [llGetDisplayName](../llgetdisplayname/)
+- [llGetObjectDetails](../llgetobjectdetails/)
+- [llRequestAgentData](../llrequestagentdata/)
+- [llName2Key](../llname2key/)
+- [llRequestUserKey](../llrequestuserkey/)
+- [llDetectedName](../lldetectedname/)
+
+<WikiAttribution />

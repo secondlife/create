@@ -1,0 +1,33 @@
+---
+title: llGetScriptName
+description: |-
+  Returns the name of the script that this function is used in.
+  Returns the name of this script.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetScriptName" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Remove the current script from the object:
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llRemoveInventory(llGetScriptName());
+    }
+}
+```
+
+## See Also
+
+- [llRemoveInventory](../llremoveinventory/)
+
+<WikiAttribution />

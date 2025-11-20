@@ -1,0 +1,199 @@
+---
+title: llGetObjectDetails
+description: >-
+  Returns a list of object details specified in the Parameters list for the
+  object or avatar in the region with key ID.
+
+  Parameters are specified by the OBJECT_* constants.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetObjectDetails" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The `id` parameter holds the UUID of the avatar or prim this function will get details of.
+
+If `id` is not found in the region, adjacent regions are searched for avatars that match `id`. An avatar is only considered to have been found if it is inside the region or within a 34 meter zone outside the region boundaries. A single valid result may be returned after the avatar leaves this zone.
+
+## Parameters List
+
+The `params` list indicates the object attributes of interest. The order they are supplied in determines the order of the corresponding return values in the returned list.
+
+- If `params` contains unsupported integer values, `OBJECT_UNKNOWN_DETAIL` (value: -1) is placed in the output list
+- If `params` contains non-integer types, those values will be silently ignored
+
+## Caveats
+
+- `OBJECT_ROT` returns an accurate facing for avatars seated or in mouselook, but only a rough direction otherwise
+- Adjacent regions are not searched for prims that match `id`
+- Information for avatars that can no longer be found will still be available for about 45 seconds but is not updated
+- This function does not return information about items in inventory
+- `llTargetOmega` only affects the return of `OBJECT_ROT` if the object is physical; if not physical, the original start rotation is returned (llTargetOmega is a client-side effect)
+- `OBJECT_SCRIPT_MEMORY` reports the maximum memory that all scripts in an object could use, not the actual amount currently used. For Mono scripts, this is the default 64K or what was set with `llSetMemoryLimit`, not the current dynamic allocation. For LSO scripts, 16K is real usage. This makes the reported value a worst-case scenario
+- `OBJECT_RUNNING_SCRIPT_COUNT` includes crashed scripts in its count
+- `OBJECT_REZZER_KEY` returns `NULL_KEY` for objects rezzed prior to server version 16.01.16.310114
+- Objects copied in-world between server versions 16.01.16.310114 and 16.10.14.320687 return the object's creator key for rezzer key
+- Child prims linked before server version 17.11.11.510664 return the root prim's rezzer key
+- Child prims delinked before server version 17.11.11.510664 return `NULL_KEY` for rezzer key
+- When targeting an agent with `OBJECT_REZZER_KEY` while sitting on an object, the rezzer key of the object's root prim is returned
+- When targeting an attachment with `OBJECT_MASS`, the mass of the avatar (or the avatar's sat-upon object) is returned
+- Since `OBJECT_GROUP` returns `NULL_KEY` for avatars, a workaround is required to get an avatar's active group. A common approach is to query the avatar's attachments with `llGetAttachedList` and if at least one is found, get `OBJECT_GROUP` for that attachment as it is likely to match the avatar's group
+
+## Examples
+
+### Basic Object/Avatar Details
+
+```lsl
+// Show some basic details for the colliding object/avatar. Note that group will be NULL_KEY for avatars.
+default
+{
+    collision_start(integer num_detected)
+    {
+      key  id      = llDetectedKey(0);
+      list details = llGetObjectDetails(id, ([OBJECT_NAME, OBJECT_DESC,
+                            OBJECT_POS, OBJECT_ROT, OBJECT_VELOCITY,
+                            OBJECT_OWNER, OBJECT_GROUP, OBJECT_CREATOR]));
+      llShout(PUBLIC_CHANNEL, "UUID: " + (string)id
+                    + "\nName: "          + llList2String(details, 0)
+                    + "\nDescription: "  + llList2String(details, 1)
+                    + "\nPosition: "      + llList2String(details, 2)
+                    + "\nRotation: "       + llList2String(details, 3)
+                    + "\nVelocity: "       + llList2String(details, 4)
+                    + "\nOwner: "          + llList2String(details, 5)
+                    + "\nGroup: "          + llList2String(details, 6)
+                    + "\nCreator: "        + llList2String(details, 7));
+    }
+}
+```
+
+### Group Join Inviter
+
+```lsl
+// Group join inviter - gets the name of the object's active group from the online group profile
+
+key groupNameRequestId;
+key groupKey;
+string groupName;
+
+init()
+{
+    // WARNING:
+    // different prims can have different active groups!!!
+
+    // get the key of the root prim's group
+    groupKey = llList2Key(llGetObjectDetails(llGetLinkKey(LINK_ROOT), [OBJECT_GROUP]), 0);
+
+    // request the name of the root prim's group
+    groupNameRequestId = llHTTPRequest("http://world.secondlife.com/group/" + (string)groupKey, [], "");
+}
+
+default
+{
+    state_entry()
+    {
+        init();
+    }
+
+    touch_start(integer num_detected)
+    {
+        if (groupKey == NULL_KEY || groupName == "")
+            return;
+
+        key id = llDetectedKey(0);
+        llInstantMessage(id,
+            "Click the link to join the group '" + groupName + "'\n"
+            + "secondlife:///app/group/" + (string)groupKey + "/about");
+    }
+
+    http_response(key request_id, integer status, list metadata, string body)
+    {
+        if (request_id != groupNameRequestId)
+            return;
+
+        list args = llParseString2List(body, ["title"], []);
+        groupName = llList2String(llParseString2List(llList2String(args, 1), [">", "<", "/"], []), 0);
+    }
+}
+```
+
+### Aim & Shoot Example
+
+```lsl
+// Aim & shoot
+default
+{
+    state_entry()
+    {
+        llRequestPermissions(llGetOwner(), PERMISSION_TAKE_CONTROLS);
+    }
+
+    control(key id, integer pressed, integer change)
+    {
+        if(change & pressed & CONTROL_ML_LBUTTON)
+            llSensor("", "", AGENT|PASSIVE|ACTIVE, 96.0, PI/16.0);
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if(perm&PERMISSION_TAKE_CONTROLS)
+            llTakeControls(CONTROL_ML_LBUTTON, TRUE, TRUE);
+    }
+
+    sensor(integer n)
+    {
+        key uuid=llDetectedKey(0);
+        list a = llGetObjectDetails(uuid, ([
+            OBJECT_NAME, OBJECT_DESC, OBJECT_POS, OBJECT_ROT,
+            OBJECT_VELOCITY,OBJECT_OWNER, OBJECT_GROUP, OBJECT_CREATOR]));
+        llOwnerSay("UUID: " + (string)uuid +
+            "\nName: \"" + llList2String(a,0)+ "\"" +
+            "\nDecription: \"" + llList2String(a,1) + "\"" +
+            "\nPosition: " + llList2String(a,2) +
+            "\nRotation: " + llList2String(a,3) +
+            "\nVelocity: " + llList2String(a,4) +
+            "\nOwner: " + llList2String(a,5) +
+            "\nGroup: " + llList2String(a,6) +
+            "\nCreator: " + llList2String(a,7)
+        );
+    }
+}
+```
+
+### Object Script Time
+
+```lsl
+// Object Script Time
+default
+{
+    touch_start(integer num_detected)
+    {
+        llOwnerSay(llGetObjectName()+" Script Time: "+llList2String(llGetObjectDetails(llGetKey(), [OBJECT_SCRIPT_TIME]), 0));
+    }
+}
+```
+
+### Check for Linden Trees or Grass
+
+```lsl
+integer isLindenTreeOrGrass(key id){
+    //Check if it's an OPT_OTHER and not an attachment, which makes it a Linden tree or grass!
+    list out = llGetObjectDetails(id, [OBJECT_PATHFINDING_TYPE, OBJECT_ATTACHED_POINT]);
+    return (llList2Integer(out, 0) == OPT_OTHER) && !llList2Integer(out, 1);
+}
+```
+
+## Related Functions
+
+- [llKey2Name](../llkey2name/)
+- [llGetPrimitiveParams](../llgetprimitiveparams/)
+- [llSetLinkPrimitiveParams](../llsetlinkprimitiveparams/)
+- [llSetPrimitiveParams](../llsetprimitiveparams/)
+- [llGetParcelDetails](../llgetparceldetails/)
+- [llGetLinkPrimitiveParams](../llgetlinkprimitiveparams/)
+
+<WikiAttribution />

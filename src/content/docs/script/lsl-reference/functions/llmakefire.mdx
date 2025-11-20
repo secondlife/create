@@ -1,0 +1,74 @@
+---
+title: llMakeFire
+description: >-
+  Make fire like particles. Deprecated: Use llParticleSystem instead.
+
+  Make fire particles using texture from the objects inventory. Deprecated: Use
+  llParticleSystem instead.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llMakeFire" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Beginning in version 1.14, the simulator uses `llParticleSystem` to emulate legacy `llMakeFire` particles. For new code, use `llParticleSystem` directly for better control and more predictable behavior.
+
+## Implementation with llParticleSystem
+
+Here is an example of how to emulate `llMakeFire` using the modern particle system:
+
+```lsl
+fakeMakeFire(integer particle_count, float particle_scale, float particle_speed,
+             float particle_lifetime, float source_cone, string source_texture_id,
+             vector local_offset)
+{
+    //    local_offset is ignored
+    llParticleSystem([
+        PSYS_PART_FLAGS,            PSYS_PART_INTERP_COLOR_MASK | PSYS_PART_INTERP_SCALE_MASK | PSYS_PART_EMISSIVE_MASK | PSYS_PART_WIND_MASK,
+        PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_ANGLE_CONE,
+        PSYS_PART_START_COLOR,      <1.0, 1.0, 1.0>,
+        PSYS_PART_END_COLOR,        <1.0, 1.0, 1.0>,
+        PSYS_PART_START_ALPHA,      0.50,
+        PSYS_PART_END_ALPHA,        0.10,
+        PSYS_PART_START_SCALE,      <particle_scale/2, particle_scale/2, 0.0>,
+        PSYS_PART_END_SCALE,        <particle_scale, particle_scale, 0.0>,
+        PSYS_PART_MAX_AGE,          0.5,
+        PSYS_SRC_ACCEL,             <0.0, 0.0, 0.0>,
+        PSYS_SRC_TEXTURE,           source_texture_id,
+        PSYS_SRC_BURST_RATE,        5 / particle_count,
+        PSYS_SRC_ANGLE_BEGIN,       0.0,
+        PSYS_SRC_ANGLE_END,         source_cone * PI,
+        PSYS_SRC_BURST_PART_COUNT,  1,
+        PSYS_SRC_BURST_RADIUS,      0.0,
+        PSYS_SRC_BURST_SPEED_MIN,   particle_speed,
+        PSYS_SRC_BURST_SPEED_MAX,   particle_speed,
+        PSYS_SRC_MAX_AGE,           particle_lifetime / 2,
+        PSYS_SRC_OMEGA,             <0.0, 0.0, 0.0>
+        ]);
+}
+```
+
+## Known Limitations and Discrepancies
+
+When emulating `llMakeFire` with `llParticleSystem`, be aware of these differences from the original function:
+
+1. **Random Particle Lifetime**: The original `llMakeFire` has random particle lifetime, which cannot be created in the current particle system via a single call. The emulation uses a fixed lifetime.
+
+2. **Particle Growth**: The original `llMakeFire` has continual particle growth throughout its lifetime, ending well past the 4m limit of the current system on long-lived particles. The emulation cannot reproduce this behavior.
+
+3. **Parameter Scaling**: Several values are not taken verbatim in the original particle system (velocity is not m/sec, and particle count seems to be wildly off). The emulation approximates these loosely via basic divisors, which may not match exactly in all scenarios.
+
+4. **Local Offset**: There is no way to duplicate the offset parameter from the old functions within the new particle system.
+
+5. **Pumping Effect**: These effects do not "pump" like the older functions. Calling the function 10 times won't produce 10 times as many particles as the old functions would. The new system maintains a single set property.
+
+## See Also
+
+- [llParticleSystem](llParticleSystem)
+
+<WikiAttribution />

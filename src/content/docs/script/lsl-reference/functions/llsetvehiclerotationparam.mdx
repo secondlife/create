@@ -1,0 +1,32 @@
+---
+title: llSetVehicleRotationParam
+description: |-
+  Sets a vehicle rotation parameter.
+  Valid parameters can be found in the wiki documentation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetVehicleRotationParam" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Setting the vehicle reference frame to align with world axes (front facing east, left side facing north):
+
+1. Place the vehicle with front facing east (red arrow) and with left side facing north (green arrow)
+2. Set the reference frame using:
+
+```lsl
+llSetVehicleRotationParam(VEHICLE_REFERENCE_FRAME, ZERO_ROTATION / llGetRootRotation());
+```
+
+## See Also
+
+- [llSetVehicleFloatParam](../llsetvehiclefloatparam/)
+- [llSetVehicleVectorParam](../llsetvehiclevectorparam/)
+- Linden Vehicle Tutorial - Learn more about vehicle physics
+
+<WikiAttribution />

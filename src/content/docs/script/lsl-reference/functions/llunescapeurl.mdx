@@ -1,0 +1,63 @@
+---
+title: llUnescapeURL
+description: >-
+  Returns the string that is the URL unescaped, replacing "%20" with spaces,
+  etc., version of URL.
+
+  This function can output raw UTF-8 strings.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llUnescapeURL" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+string str = "http://wiki.secondlife.com/wiki/LSL Portal";
+
+default
+{
+    state_entry()
+    {
+        llOwnerSay("Plain string:\n\t" + str);
+        // output: "http://wiki.secondlife.com/wiki/LSL Portal"
+
+        llOwnerSay("Escaped string:\n\t" + llEscapeURL(str));
+        // output: "http%3A%2F%2Fwiki%2Esecondlife%2Ecom%2Fwiki%2FLSL%20Portal"
+
+        llOwnerSay("Escaped string unescaped again:\n\t" + llUnescapeURL( llEscapeURL(str) ));
+        // output: "http://wiki.secondlife.com/wiki/LSL Portal"
+
+        // because escaping and unescaping are exact opposite
+        // and unescaping an escaped string returns the original
+
+
+        //  For readability's sake it would make more sense to do:
+        llOwnerSay("For readability's sake:\n\t" + "http://wiki.secondlife.com/wiki/" + llEscapeURL("LSL Portal"));
+        // output: "http://wiki.secondlife.com/wiki/LSL%20Portal"
+    }
+}
+```
+
+## Caveats
+
+- The hexadecimal encoded representation of UTF-8 byte encoding is the only supported means of access to non-ASCII characters (Unicode characters).
+- Decoding of Unicode as `"%u####"` is not supported.
+- The `"+"` character is not decoded as a space.
+
+## Notes
+
+This function can output raw UTF-8 strings. Escaping and unescaping are exact opposites—unescaping an escaped string returns the original.
+
+## See Also
+
+- [llEscapeURL] - Opposite of llUnescapeURL
+- [UTF-8]
+- [Base64]
+- [Combined Library: UnicodeIntegerToUTF8] - Easily convert Unicode character codes to string form
+
+<WikiAttribution />

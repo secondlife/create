@@ -1,0 +1,33 @@
+---
+title: llSensorRepeat
+description: >-
+  Initiates a periodic scan every Rate seconds, for Name and ID with Type
+  (AGENT, ACTIVE, PASSIVE, and/or SCRIPTED) within Range meters and Arc radians
+  of forward vector.
+
+  Specifying a blank Name, 0 Type, or NULL_KEY ID will prevent filtering results
+  based on that parameter. A range of 0.0 does not perform a scan.
+
+  Results are returned in the sensor and no_sensor events.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llSensorRepeat" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.SensorRepeat()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llSensorRepeat](/script/reference/lsl/functions/llSensorRepeat/)
+
+

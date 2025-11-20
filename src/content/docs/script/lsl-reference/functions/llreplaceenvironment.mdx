@@ -1,0 +1,69 @@
+---
+title: llReplaceEnvironment
+description: Replaces the environment for a parcel or region.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llReplaceEnvironment" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+// Will set the entire region to the "Tropicalia" EEP from the Linden inventory when touched.
+// It will set all the tracks to the same EEP with 24 hour day and a -8 hour Day Offset.
+// The "Tropicalia" must be in the prims inventory with the script.
+//
+// Limited to Estate Managers or Region owners.
+// Madi Perth - 4/17/2023
+
+default
+{
+    touch_start(integer total_number)
+    {
+        llReplaceEnvironment(<-1, -1, -1>, "Tropicalia", -1, 86400, (86400-28800));
+    }
+}
+```
+
+## Caveats and Notes
+
+- An environment set locally on the viewer will override any environment set from this function.
+- A parameter override set by `llSetEnvironment` will be preserved after the environment is replaced by this function. Call `llSetEnvironment` with an empty list parameter to clear any straggling overrides.
+- The environment specified by this function is applied asynchronously, as the simulator must download the environment asset before applying it. This means that `llGetEnvironment` will not immediately reflect the new environment's parameters, although the delay is typically quite small.
+- If a UUID is passed as the environment parameter and that UUID does not specify an environment setting or one can not be constructed, the function will return success (1) but will post a message to the debug channel.
+- If the parcel is group-owned, the script must either be deeded to the group, or the script owner must have "Modify environment settings and day cycle" group ability **and** have an active agent in the sim.
+- Environment assets issues may be reported in the debug chat.
+
+## Track Numbers
+
+- `0` - Water level
+- `1` - Ground level
+- `2` - Sky at 1000m
+- `3` - Sky at 2000m
+- `4` - Sky at 3000m
+- `-1` - All tracks
+
+## Permissions Required
+
+The owner of the script must have permission to edit the environment on the destination parcel, or be an estate manager in the case of an entire region.
+
+## Return Values
+
+| Value | Constant | Description |
+|-------|----------|-------------|
+| 1 | - | The parcel or region will attempt to change the applied environment. |
+| -3 | ENV_NO_ENVIRONMENT | The environment inventory object could not be found. |
+| -8 | ENV_THROTTLE | The scripts have exceeded the throttle. Wait and retry the request. |
+| -9 | ENV_NO_PERMISSIONS | The script does not have permission to change the environment at the selected location, or there was an attempt to remove altitude track 0 or 1. |
+
+## See Also
+
+- [llSetAgentEnvironment](../llsetagentenvironment/)
+- [llGetEnvironment](../llgetenvironment/)
+- [llSetEnvironment](../llsetenvironment/)
+
+<WikiAttribution />

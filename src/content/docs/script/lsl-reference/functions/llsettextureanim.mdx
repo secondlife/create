@@ -1,0 +1,138 @@
+---
+title: llSetTextureAnim
+description: >-
+  Animates a texture by setting the texture scale and offset.
+
+  Mode is a bitmask of animation options.
+
+  Face specifies which object face to animate.
+
+  SizeX and SizeY specify the number of horizontal and vertical frames.Start
+  specifes the animation start point.
+
+  Length specifies the animation duration.
+
+  Rate specifies the animation playback rate.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetTextureAnim" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Frames are sub-rectangles within the texture. A set of frames with 2 horizontal (SizeX) and 3 vertical (SizeY) means the overall texture is divided into 3 rows of 2 columns of images, each of which is a frame. `llSetTextureAnim` will animate across these 6 starting with the top left image and going across and down, optionally repeating. If `SMOOTH` is set, the frames slide smoothly from one to the next across each row but will "jump" from one row to the next; if off, each frame is displayed in turn centered on the face.
+
+Frames are numbered from left to right, top to bottom, starting at 0.
+
+## Examples
+
+### Smooth Horizontal Scrolling
+
+This slides a texture smoothly along the horizontal U-axis and loops it when it gets to the end:
+
+```lsl
+llSetTextureAnim(ANIM_ON | SMOOTH | LOOP, ALL_SIDES, 1, 1, 1.0, 1.0, 1.0);
+```
+
+### Reverse Smooth Scrolling
+
+This slides a texture smoothly along the horizontal U-axis in the opposite direction:
+
+```lsl
+llSetTextureAnim(ANIM_ON | SMOOTH | LOOP, ALL_SIDES, 1, 1, 1.0, 1.0, -1.0);
+```
+
+### Cell Animation
+
+This divides a texture into 64 "cells" (8 across, 8 down) and flips through them left to right, top to bottom. Useful for cell animation:
+
+```lsl
+llSetTextureAnim(ANIM_ON | LOOP, ALL_SIDES, 8, 8, 0.0, 64.0, 6.4);
+```
+
+### Texture Rotation
+
+This rotates a texture counter-clockwise at 2 revolutions per second. Change the last value to `-2*TWO_PI` to rotate clockwise:
+
+```lsl
+llSetTextureAnim(ANIM_ON | SMOOTH | ROTATE | LOOP, ALL_SIDES, 1, 1, 0, TWO_PI, 2*TWO_PI);
+```
+
+### Texture Scaling
+
+This scales a texture larger and smaller:
+
+```lsl
+llSetTextureAnim(ANIM_ON | SMOOTH | SCALE | PING_PONG | LOOP, ALL_SIDES, 1, 1, 1.0, 3.0, 2.0);
+```
+
+### Stopping Animation
+
+This turns off all texture animations:
+
+```lsl
+llSetTextureAnim(FALSE, ALL_SIDES, 0, 0, 0.0, 0.0, 1.0);
+```
+
+### Toggling Animation to Specific Frame
+
+This toggles a looping animation to make it stop at a specific frame:
+
+```lsl
+integer textureIsBeingAnimated;
+
+default {
+    touch_start(integer num_detected) {
+        if (textureIsBeingAnimated)
+            llSetTextureAnim(ANIM_ON | LOOP, ALL_SIDES, 1, 5, 0.0, 0.0, 1.0);
+        else
+            llSetTextureAnim(ANIM_ON | SMOOTH, ALL_SIDES, 1, 5, 5.0, 1.0, 1.0);
+
+        // toggle back and forth between TRUE (1) and FALSE (0)
+        textureIsBeingAnimated = !textureIsBeingAnimated;
+    }
+}
+```
+
+## Important Notes on Rate Parameter
+
+- If Rate is negative, it has the same effect as using the `REVERSE` flag
+- If Rate is negative and the `REVERSE` flag is used, they cancel each other out
+- Rate must not be zero
+- If Length is 0, it is considered to be SizeX * SizeY if both are above 0, otherwise 1
+
+## Caveats and Limitations
+
+- **One animation per prim**: You can only have one texture animation on a prim. Calling `llSetTextureAnim` more than once on a prim will reset the existing animation
+  - Calling `llSetTextureAnim` again with the exact same values will not reset animation (a small difference in rate will suffice)
+- **Cannot combine ROTATE and SCALE**: These flags are mutually exclusive
+- **Size constraints**: SizeX and SizeY are both limited to a range of 0 to 255
+  - Negative sizes behave as if texture repeats were set to 0 and cannot be used to mirror frames
+- **Animation modes override texture parameters**:
+  - Texture offsets are ignored in frame-based and `SMOOTH` scrolling modes
+  - Repeats are ignored if SizeX and SizeY are not 0
+  - With either size set to 0, `SMOOTH` scrolling will use the prim's texture repeats; in frame-based animation, there is no meaningful effect
+  - Texture rotation is ignored in `ROTATE` mode
+  - Texture repeats are ignored in `SCALE` mode
+- **Selection resets animation**: Selecting and un-selecting a prim with animation will reset the animation from the beginning
+- **Impact on PBR properties**: While a texture animation is active on any face of a prim, `PRIM_NORMAL` and `PRIM_SPECULAR` are forced to have their repeats, rotations, and offsets match the `PRIM_TEXTURE` ones, even on faces that are not being animated
+
+## Material Interaction Notes
+
+For Blinn-Phong materials, the texture's rotation for each side affects the apparent motion. If the texture is rotated 90 degrees via the edit box, the texture may not flow in the direction expected.
+
+For PBR materials, the Blinn-Phong texture rotation for each side affects the apparent motion. Any Blinn-Phong transform component (for example the offsets argument of `PRIM_TEXTURE`) which is not animated will be applied to the PBR material as well. Thus, a GLTF material without a GLTF texture transform will animate identically to a Blinn-Phong material. If a GLTF texture transform (for example `PRIM_GLTF_BASE_COLOR`) is applied, it will be in addition to the Blinn-Phong transform and texture animation.
+
+## Persistence
+
+Texture animation is a property of the prim—you can remove the script that started the animation, and the prim will remember the settings anyway. Note that texture animation is a prim property that is lost when using the rezzed-in-world copy method (shift-drag).
+
+## See Also
+
+- [llSetLinkTextureAnim](../llsetlinktextureanim/)
+
+<WikiAttribution />

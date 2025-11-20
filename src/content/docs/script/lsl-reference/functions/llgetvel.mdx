@@ -1,0 +1,60 @@
+---
+title: llGetVel
+description: |-
+  Returns the velocity of the object.
+  Returns a vector that is the velocity of the object.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetVel" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+The speed is the magnitude of the velocity, measured in meters per second. Velocity reported is relative to the global coordinate frame (the object rotation has no affect on this function's output).
+
+For physical objects, velocity is the velocity of its center of mass. When the object has some torque and no force, the position of the object moves (it turns), but its center of mass is unchanged, so the velocity is null.
+
+To get the velocity relative to the local frame (the direction the object is pointing), divide the output of this function by its rotation:
+
+```lsl
+vector local_vel = llGetVel() / llGetRot()
+```
+
+## Examples
+
+A simple (though not very effective) way of keeping a physical object in place:
+
+```lsl
+//A very simple (and not very effective) way of keeping a physical object in place.
+//If you ever want to actually stop an object, use llMoveToTarget(llGetPos(), .1)
+
+default
+{
+    state_entry()
+    {
+        vector spd;
+        {
+            @loop;
+            if (llVecMag(spd = llGetVel()) > .001)
+            { //We're accelerating...
+                llApplyImpulse(-spd, 0); //Slow us down.
+            }
+        jump loop;
+        }
+    }
+}//Written by Xaviar Czervik
+```
+
+## See Also
+
+- [llGetAccel](../llgetaccel/)
+- [llGetOmega](../llgetomega/)
+- [llGetForce](../llgetforce/)
+- [llGetTorque](../llgettorque/)
+- [llGetMass](../llgetmass/)
+
+<WikiAttribution />

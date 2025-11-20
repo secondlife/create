@@ -1,0 +1,55 @@
+---
+title: llCloud
+description: Returns the cloud density at the object's position + Offset.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llCloud" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Legacy clouds are no longer supported as of server version 13.02.08.270166 - this function now only returns 0.0. See `llGetEnvironment` instead.
+
+## Overview
+
+Second Life features a cellular automata-based weather system. There are 16x16 square cloud "cells" per region. Clouds and wind are interrelated.
+
+## Examples
+
+```lsl
+default
+{
+    touch_start(integer num)
+    {
+        llSay(0,"Cloud density:" + (string)llCloud(ZERO_VECTOR));
+    }
+}
+```
+
+## Caveats
+
+- There are currently no Second Life clients that render rain.
+- The client attempts to render clouds from the cloud algorithm results sent from the server, which is why different clients can see different cloud formations and de-synchronizes cloud view from the server over time. The cloud density data is sent from the server to the client when the region is loaded by the client. This can happen when the region comes into view, during teleport or during login.
+
+## Notes
+
+### Client
+
+Clouds are always rendered between about 180-200m absolute height.
+
+### Algorithm
+
+The cloud seed/growth/dissipation algorithm uses a solenoidal vector field, which is a vector field with zero-divergence: ∇ · v = 0
+
+This condition is satisfied whenever v has a vector potential A, because if v = ∇ ⨯ A then ∇ · v = ∇ · (∇ ⨯ A) = 0
+
+## See Also
+
+- [llWind](../llwind/)
+- [llGetSunDirection](../llgetsundirection/)
+
+<WikiAttribution />

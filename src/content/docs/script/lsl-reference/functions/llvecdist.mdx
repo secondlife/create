@@ -1,0 +1,77 @@
+---
+title: llVecDist
+description: Returns the distance between Location1 and Location2.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llVecDist" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Distance Calculation
+
+```lsl
+default {
+    state_entry()
+    {
+        vector input_1 = <1.0,2.0,3.0>;
+        vector input_2 = <3.0,2.0,1.0>;
+        llOwnerSay("The distance between " + (string) input_1 +
+            " and " + (string) input_2 + " is: "+(string)llVecDist(input_1, input_2) );
+    }
+}
+```
+
+### Detecting Object Rotation
+
+This example resets the script if the object has been rotated beyond a tolerance threshold:
+
+```lsl
+//To reset script on touch if the object has been rotated since the last script reset
+float gTolerance = 0.05;  //This corresponds to about a 3 degree rotation
+default
+{
+	state_entry()
+	{
+		llSetObjectDesc((string)llRot2Euler(llGetRot()));
+	}
+
+	touch_start(integer total_number)
+	{
+		if (llVecDist(llRot2Euler(llGetRot()), (vector)llGetObjectDesc()) > gTolerance)
+		{
+			llSay(0,"This object has rotated. Automatic reset engaged.");
+			llResetScript();
+		}
+	}
+}
+```
+
+## Notes
+
+### Mathematical Equivalents
+
+llVecDist is mathematically equivalent to:
+
+- `llVecMag(vec_a - vec_b)`
+- `llSqrt((vec_b.x - vec_a.x) * (vec_b.x - vec_a.x) + (vec_b.y - vec_a.y) * (vec_b.y - vec_a.y) + (vec_b.z - vec_a.z) * (vec_b.z - vec_a.z))`
+
+### Performance Considerations
+
+There are ways to optimize distance calculations for more efficient code. For example, comparing `vector v3 = (v1-v2); v3*v3 < (f*f);` is over twice as fast as `llVecDist(v1,v2) < f;`
+
+## Resources
+
+- [Video Tutorial](https://www.youtube.com/watch?v=D0WvH58IWEo) - Visual explanation of vector distance calculations
+
+## See Also
+
+- [llVecMag](/script/reference/lsl/functions/llvecmag) - Returns the magnitude of a vector
+- [llVecNorm](/script/reference/lsl/functions/llvecnorm) - Returns a normalized vector
+- [llSqrt](/script/reference/lsl/functions/llsqrt) - Returns the square root of a float
+
+<WikiAttribution />

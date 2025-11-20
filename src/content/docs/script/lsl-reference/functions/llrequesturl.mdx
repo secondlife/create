@@ -1,0 +1,137 @@
+---
+title: llRequestURL
+description: >-
+  Requests one HTTP:// URL for use by this script. The http_request event is
+  triggered with the result of the request.
+
+  Returns a key that is the handle used for identifying the result in the
+  http_request event.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRequestURL" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic URL Request After Region Restart
+
+```lsl
+string url;
+key urlRequestId;
+
+default
+{
+	state_entry()
+	{
+		urlRequestId = llRequestURL();
+	}
+
+	on_rez(integer start_param)
+	{
+		llResetScript();
+	}
+
+	changed(integer change)
+	{
+		if (change & (CHANGED_OWNER | CHANGED_INVENTORY))
+		{
+			llResetScript();
+		}
+		if (change & (CHANGED_REGION | CHANGED_REGION_START | CHANGED_TELEPORT))
+		{
+			urlRequestId = llRequestURL();
+		}
+	}
+
+	http_request(key id, string method, string body)
+	{
+		if (id == urlRequestId)
+		{
+			if (method == URL_REQUEST_DENIED)
+			{
+				llOwnerSay("The following error occurred while attempting to get a free URL for this device:\n\n" + body);
+			}
+			else if (method == URL_REQUEST_GRANTED)
+			{
+				url = body;
+				llLoadURL(llGetOwner(), "Click to visit my URL!", url);
+			}
+		}
+	}
+}
+```
+
+### URL Allocation Demonstration
+
+This example demonstrates how multiple URL requests accumulate (note: for demonstration purposes only):
+
+```lsl
+// WARNING:
+//      This script is only for proof-of-concept (demo purposes).
+//      DO NOT use it if you don't have the sim owners and/or
+//      estate managers OK to test this script.
+//      This script can possibly block HTTP communication from and to the sim.
+//      ...bringing down all networked vendors and/or similar machines.
+//
+//      This script allocates all available URLs.
+//      Deleting the script and/or derezzing the object containing the script,
+//      will release all previously taken URLs.
+
+default
+{
+	state_entry()
+	{
+		llRequestURL();
+	}
+
+	http_request(key id, string method, string body)
+	{
+		if (method == URL_REQUEST_DENIED)
+		{
+			llSetText("No free URLs!", <1.0, 0.0, 0.0>, 1.0);
+		}
+		else if (method == URL_REQUEST_GRANTED)
+		{
+			llSetText((string)llGetFreeURLs() + " URLs left\n" + body, <1.0, 1.0, 1.0>, 1.0);
+			llRequestURL();
+		}
+		else if (method == "GET")
+		{
+			llHTTPResponse(id, 200, "Hello there!");
+		}
+	}
+}
+```
+
+## Caveats
+
+- HTTP-in is not on the usual HTTP port number; the URL provided in the `http_request` event includes the correct port number.
+- Your script (and any client that uses it) should not "validate" the provided URL; do not assume that it maps to any particular address or is in any particular domain. These may change during infrastructure updates and may become more dynamic in the future.
+- Use of this function is throttled. Although it has no forced sleep time, too many requests (5-ish) in a short period will cause all further requests to be denied until the script stops requesting URLs for at least 1 second. Using an `llSleep` of 0.6 seconds or greater between each request will prevent throttling.
+- When a region is restarted all HTTP server URLs are automatically released and invalidated. Use `CHANGED_REGION_START` to detect this so a new URL can be requested.
+- The number of available URLs is a limited resource. See LSL http_server documentation for resource limitation details.
+- When abandoning a URL, release it with `llReleaseURL` to avoid leaks. Resetting the script or deleting the prim will also suffice to release URLs.
+- Unlike listeners, URLs persist across state changes.
+
+## Notes
+
+For a fully worked out example showing how to get a URL, register it with an external client, and implement proper backoff and retry for contacting external services, see the HTTP Server URL Registration documentation.
+
+Important: If you request another URL, the old one will not be released—it will remain active. Store the old URL in a global variable and release it with `llReleaseURL` before requesting a new one.
+
+From Monty Linden: "Another comment on resilient programming: getting a global resource, an HTTP listener in this case, should always be considered an operation that can fail for transitory reasons (as well as permanent ones). In this case, LSL folds retryable and permanent errors into the same error status and there's no opportunity for a script writer to distinguish the two cases. But a reasonable way to handle this is sleeping with limited retries before failing hard in the LSL code."
+
+## See Also
+
+- [llRequestSecureURL](../llrequestsecureurl/)
+- [llGetFreeURLs](../llgetfreeurls/)
+- [llReleaseURL](../llreleaseurl/)
+- [llHTTPResponse](../llhttpresponse/)
+- [llGetHTTPHeader](../llgethttpheader/)
+- LSL http_server
+
+<WikiAttribution />

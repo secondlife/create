@@ -1,0 +1,43 @@
+---
+title: llGetObjectMass
+description: |-
+  Returns the mass of the avatar or object in the region.
+  Gets the mass of the object or avatar corresponding to ID.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetObjectMass" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- Returns zero if `id` is not found in the region
+- `id` can be any prim in the object
+
+## Examples
+
+```lsl
+default {
+    touch(integer n) {
+        llSay(0, llDetectedName(0) + " your mass is " + (string)llGetObjectMass(llDetectedKey(0)) + " lindogram.");
+    }
+}
+```
+
+## Notes
+
+- Mass in Second Life is expressed as *lindogram*. One lindogram appears to be equal to 100 kilograms.
+- Mass for avatars is relative to shape/size and unaffected by attachments. However, avatar masses show less variation than expected relative to shape/size, and the lindogram masses do not appear realistic.
+- Sitting avatars add their mass to the object.
+- This function returns a mass of 0.01 for child agents.
+- Prior to server code version 1.18.6.76747, avatar mass was fixed at 1.954922 lindogram. It is now relative to avatar shape/size.
+- This function is a handy way to determine if an object or avatar still exists in a region. Other methods exist (such as checking that OBJECT_OWNER returned by llGetObjectDetails is a valid key), but this has slightly less overhead.
+
+## See Also
+
+- [llGetMass](../llgetmass/)
+
+<WikiAttribution />

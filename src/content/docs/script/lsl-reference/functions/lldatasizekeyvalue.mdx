@@ -1,0 +1,64 @@
+---
+title: llDataSizeKeyValue
+description: |2-
+
+                     Starts an asychronous transaction the request the used and total amount of data allocated for the Experience. The dataserver callback will be executed with the key returned from this call and a string describing the result. The result is commma-delimited list. The first item is an integer specifying if the transaction succeeded (1) or not (0). In the failure case, the second item will be an integer corresponding to one of the XP_ERROR_... constants. In the success case the second item will be the the amount in use and the third item will be the total available.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDataSizeKeyValue" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+key trans;
+
+default
+{
+    state_entry()
+    {
+        trans = llDataSizeKeyValue();
+    }
+
+    dataserver( key _t, string _value )
+    {
+        if ( _t == trans )
+        {
+            // our llDataSizeKeyValue transaction is done
+            list result = llCSV2List( _value );
+            if ( llList2Integer( result, 0 ) == 1 )
+            {
+                // data size retrieved
+                llSay( 0, "Space in use: " + llList2String( result, 1 ) );
+                llSay( 0, "Total space:  " + llList2String( result, 2 ) );
+            }
+            else
+            {
+                // data size check failed
+                llSay( 0, "Key-value failed to check size: " + llList2String( result, 1 ) );
+            }
+        }
+    }
+}
+```
+
+The result string is comma-delimited:
+- First item: Integer (1 for success, 0 for failure)
+- On success: Second item is the amount of data in use, third item is the total available quota
+- On failure: Second item is an integer corresponding to an `XP_ERROR_...` constant
+
+## See Also
+
+- [llGetExperienceErrorMessage](../llgetexperienceerrormessage/)
+- [llCreateKeyValue](../llcreatekeyvalue/)
+- [llReadKeyValue](../llreadkeyvalue/)
+- [llUpdateKeyValue](../llupdatekeyvalue/)
+- [llDeleteKeyValue](../lldeletekeyvalue/)
+- [llKeyCountKeyValue](../llkeycountkeyvalue/)
+- [llKeysKeyValue](../llkeyskeyvalue/)
+
+<WikiAttribution />

@@ -1,0 +1,54 @@
+---
+title: llFloor
+description: Returns largest integer value <= Value.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llFloor" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+   state_entry()
+   {
+       llSay(0,  "The floor value of -4.5 is: "+(string)llFloor(-4.5) );
+       //Returns "The floor value of -4.5 is: -5"
+
+       llSay(0,  "The floor value of -4.9 is: "+(string)llFloor(-4.9) );
+       //Returns "The floor value of -4.9 is: -5"
+
+       llSay(0,  "The floor value of -4.1 is: "+(string)llFloor(-4.1) );
+       //Returns "The floor value of -4.1 is: -5"
+
+       llSay(0,  "The floor value of 4.5 is: "+(string)llFloor(4.5) );
+       //Returns "The floor value of 4.5 is: 4"
+
+       llSay(0,  "The floor value of 4.9 is: "+(string)llFloor(4.9) );
+       //Returns "The floor value of 4.9 is: 4"
+
+       llSay(0,  "The floor value of 4.1 is: "+(string)llFloor(4.1) );
+       //Returns "The floor value of 4.1 is: 4"
+    }
+}
+```
+
+## Caveats
+
+- The returned value is -2147483648 (0x80000000) if the arithmetic result is outside of the range of valid integers (-2147483648 to 2147483647 inclusive).
+
+## Notes
+
+- For positive values, it is quicker and shorter to simply cast the float to an integer. `i=(integer)f` is 32 bytes shorter than `i=llFloor(f)` (in Byte Code) and about 30 times faster in execution, while giving the same result.
+
+## See Also
+
+- [llRound](../llround/)
+- [llCeil](../llceil/)
+
+<WikiAttribution />

@@ -1,0 +1,86 @@
+---
+title: llEjectFromLand
+description: |-
+  Ejects AvatarID from land that you own.
+  Ejects AvatarID from land that the object owner (group or resident) owns.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llEjectFromLand" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Eject Avatar by Partial Name Match
+
+This example demonstrates a practical chat-based ejection system that uses partial name matching to eject avatars from your land. It's designed for fast enforcement on PvP sims.
+
+```lsl
+// Eject system that responds to chat commands
+// Usage: /1 eject shenan (will eject avatars whose names contain "shenan")
+
+string msg;
+string name;
+
+default
+{
+    on_rez(integer n)
+    {
+        llResetScript();
+    }
+
+    state_entry()
+    {
+        llListen(1, "", llGetOwner(), "");
+        llListen(0, "", llGetOwner(), "");
+    }
+
+    listen(integer n, string m, key k, string msg)
+    {
+        if (llGetSubString(msg, 0, 5) == "eject ")
+        {
+            name = llToLower(llStringTrim(llDeleteSubString(msg, 0, 5), STRING_TRIM));
+            llSensor("", "", AGENT, 96, PI);
+        }
+    }
+
+    sensor(integer n)
+    {
+        integer i = 0;
+        for (;i<n;++i)
+        {
+            if (llOverMyLand(llDetectedKey(i)))
+            {
+                if (~llSubStringIndex(llToLower(llDetectedName(i)), name))
+                {
+                    llOwnerSay("ejecting " + llDetectedName(i));
+                    llEjectFromLand(llDetectedKey(i));
+                }
+            }
+        }
+    }
+
+    no_sensor()
+    {
+        llOwnerSay("Avatar not found.");
+    }
+}
+```
+
+## Caveats
+
+- Be careful when using partial name matching: if you search for a common substring, you may eject multiple avatars unintentionally
+- This function only ejects avatars from your parcel; it does not remove them from the region
+- The function requires the script to have permission to eject (typically when placed on parcel-owned objects)
+
+## See Also
+
+- [llOverMyLand](../llovermyland/)
+- [llSensor](../llsensor/)
+- [llDetectedKey](../lldetectedkey/)
+- [llDetectedName](../lldetectedname/)
+
+<WikiAttribution />

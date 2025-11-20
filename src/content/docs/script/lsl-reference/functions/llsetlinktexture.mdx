@@ -1,0 +1,70 @@
+---
+title: llSetLinkTexture
+description: >-
+  Sets the Texture of Face on a linked prim, specified by LinkNumber. Texture
+  may be a UUID or name of a texture in prim inventory.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetLinkTexture" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Usage: Setting Texture on All Sides
+
+Cover a link set in the texture "bark" (from the library):
+
+```lsl
+default
+{
+    touch_start(integer detected)
+    {
+        llSetLinkTexture(LINK_SET, "66bf4030-04f9-a808-43ab-b48b6aeb6456", ALL_SIDES);
+    }
+}
+```
+
+## Performance Optimization
+
+### SetLinkTextureFast
+
+The standard `llSetLinkTexture` function has a 0.2 second delay built in. While `SetLinkTextureFast` is not extremely fast, it performs faster than the standard function by avoiding that delay:
+
+```lsl
+SetLinkTextureFast(integer link, string texture, integer face)
+{
+    // Obtain the current texture parameters and replace the texture only.
+    // If we are going to apply the texture to ALL_SIDES, we need
+    // to adjust the returned parameters in a loop, so that each face
+    // keeps its current repeats, offsets and rotation.
+    list Params = llGetLinkPrimitiveParams(link, [PRIM_TEXTURE, face]);
+    integer idx;
+    face *= face > 0; // Make it zero if it was ALL_SIDES
+    // This part is tricky. The list returned by llGLPP has a 4 element stride
+    // (texture, repeats, offsets, angle). But as we modify it, we add two
+    // elements to each, so the completed part of the list has 6 elements per
+    // stride.
+    integer NumSides = llGetListLength(Params) / 4; // At this point, 4 elements per stride
+    for (idx = 0; idx < NumSides; ++idx)
+    {
+        // The part we've completed has 6 elements per stride, thus the *6.
+        Params = llListReplaceList(Params, [PRIM_TEXTURE, face++, texture], idx*6, idx*6);
+    }
+    llSetLinkPrimitiveParamsFast(link, Params);
+}
+```
+
+This helper function preserves each face's current repeats, offsets, and rotation while only changing the texture.
+
+## See Also
+
+- [llSetLinkAlpha](/script/reference/lsl/functions/llsetlinkalpha/)
+- [llSetLinkColor](/script/reference/lsl/functions/llsetlinkcolor/)
+- [llSetLinkPrimitiveParams](/script/reference/lsl/functions/llsetlinkprimitiveparams/)
+- [Internal Textures](/script/reference/lsl/internal-textures/)
+
+<WikiAttribution />

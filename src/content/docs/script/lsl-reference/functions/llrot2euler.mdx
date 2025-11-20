@@ -1,0 +1,102 @@
+---
+title: llRot2Euler
+description: |-
+  Returns the Euler representation (roll, pitch, yaw) of Rotation.
+  Returns the Euler Angle representation of the Rotation.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRot2Euler" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Basic Rotation Conversion
+
+```lsl
+default
+{
+    state_entry()
+    {
+        rotation input = llGetRot();
+        llSay(0, "The Rot2Euler of " + (string)input + " is: " + (string) llRot2Euler(input) );
+    }
+}
+```
+
+### Rotating by Euler Angles
+
+This example demonstrates converting a rotation to Euler angles, manipulating them, and converting back. It rotates a prim by 15 degrees each time it is touched.
+
+```lsl
+// This script rotates a prim by 15 degrees each time the prim is touched
+// While not the best way of achieving the result,
+// this script demonstrates the use of llRot2Euler and llEuler2Rot
+// and the use of more human-friendly degrees rather than radians
+
+default
+{
+    touch_start(integer total_number)
+    {
+        // Get the object's current rotation as a quarternion
+        rotation rot = llGetRot();
+        // Convert the rotation to a euler with roll, pitch, and yaw in radians
+        vector euler = llRot2Euler(rot);
+        // convert the angles from radians to degrees
+        euler *= RAD_TO_DEG;
+        // Add 15 degrees on the Z axis
+        euler += <0, 0, 15>;
+        // Say the current euler values in degrees
+        llSay(0, (string) euler);
+        // convert degrees back to radians
+        euler *= DEG_TO_RAD;
+        // Convert the euler back to a rotation quarternion
+        rot =  llEuler2Rot (euler);
+        // Apply the updated rotation to the prim
+        llSetRot( rot );
+    }
+}
+```
+
+## Caveats
+
+- Angles greater than PI radians (180 degrees) are returned as negative angles.
+
+## Notes
+
+The Euler angle vector (in radians) is converted from a rotation by performing rotations around the 3 axes in Z, Y, X order.
+
+### Reference Implementation
+
+This reference implementation demonstrates the mathematical principles behind the function:
+
+```lsl
+vector uRot2Euler(rotation rot)
+{
+        vector ret;
+        vector temp;
+
+        //x-axis
+        temp = <0,0,1>*rot;
+        ret.x = llAtan2(temp.z,temp.y)-PI/2;
+        rot = rot/llEuler2Rot(<ret.x,0,0>);
+        //y-axis
+        temp = <0,0,1>*rot;
+        ret.y = -llAtan2(temp.z,temp.x)+PI/2;
+        rot = rot/llEuler2Rot(<0,ret.y,0>);
+        //z-axis
+        temp = <1,0,0>*rot;
+        ret.z = llAtan2(temp.y,temp.x);
+        return ret;
+}
+```
+
+## See Also
+
+- [llEuler2Rot](../lleuler2rot/)
+- Euler Angles (Wikipedia reference)
+
+<WikiAttribution />

@@ -1,0 +1,55 @@
+---
+title: llPatrolPoints
+description: |-
+  Patrol a list of points.
+  Sets the points for a character (llCreateCharacter) to patrol along.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llPatrolPoints" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llCreateCharacter([CHARACTER_MAX_SPEED, 25, CHARACTER_DESIRED_SPEED, 15.0]);
+        //MAX_SPEED is @ 20 by default
+    }
+
+    touch_start(integer total_number)
+    {
+        list points = [llGetPos() + <5,0,0>, llGetPos() - <5,0,0>];
+        llPatrolPoints(points, [PATROL_PAUSE_AT_WAYPOINTS, TRUE]);
+    }
+}
+```
+
+## Caveats
+
+- Must use `llCreateCharacter` or script won't compile
+- Vertical positions specified for any vectors should be chosen to be as close as possible to the actual height of the terrain requested. Large difference between the provided vertical position and the actual terrain/object will result in failure of the behavior.
+- The `patrolPoints` list requires a minimum of two valid vectors.
+  - If a vector in the list is outside the nav volume (e.g.: too high,) it will be ignored.
+
+## See Also
+
+- [llCreateCharacter](../llcreatecharacter/)
+- [llDeleteCharacter](../lldeletecharacter/)
+- [llEvade](../llevade/)
+- [llExecCharacterCmd](../llexeccharactercmd/)
+- [llGetClosestNavPoint](../llgetclosestnavpoint/)
+- [llFleeFrom](../llfleefrom/)
+- [llNavigateTo](../llnavigateto/)
+- [llPursue](../llpursue/)
+- [llUpdateCharacter](../llupdatecharacter/)
+- [llWanderWithin](../llwanderwithin/)
+- path_update (event)
+
+<WikiAttribution />

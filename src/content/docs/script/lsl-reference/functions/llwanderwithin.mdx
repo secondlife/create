@@ -1,0 +1,57 @@
+---
+title: llWanderWithin
+description: |-
+  Wander within a specified volume.
+  Sets a character to wander about a central spot within a specified area.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llWanderWithin" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llCreateCharacter([CHARACTER_MAX_SPEED, 25, CHARACTER_DESIRED_SPEED, 15.0]);
+        //MAX_SPEED is @ 20 by default
+    }
+
+    touch_start(integer total_number)
+    {
+        llWanderWithin(llGetPos(), <10.0, 10.0, 5.0>, [WANDER_PAUSE_AT_WAYPOINTS, TRUE]);
+    }
+}
+```
+
+## Caveats
+
+- Must use `llCreateCharacter` or script won't compile.
+- Wander area is a rough area based on the specified origin, to a specified scale on each axis. So, if `<20, 10, 2>` is specified the object will wander within 20m along the world x-axis, 10m along the world y-axis, and 2m along the world z-axis.
+  - If `dist` has any dimension less than 1.0, an error is shouted on `DEBUG_CHANNEL`: "Scale too small. All dimensions must be at least 1.0."
+- When `WANDER_PAUSE_AT_WAYPOINTS` is enabled, `PU_GOAL_REACHED` and `PU_SLOWDOWN_DISTANCE_REACHED` `path_update` events will be triggered when approaching each waypoint. When this flag is disabled, the aforementioned path_update events will not be triggered when arriving at waypoints.
+- Wander area can be limited to a smaller area by introducing obstacles such as walls.
+- Vertical positions specified for any vectors should be chosen to be as close as possible to the actual height of the terrain requested. Large difference between the provided vertical position and the actual terrain/object will result in failure of the behavior.
+- As for all pathfinding behaviors, do not rely on the detailed implementation. The wander distance is just a rough estimate. The exact shape may change. Do not make this another PATHBUG-69.
+
+## See Also
+
+- [llCreateCharacter](../llcreatecharacter/)
+- [llDeleteCharacter](../lldeletecharacter/)
+- [llEvade](../llevade/)
+- [llExecCharacterCmd](../llexeccharactercmd/)
+- [llGetClosestNavPoint](../llgetclosestnavpoint/)
+- [llFleeFrom](../llfleefrom/)
+- [llNavigateTo](../llnavigateto/)
+- [llPatrolPoints](../llpatrolpoints/)
+- [llPursue](../llpursue/)
+- [llUpdateCharacter](../llupdatecharacter/)
+- path_update event
+
+<WikiAttribution />

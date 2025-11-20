@@ -1,0 +1,54 @@
+---
+title: llGetGeometricCenter
+description: >-
+  Returns the vector that is the geometric center of the object relative to the
+  root prim.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetGeometricCenter" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer total_number)
+    {
+        llOwnerSay("Geometric center of the object relative to the root prim: " + (string)llGetGeometricCenter());
+    }
+}
+```
+
+## Caveats
+
+The "geometric center" is different from the "center" in viewer's build tools and also different from what llRezObject considers to be the "center" of a linkset.
+
+## Notes
+
+- The "geometric center" is the average of all linked prim centers. Mathematically, it's the root-relative positions of all linked prims in the linkset added together and divided by the number of prims in the linkset.
+
+### Implementation Details
+
+```lsl
+vector GetGeometricCenter(){
+    vector center = ZERO_VECTOR;
+    integer p = llGetNumberOfPrims();
+    //since we skip the root prim, we can ignore the single prim case.
+    //If we weren't skipping the root, this would be more complicated.
+    integer i = 1;
+    while(i < p)
+        center += llList2Vector(llGetLinkPrimitiveParams(++i, [PRIM_POS_LOCAL]), 0);
+    return center / p;
+}
+```
+
+## See Also
+
+- [llGetCenterOfMass](../llgetcenterofmass/)
+
+<WikiAttribution />

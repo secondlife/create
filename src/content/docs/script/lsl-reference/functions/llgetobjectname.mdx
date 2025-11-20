@@ -1,0 +1,69 @@
+---
+title: llGetObjectName
+description: |-
+  Returns the name of the prim which the script is attached to.
+  Returns the name of the prim (not object) which contains the script.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetObjectName" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function **does not** get the name of the object's root prim, but the name of the prim containing the script. Use `llGetLinkName(LINK_ROOT)` to get the root prim's name instead.
+
+## Caveats
+
+- The prim name is limited to 63 bytes. Any string longer than that will be truncated. This truncation does not always happen when the attribute is set or read.
+- This function may return "(Waiting)" sometimes. See the Notes section below.
+
+## Examples
+
+### Get this prim's name
+
+```lsl
+default
+{
+    state_entry()
+    {
+    //  PUBLIC_CHANNEL has the integer value 0
+        llSay(PUBLIC_CHANNEL, "This prim's name: " + llGetObjectName() );
+    }
+}
+```
+
+### Get the root prim's name
+
+```lsl
+default
+{
+    state_entry()
+    {
+    //  PUBLIC_CHANNEL has the integer value 0
+        llSay(PUBLIC_CHANNEL, "Root prim's name: "
+            + llGetLinkName(LINK_ROOT));
+    }
+}
+```
+
+## Notes
+
+### Erroneous "(Waiting)" Return Value
+
+The function may return "(Waiting)" in some cases. This occurs when the function queries the asset server and that query times out. It then silently proceeds to the next instruction.
+
+A workaround is to test that the object name is not "(Waiting)" after calling `llGetObjectName()`.
+
+## See Also
+
+- [llSetObjectName](../llsetobjectname/)
+- [llGetLinkName](../llgetlinkname/)
+- [llGetObjectDesc](../llgetobjectdesc/)
+- [llSetObjectDesc](../llsetobjectdesc/)
+- [llGetObjectDetails](../llgetobjectdetails/)
+
+<WikiAttribution />

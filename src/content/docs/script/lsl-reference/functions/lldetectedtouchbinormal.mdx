@@ -1,0 +1,58 @@
+---
+title: llDetectedTouchBinormal
+description: >-
+  Returns the surface bi-normal for a triggered touch event.
+
+  Returns a vector that is the surface bi-normal (tangent to the surface) where
+  the touch event was triggered.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llDetectedTouchBinormal" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    touch_start(integer total_num)
+    {
+        llOwnerSay((string)llDetectedTouchBinormal(0));
+    }
+}
+```
+
+## Caveats
+
+- `TOUCH_INVALID_VECTOR` (0.0, 0.0, 0.0) is returned when:
+  - The avatar's viewer does not support face touch detection. To check if face touch detection is supported, check the return of `llDetectedTouchFace`.
+  - The touch has moved off the surface of the prim.
+  - The event triggered is not a touch event.
+
+## Notes
+
+- This function is for touch category events only.
+- The prim that was touched may not be the prim receiving the event. Use `llDetectedLinkNumber` to check for this.
+- Use `llDetectedTouchFace` to determine which face was touched.
+- To find the third tangent vector, cross this vector with the normal from `llDetectedTouchNormal`. This information can be used to find the tangent space at the touch location.
+
+## See Also
+
+- [llDetectedLinkNumber](../lldetectedlinknumber/)
+- [llDetectedTouchFace](../lldetectedtouchface/)
+- [llDetectedTouchST](../lldetectedtouchst/)
+- [llDetectedTouchUV](../lldetectedtouchuv/)
+- [llDetectedTouchPos](../lldetectedtouchpos/)
+- [llDetectedTouchNormal](../lldetectedtouchnormal/)
+
+## Related Events
+
+- `touch_start`
+- `touch`
+- `touch_end`
+
+<WikiAttribution />

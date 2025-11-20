@@ -1,0 +1,81 @@
+---
+title: llGetClosestNavPoint
+description: >-
+  Get the closest navigable point to the point provided.
+
+  The function accepts a point in region-local space (like all the other
+  path-finding methods) and returns either an empty list or a list containing a
+  single vector which is the closest point on the navigation-mesh to the point
+  provided.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetClosestNavPoint" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+- There is no guarantee that a path exists from your current location to the returned point.
+
+## Notes
+
+- Using this function incurs a one frame script sleep and the call can be extremely expensive.
+- It is intended to be used in response to a `path_update` message indicating an inability to reach a requested destination (e.g., because the character or the destination is off the mesh).
+
+## Examples
+
+```lsl
+create_character()
+{
+    // Clear any previous character behaviors
+    llDeleteCharacter();
+
+    // default speed is 20
+    llCreateCharacter([CHARACTER_DESIRED_SPEED, 10.0]);
+    llWanderWithin(llGetPos(), <64.0, 64.0, 2.0>, []);
+}
+
+default
+{
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
+
+    state_entry()
+    {
+        create_character();
+    }
+
+    touch_start(integer num_detected)
+    {
+        vector currentPos = llGetPos();
+        list points = llGetClosestNavPoint(currentPos, [GCNP_RADIUS, 10.0] );
+
+        if (!llGetListLength(points))
+            return;
+
+        llSay(0, "current position " + (string)currentPos
+            + " and closest nav point " + (string)llList2Vector(points, 0) );
+    }
+}
+```
+
+## See Also
+
+- [llCreateCharacter](../llcreatecharacter/)
+- [llDeleteCharacter](../lldeletecharacter/)
+- [llEvade](../llevade/)
+- [llExecCharacterCmd](../llexeccharactercmd/)
+- [llFleeFrom](../llfleefrom/)
+- [llNavigateTo](../llnavigateto/)
+- [llPatrolPoints](../llpatrolpoints/)
+- [llPursue](../llpursue/)
+- [llUpdateCharacter](../llupdatecharacter/)
+- [llWanderWithin](../llwanderwithin/)
+- path_update event
+
+<WikiAttribution />

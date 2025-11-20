@@ -1,0 +1,54 @@
+---
+title: llPursue
+description: |-
+  Chase after a target.
+  Causes the character (llCharacter) to pursue the target defined by TargetID.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llPursue" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llCreateCharacter([CHARACTER_DESIRED_SPEED, 35.0, CHARACTER_MAX_SPEED, 35.0]);
+    }
+
+    touch_start(integer total_number)
+    {
+        llPursue(llDetectedKey(0), [PURSUIT_OFFSET, <-2.0, 0.0, 0.0>, PURSUIT_FUZZ_FACTOR, 0.2]);
+    }
+}
+```
+
+## Caveats
+
+- Must use `llCreateCharacter` or script will crash with an error
+- Vertical positions specified for any vectors should be chosen to be as close as possible to the actual height of the terrain requested. Large differences between the provided vertical position and the actual terrain/object will result in failure of the behavior
+- Z value is unused (erroneous if not 0.0) in the parameter for `PURSUIT_OFFSET`
+- `REQUIRE_LINE_OF_SIGHT` does not require line of sight immediately after `llPursue()` is called - it only affects target position updates after the target object/agent moves
+- `FUZZ_FACTOR` picks a point within an area of approximately (scale * lengthOfOffset) around the offset position. Value must be between 0.0 and 1.0
+
+## See Also
+
+- [llCreateCharacter](../llcreatecharacter/)
+- [llDeleteCharacter](../lldeletecharacter/)
+- [llEvade](../llevade/)
+- [llExecCharacterCmd](../llexeccharactercmd/)
+- [llGetClosestNavPoint](../llgetclosestnavpoint/)
+- [llFleeFrom](../llfleefrom/)
+- [llNavigateTo](../llnavigateto/)
+- [llPatrolPoints](../llpatrolpoints/)
+- [llUpdateCharacter](../llupdatecharacter/)
+- [llWanderWithin](../llwanderwithin/)
+- path_update (event)
+
+<WikiAttribution />

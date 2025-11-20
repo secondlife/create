@@ -1,0 +1,48 @@
+---
+title: llStopLookAt
+description: Stop causing object to point at a target (due to llLookAt() or llRotLookAt()).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llStopLookAt" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+This function works in conjunction with [llLookAt](/script/reference/lsl/functions/llLookAt/) or [llRotLookAt](/script/reference/lsl/functions/llRotLookAt/) to stop the object from pointing at a target.
+
+## Examples
+
+```lsl
+default
+{
+    state_entry()
+    {
+        llSensorRepeat("", "", AGENT, 20.0, PI, 0.2);
+        //Detects avatars
+    }
+
+    sensor(integer total_number)
+    {
+        llLookAt( llDetectedPos(0) + <0.0, 0.0, 1.0>, 3.0, 1.0 );
+        //Looks at the nearest avatar.
+    }
+
+    touch_start(integer total_number)
+    {
+        llStopLookAt();
+        llSensorRemove();
+        //Stops looking at any avatar and removes the sensor.
+    }
+}
+```
+
+## See Also
+
+- [llLookAt](/script/reference/lsl/functions/llLookAt/)
+- [llRotLookAt](/script/reference/lsl/functions/llRotLookAt/)
+
+<WikiAttribution />

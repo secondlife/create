@@ -1,0 +1,35 @@
+---
+title: llDeleteSubList
+description: >-
+  Removes the slice from start to end and returns the remainder of the list.
+
+  Remove a slice from the list and return the remainder, start and end are
+  inclusive.
+
+  Using negative numbers for start and/or end causes the index to count
+  backwards from the length of the list, so 0, -1 would delete the entire list.
+
+  If Start is larger than End the list deleted is the exclusion of the entries;
+  so 6, 4 would delete the entire list except for the 5th list entry.
+---
+
+import SLuaFunction from '@components/SLuaFunction.astro';
+
+<SLuaFunction name="llDeleteSubList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here showing SLua/Luau syntax with `ll.DeleteSubList()`.
+
+## Notes
+
+Add additional notes, caveats, or tips specific to using this function in SLua/Luau.
+
+## See Also
+
+- Related functions can be linked here
+- [LSL equivalent: llDeleteSubList](/script/reference/lsl/functions/llDeleteSubList/)
+
+

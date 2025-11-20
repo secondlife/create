@@ -1,0 +1,36 @@
+---
+title: llGetParcelPrimOwners
+description: >-
+  Returns a list of up to 100 residents who own objects on the parcel at
+  Position, with per-owner land impact totals.
+
+  Requires owner-like permissions for the parcel, and for the script owner to be
+  present in the region.
+
+  The list is formatted as [ key agentKey1, integer agentLI1, key agentKey2,
+  integer agentLI2, ... ], sorted by agent key.
+
+  The integers are the combined land impacts of the objects owned by the
+  corresponding agents.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetParcelPrimOwners" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+Add example usage here.
+
+## Notes
+
+Add additional notes, caveats, or tips here.
+
+## See Also
+
+- Related functions can be linked here
+
+<WikiAttribution />

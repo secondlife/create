@@ -1,0 +1,85 @@
+---
+title: llListFindList
+description: >-
+  Returns the index of the first instance of Find in ListVariable. Returns -1 if
+  not found.
+
+  Returns the position of the first instance of the Find list in the
+  ListVariable. Returns -1 if not found.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llListFindList" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+```lsl
+list numbers = [1, 2, 3, 4, 5];
+default
+{
+    state_entry()
+    {
+        integer index = llListFindList(numbers, [3]);
+        if (index != -1)
+        {
+            list three_four = llList2List(numbers, index, index + 1);
+            llOwnerSay(llDumpList2String(three_four, ","));
+            // Object: 3,4
+        }
+    }
+}
+```
+
+You can also search for multiple items at once to find a pattern in a list:
+
+```lsl
+list avatarsWhoFoundMagicLeaves = ["Fire Centaur","Red Leaf"];
+default
+{
+    state_entry()
+    {
+        integer index = llListFindList(avatarsWhoFoundMagicLeaves, ["Fire Centaur","Red Leaf"]);
+        if (index != -1)
+        {
+            list output = llList2List(avatarsWhoFoundMagicLeaves, index, index + 1);
+            llOwnerSay(llDumpList2String(output, ","));
+            // Object: Fire Centaur, Red Leaf
+        }
+    }
+}
+```
+
+## Caveats
+
+- Strict type matching and case sensitivity is enforced:
+  - `"1"` != `1` (string vs integer)
+  - `"1.0"` != `1.0` (string vs float)
+  - `1` != `1.0` (integer vs float)
+  - `"a822ff2b-ff02-461d-b45d-dcd10a2de0c2"` != `(key)"a822ff2b-ff02-461d-b45d-dcd10a2de0c2"` (string vs key)
+  - `"Justice"` != `"justice"` (case-sensitive)
+- If the search list is an empty list `[]`, the value returned is `0` rather than `-1`.
+
+## Efficient Existence Check
+
+An easy way to check if an item exists in a list without comparing to -1:
+
+```lsl
+if(~llListFindList(myList, (list)item))
+{
+    // Item exists in list
+    // This works because ~(-1) produces 0, but ~ of any other value produces non-zero
+    // So any return value (including 0) that corresponds to a found item makes the condition true
+    // This saves bytecode and is faster than using != -1
+    // This uses bitwise NOT (~) not negation (-)
+}
+```
+
+## See Also
+
+- [llSubStringIndex](../llsubstringindex/)
+
+<WikiAttribution />

@@ -1,0 +1,77 @@
+---
+title: llGetAlpha
+description: >-
+  Returns the alpha value of Face.
+
+  Returns the 'alpha' of the given face. If face is ALL_SIDES the value returned
+  is the mean average of all faces.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llGetAlpha" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+import WikiAttribution from '@components/WikiAttribution.astro';
+
+
+### Get Alpha of All Faces
+
+Reports the alpha value for each face on the prim:
+
+```lsl
+//Tells the owner the alpha on all sides
+default
+{
+    state_entry()
+    {
+        integer i = 0;
+        integer max = llGetNumberOfSides();
+        while(i < max)
+        {
+            llSay(0,"Face "+(string)i+" alpha is " + (string)llGetAlpha(i));
+            ++i;
+        }
+    }
+}
+```
+
+### Average Prim Alpha
+
+Calculate the average alpha across all faces:
+
+```lsl
+float AveragePrimAlpha()
+{
+    //Since this is so simple you may just want to inline it instead of including the function.
+    return (llGetAlpha(ALL_SIDES) / llGetNumberOfSides());
+}
+```
+
+### Conditional Alpha Check
+
+Check if a face is transparent and make the prim visible if it's not:
+
+```lsl
+//if face 0 is "transparent" then make the prim "visible"
+if (llGetAlpha(0))  ;
+else llSetAlpha(1.0, ALL_SIDES);
+```
+
+## Notes
+
+### Rounding
+
+Alpha is stored in a single 8-bit byte, meaning there are 256 possible values. Consequently, the values returned by this function are all multiples of 1/255. When the alpha value is initially stored, the float value is rounded to the nearest multiple, turning 0.5 into 128/255 for example.
+
+## See Also
+
+- [llSetAlpha](llSetAlpha.mdx) - Sets the prim's alpha
+- [llGetColor](llGetColor.mdx) - Gets the prim's color
+- [llSetColor](llSetColor.mdx) - Sets the prim's color
+- [llSetLinkColor](llSetLinkColor.mdx) - Sets a link's color
+- [llSetLinkAlpha](llSetLinkAlpha.mdx) - Sets a link's alpha
+- [llGetNumberOfSides](llGetNumberOfSides.mdx) - Gets the number of faces on the prim
+
+<WikiAttribution />
