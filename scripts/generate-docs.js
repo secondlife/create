@@ -81,6 +81,9 @@ async function generateDocs() {
   const events = Object.keys(lslDefs.events);
   const constants = Object.keys(lslDefs.constants);
 
+  // Events that are LSL-specific and should not be included in SLua documentation
+  const lslOnlyEvents = ['state_entry', 'state_exit', 'timer'];
+
   for (const funcName of functions) {
     // Skip private functions
     if (lslDefs.functions[funcName]?.private) {
@@ -91,11 +94,16 @@ async function generateDocs() {
   }
   console.log(`✅ Generated ${Object.keys(lslDefs.functions).length*2} doc pages for ${Object.keys(lslDefs.functions).length} functions.`);
 
+  let sluaEventCount = 0;
   for (const eventName of events) {
     generateFor(eventName, lslDefs.events[eventName]?.tooltip, 'LSLEvent', '../src/content/docs/script/lsl-reference/events');
-    generateFor(eventName, lslDefs.events[eventName]?.tooltip, 'SLuaEvent', '../src/content/docs/script/slua-reference/events');
+    // Skip LSL-only events when generating SLua documentation
+    if (!lslOnlyEvents.includes(eventName)) {
+      generateFor(eventName, lslDefs.events[eventName]?.tooltip, 'SLuaEvent', '../src/content/docs/script/slua-reference/events');
+      sluaEventCount++;
+    }
   }
-  console.log(`✅ Generated ${Object.keys(lslDefs.events).length*2} doc pages for ${Object.keys(lslDefs.events).length} events.`);
+  console.log(`✅ Generated ${Object.keys(lslDefs.events).length} LSL event pages and ${sluaEventCount} SLua event pages for ${Object.keys(lslDefs.events).length} events.`);
 
   for (const constantName of constants) {
     generateFor(constantName, lslDefs.constants[constantName]?.tooltip, 'LSLConstant', '../src/content/docs/script/lsl-reference/constants');
