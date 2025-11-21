@@ -9,17 +9,17 @@ SLua provides the `LLTimers` system for managing timers in your scripts. Unlike 
 
 ## Creating Timers
 
-### Recurring Timers with `on()`
+### Recurring Timers with `every()`
 
 Create a timer that fires repeatedly at a specified interval:
 
 ```lua
-local handler = LLTimers:on(0.1, function(scheduled_time, interval)
+local handler = LLTimers:every(0.1, function(scheduled_time, interval)
     ll.Say(0, "Timer fires every 0.1 seconds")
 end)
 ```
 
-The `on()` method takes two parameters:
+The `every()` method takes two parameters:
 - **Interval** (number): Time in seconds between timer fires
 - **Callback function**: Function called each time the timer fires
 
@@ -35,24 +35,12 @@ end)
 
 One-time timers automatically remove themselves after firing. Note that the `interval` parameter is not passed to `once()` callbacks since they only fire once.
 
-### Using `every()` as an Alias
-
-The `every()` method is an alias for `on()` and works identically:
-
-```lua
--- These are equivalent
-LLTimers:on(0.5, function() end)
-LLTimers:every(0.5, function() end)
-```
-
-Use whichever reads more naturally in your code.
-
 ## Stopping Timers
 
 All timer creation methods return a handler reference that you can use to stop the timer:
 
 ```lua
-local handler = LLTimers:on(1.0, function()
+local handler = LLTimers:every(1.0, function()
     ll.Say(0, "Tick")
 end)
 
@@ -69,7 +57,7 @@ The `off()` method returns:
 Timer callbacks receive two parameters:
 
 ```lua
-LLTimers:on(1.0, function(scheduled_time, interval)
+LLTimers:every(1.0, function(scheduled_time, interval)
     local current_time = os.clock()
     local delay = current_time - scheduled_time
 
@@ -91,9 +79,9 @@ The `scheduled_time` parameter lets you detect if your timer is running late by 
 Any positive number specifies the interval in seconds:
 
 ```lua
-LLTimers:on(0.1, callback)   -- 100 milliseconds
-LLTimers:on(1.0, callback)   -- 1 second
-LLTimers:on(5.5, callback)   -- 5.5 seconds
+LLTimers:every(0.1, callback)   -- 100 milliseconds
+LLTimers:every(1.0, callback)   -- 1 second
+LLTimers:every(5.5, callback)   -- 5.5 seconds
 ```
 
 ### Zero Interval (Immediate Execution)
@@ -101,7 +89,7 @@ LLTimers:on(5.5, callback)   -- 5.5 seconds
 An interval of `0` creates a timer that fires as soon as possible:
 
 ```lua
-LLTimers:on(0, function()
+LLTimers:every(0, function()
     ll.Say(0, "Fires immediately on next tick")
 end)
 ```
@@ -126,7 +114,7 @@ setmetatable(counter, {
     end
 })
 
-LLTimers:on(1.0, counter)
+LLTimers:every(1.0, counter)
 ```
 
 ### Removing Timers from Within Callbacks
@@ -136,7 +124,7 @@ Timers can remove themselves or other timers during execution:
 ```lua
 local handler
 
-handler = LLTimers:on(1.0, function()
+handler = LLTimers:every(1.0, function()
     ll.Say(0, "Firing once, then stopping")
     LLTimers:off(handler)
 end)
@@ -147,12 +135,12 @@ You can also modify other timers:
 ```lua
 local timer1, timer2
 
-timer1 = LLTimers:on(1.0, function()
+timer1 = LLTimers:every(1.0, function()
     ll.Say(0, "Timer 1 stopping timer 2")
     LLTimers:off(timer2)
 end)
 
-timer2 = LLTimers:on(0.5, function()
+timer2 = LLTimers:every(0.5, function()
     ll.Say(0, "Timer 2 tick")
 end)
 ```
@@ -162,7 +150,7 @@ end)
 Timer callbacks can use `coroutine.yield()` to yield execution back to the simulator:
 
 ```lua
-LLTimers:on(1.0, function()
+LLTimers:every(1.0, function()
     ll.Say(0, "Starting")
     coroutine.yield()  -- Yields to simulator, resumes on next frame
     ll.Say(0, "Continued on next frame")
@@ -178,7 +166,7 @@ If a timer is delayed by more than 2 seconds (e.g., due to script lag), it fires
 ```lua
 -- If this timer is delayed by 10 seconds, it won't fire 100 times rapidly
 -- Instead, it fires once and resumes normal scheduling
-LLTimers:on(0.1, function()
+LLTimers:every(0.1, function()
     ll.Say(0, "Protected from catch-up spam")
 end)
 ```
@@ -191,17 +179,17 @@ You can create as many timers as you need, each with different intervals:
 
 ```lua
 -- Fast update for smooth animations
-LLTimers:on(0.05, function()
+LLTimers:every(0.05, function()
     -- Update animation frame
 end)
 
 -- Medium update for game logic
-LLTimers:on(0.5, function()
+LLTimers:every(0.5, function()
     -- Check game state
 end)
 
 -- Slow update for housekeeping
-LLTimers:on(5.0, function()
+LLTimers:every(5.0, function()
     -- Clean up old data
 end)
 
@@ -220,7 +208,7 @@ All timers run independently and maintain their own schedules.
 ```lua
 local count = 10
 
-local countdown = LLTimers:on(1.0, function()
+local countdown = LLTimers:every(1.0, function()
     ll.Say(0, tostring(count))
     count = count - 1
 
@@ -249,7 +237,7 @@ delayedSay("Hello in 5 seconds", 5.0)
 ```lua
 local health = 100
 
-LLTimers:on(1.0, function(scheduled_time, interval)
+LLTimers:every(1.0, function(scheduled_time, interval)
     health = health - 1
 
     if health <= 0 then
@@ -269,7 +257,7 @@ end)
 local active = true
 local handler
 
-handler = LLTimers:on(1.0, function()
+handler = LLTimers:every(1.0, function()
     if not active then
         return  -- Skip execution but keep timer running
     end
@@ -296,7 +284,7 @@ function startTimer(name, interval, callback)
     end
 
     -- Create and store new timer
-    timers[name] = LLTimers:on(interval, callback)
+    timers[name] = LLTimers:every(interval, callback)
 end
 
 function stopTimer(name)
@@ -455,12 +443,12 @@ attemptAction(3)  -- Try up to 3 times
 
 ```lua
 -- ✗ Can't stop this timer later
-LLTimers:on(1.0, function()
+LLTimers:every(1.0, function()
     ll.Say(0, "Tick")
 end)
 
 -- ✓ Store the handler
-local handler = LLTimers:on(1.0, function()
+local handler = LLTimers:every(1.0, function()
     ll.Say(0, "Tick")
 end)
 ```
@@ -470,7 +458,7 @@ end)
 ```lua
 -- ✗ Creates new timer on each touch, never cleans up old ones
 LLEvents:on("touch_start", function(detected)
-    LLTimers:on(1.0, function()
+    LLTimers:every(1.0, function()
         ll.Say(0, "Timer tick")
     end)
 end)
@@ -482,7 +470,7 @@ LLEvents:on("touch_start", function(detected)
     if handler then
         LLTimers:off(handler)
     end
-    handler = LLTimers:on(1.0, function()
+    handler = LLTimers:every(1.0, function()
         ll.Say(0, "Timer tick")
     end)
 end)
@@ -492,12 +480,12 @@ end)
 
 ```lua
 -- ✗ Excessive processing for most use cases
-LLTimers:on(0.01, function()
+LLTimers:every(0.01, function()
     -- This fires 100 times per second!
 end)
 
 -- ✓ Use reasonable intervals
-LLTimers:on(0.1, function()
+LLTimers:every(0.1, function()
     -- 10 times per second is usually enough
 end)
 ```
@@ -522,7 +510,7 @@ LLTimers:every(5.0, function() ll.Say(0, "Timer 3") end)
 
 The `LLTimers` system provides flexible timer management in SLua:
 
-- Use `LLTimers:on()` or `LLTimers:every()` for recurring timers
+- Use `LLTimers:every()` for recurring timers
 - Use `LLTimers:once()` for one-time delayed execution
 - Use `LLTimers:off()` to stop timers
 - Multiple independent timers can run simultaneously
