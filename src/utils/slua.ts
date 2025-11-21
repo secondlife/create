@@ -6,8 +6,8 @@ export function toLuauType(lslType: string): string {
     'string': 'string',
     'key': 'string',
     'vector': 'vector',
-    'rotation': 'vector',
-    'quaternion': 'vector',
+    'rotation': 'quaternion',
+    'quaternion': 'quaternion',
     'list': '{any}',
     'void': '()'
   };
