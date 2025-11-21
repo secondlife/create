@@ -82,7 +82,7 @@ async function generateDocs() {
   const constants = Object.keys(lslDefs.constants);
 
   // Events that are LSL-specific and should not be included in SLua documentation
-  const lslOnlyEvents = ['state_entry', 'state_exit', 'timer'];
+  const lslOnlyEvents = ['state_entry', 'state_exit'];
 
   for (const funcName of functions) {
     // Skip private functions
