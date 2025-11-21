@@ -24,6 +24,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Second Life Creation',
+			favicon: '/favicon.svg',
 			editLink: {
 				baseUrl: 'https://github.com/secondlife/create/edit/main/',
 			},
