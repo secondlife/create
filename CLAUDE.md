@@ -128,15 +128,6 @@ The repository includes reference materials in the `context/` directory (gitigno
 - Licensed under Creative Commons Attribution 4.0 (text) and MIT License (code examples)
 - Use as reference for SLua language documentation and migration patterns
 
-**IMPORTANT: For SLua documentation guidelines, see [SLUA_REFERENCE.md](SLUA_REFERENCE.md)**
-This file contains:
-- Language basics and syntax differences from LSL
-- Code style conventions and best practices
-- Documentation patterns (tabs, code blocks, callouts)
-- Type annotation guidelines (ALWAYS use types in examples)
-- Common patterns and idioms (events, timers, error handling)
-- Migration quick reference tables
-
 **context/taxonomy.md** - Proposed site architecture and content taxonomy:
 - Scripting portal structure with sections for Getting Started, Features, Guides, and Recipes
 - Planned organization for SLua/LSL language documentation
@@ -159,15 +150,6 @@ Consider organizing LSL content by:
 - Examples and common patterns
 
 When building documentation, use `context/lsl_definitions.yaml` as the authoritative source for technical accuracy, and reference `context/wiki.secondlife.com/` for existing documentation patterns and examples.
-
-## SLua Documentation Guidelines
-
-**When creating or editing SLua documentation, always refer to [SLUA_REFERENCE.md](SLUA_REFERENCE.md) for:**
-- Syntax conventions (use `luau` not `lua` for code blocks)
-- Type annotation requirements (ALWAYS include types in examples)
-- Documentation patterns (tabs, asides, code formatting)
-- Common patterns and idioms
-- LSL-to-SLua migration examples
 
 ## Reference Page Generation
 
