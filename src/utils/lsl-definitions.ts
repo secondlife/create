@@ -133,6 +133,7 @@ function convertArguments(argRecords: Record<string, Argument>[]): Record<string
     const args: Record<string, Argument> = {};
     for (const record of argRecords) {
         for (const key in record) {
+            record[key].name = key;
             args[key] = record[key];
         }
     }

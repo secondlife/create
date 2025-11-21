@@ -25,9 +25,11 @@ if (!eventDef) {
 
 const args = Object.values(eventDef.arguments);
 
-// Build event signature with Luau typing
-const params = args.map((arg: Argument) => `${arg.name}: ${toLuauType(arg.type)}`).join(', ');
-const signature = `function ${name}(${params})`;
+// Build event signature with Luau typing for LLEvents:on format
+const params = args
+  .map((arg: Argument) => `${arg.name}: ${toLuauType(arg.type)}`)
+  .join(', ');
+const signature = `LLEvents:on("${name}", function(${params})\n  -- ...\nend)`;
 
 // Map arguments to Luau types for display
 const luauArgs: Record<string, Argument> = {};
