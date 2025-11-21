@@ -103,7 +103,8 @@ async function generateDocs() {
       sluaEventCount++;
     }
   }
-  console.log(`✅ Generated ${Object.keys(lslDefs.events).length} LSL event pages and ${sluaEventCount} SLua event pages for ${Object.keys(lslDefs.events).length} events.`);
+  const totalEvents = events.length;
+  console.log(`✅ Generated ${totalEvents} LSL event pages and ${sluaEventCount} SLua event pages for ${totalEvents} events.`);
 
   for (const constantName of constants) {
     generateFor(constantName, lslDefs.constants[constantName]?.tooltip, 'LSLConstant', '../src/content/docs/script/lsl-reference/constants');
