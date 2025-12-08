@@ -26,14 +26,22 @@ function table.unpack<V>(a: {V}, f: number?, t: number?): ...V
 function table.concat(a: {string}, sep: string?, f: number?, t: number?): string
 
 function table.find<V>(t: {V}, v: V, init: number?): number?
-function table.foreach<K, V, R>(t: { [K]: V }, f: (K, V) -> R?): R?
-function table.foreachi<V, R>(t: {V}, f: (number, V) -> R?): R?
 function table.sort<V>(t: {V}, f: ((V, V) -> boolean)?)
 
-function table.getn<V>(t: {V}): number
 function table.maxn<V>(t: {V}): number
 
 function table.freeze(t: table): table
 function table.isfrozen(t: table): boolean
 function table.clone(t: table): table
 ```
+
+
+## Deprecated
+```luau
+function table.foreach<K, V, R>(t: { [K]: V }, f: (K, V) -> R?): R?
+function table.foreachi<V, R>(t: {V}, f: (number, V) -> R?): R?
+function table.getn<V>(t: {V}): number
+```
+:::danger
+The above functions are deprecated and should not be used
+:::
