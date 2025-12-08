@@ -1,0 +1,35 @@
+---
+title: DetectedEvent
+description: DetectedEvent reference
+sidebar:
+    order: 3
+---
+
+:::caution[Stub]
+This documentation page is a stub and is currently under development.
+
+Feel free to contribute by submitting a pull request.
+:::
+
+```luau
+DetectedEvent = {
+    getOwner: function(): uuid,
+    getName: function(): string,
+    getKey: function(): uuid,
+    getTouchFace: function(): vector,
+    getLinkNumber: function(): number,
+    getGrab: function(): vector,
+    getGroup: function(): boolean,
+    getPos: function(): vector,
+    getRot: function(): quaternion,
+    getTouchBinormal: function(): vector,
+    getTouchNormal: function(): vector,
+    getTouchPos: function(): vector,
+    getTouchST: function(): vector,
+    getTouchUV: function(): vector,
+    getType: function(): number,
+    getVel: function(): vector,
+    getRezzer: function(): uuid,
+    getDamage: function(): {number, number, number} -- {damage, type, original}
+}
+```

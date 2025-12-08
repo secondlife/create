@@ -12,11 +12,11 @@ Feel free to contribute by submitting a pull request.
 :::
 
 ```luau
-function LLEvents:on(eventName: string, callback: function => void) => function
-function LLEvents:once(eventName: string, callback: function => void) => function
-function LLEvents:off(eventName: string, callback: function => void) => boolean
-function LLEvents:eventNames() => {string}
-function LLEvents:listeners(eventName: string) => {[string]: {function}}
+function LLEvents:on(eventName: string, callback: function => void): function
+function LLEvents:once(eventName: string, callback: function: void): function
+function LLEvents:off(eventName: string, callback: function: void): boolean
+function LLEvents:eventNames(): {string}
+function LLEvents:listeners(eventName: string): {[string]: {function}}
 ```
 
 ```luau
