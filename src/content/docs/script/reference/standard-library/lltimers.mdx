@@ -12,7 +12,7 @@ Feel free to contribute by submitting a pull request.
 :::
 
 ```luau
-function LLTimers:every(seconds: number, callback: function => void) => function
-function LLTimers:once(seconds: number, callback: function => void) => function
-function LLTimers:off(handler: function) => boolean
+function LLTimers:every(seconds: number, callback: (scheduledtime: number)): function
+function LLTimers:once(seconds: number, callback: (scheduledtime: number)): function
+function LLTimers:off(handler: function): boolean
 ```
