@@ -1,0 +1,24 @@
+---
+title: coroutine
+description: Coroutine library in Luau
+sidebar:
+    order: 8
+---
+
+:::caution[Stub]
+This documentation page is a stub and is currently under development.
+
+Feel free to contribute by submitting a pull request.
+:::
+
+{/* TODO: sorted and grouped based on related functionality */}
+```luau
+function coroutine.create(f: function): thread
+function coroutine.running(): thread?
+function coroutine.status(co: thread): string
+function coroutine.wrap(f: function): function
+function coroutine.yield(args: ...any): ...any
+function coroutine.isyieldable(): boolean
+function coroutine.resume(co: thread, args: ...any): (boolean, ...any)
+function coroutine.close(co: thread): (boolean, any?)
+```

@@ -1,0 +1,34 @@
+---
+title: string
+description: String library in Luau
+sidebar:
+    order: 3
+---
+
+:::caution[Stub]
+This documentation page is a stub and is currently under development.
+
+Feel free to contribute by submitting a pull request.
+:::
+
+{/* Note: sorted and grouped based on related functionality */}
+```luau
+function string.sub(s: string, f: number, t: number?): string
+function string.lower(s: string): string
+function string.upper(s: string): string
+function string.rep(s: string, n: number): string
+function string.reverse(s: string): string
+function string.len(s: string): number -- equivalent to #s
+
+function string.split(s: string, sep: string?): {string}
+function string.match(s: string, p: string, init: number?): ...string?
+function string.find(s: string, p: string, init: number?, plain: boolean?): (number?, number?, ...string)
+function string.format(s: string, args: ...any): string
+function string.gmatch(s: string, p: string): <iterator>
+function string.gsub(s: string, p: string, f: function | table | string, maxs: number?): (string, number)
+
+function string.byte(s: string, f: number?, t: number?): ...number
+function string.char(args: ...number): string
+function string.pack(f: string, args: ...any): string
+function string.unpack(f: string, s: string): ...any
+```

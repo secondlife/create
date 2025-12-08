@@ -1,0 +1,34 @@
+---
+title: llLoopSoundSlave
+description: >-
+  Plays attached sound looping at volume (0.0 - 1.0), synced to most audible
+  sync master.
+
+  Behaviour is identical to llLoopSound, unless there is a "Sync Master"
+  present.
+
+  If a Sync Master is already playing the Slave sound will begin playing from
+  the same point the master is in its loop synchronizing the loop points of both
+  sounds.
+
+  If a Sync Master is started when the Slave is already playing, the Slave will
+  skip to the correct position to sync with the Master.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llLoopSoundSlave" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here.
+
+## Notes
+
+Add additional notes, caveats, or tips here.
+
+## See Also
+
+- Related pages can be linked here

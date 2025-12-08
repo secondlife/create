@@ -1,0 +1,32 @@
+---
+title: bit32
+description: Bit32 library in Luau
+sidebar:
+    order: 6
+---
+
+:::caution[Stub]
+This documentation page is a stub and is currently under development.
+
+Feel free to contribute by submitting a pull request.
+:::
+
+{/* Note: sorted and grouped based on related functionality */}
+```luau
+function bit32.band(args: ...number): number
+function bit32.bnot(n: number): number
+function bit32.bor(args: ...number): number
+function bit32.bxor(args: ...number): number
+function bit32.btest(args: ...number): boolean
+
+function bit32.extract(n: number, f: number, w: number?): number
+function bit32.replace(n: number, r: number, f: number, w: number?): number
+function bit32.byteswap(n: number): number
+function bit32.countlz(n: number): number
+
+function bit32.lrotate(n: number, i: number): number
+function bit32.rrotate(n: number, i: number): number
+function bit32.lshift(n: number, i: number): number
+function bit32.rshift(n: number, i: number): number
+function bit32.arshift(n: number, i: number): number
+```

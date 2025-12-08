@@ -1,0 +1,34 @@
+---
+title: llSetKeyframedMotion
+description: >-
+  Requests that a non-physical object be key-framed according to key-frame list.
+
+  Specify a list of times, positions, and orientations to be followed by an
+  object. The object will be smoothly moved between key-frames by the simulator.
+  Collisions with other non-physical or key-framed objects will be ignored (no
+  script events will fire and collision processing will not occur). Collisions
+  with physical objects will be computed and reported, but the key-framed object
+  will be unaffected by those collisions.
+
+  Keyframes is a strided list containing positional, rotational, and time data
+  for each step in the motion.  Options is a list containing optional arguments
+  and parameters (specified by KFM_* constants).
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llSetKeyframedMotion" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here.
+
+## Notes
+
+Add additional notes, caveats, or tips here.
+
+## See Also
+
+- Related pages can be linked here

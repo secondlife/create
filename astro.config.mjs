@@ -19,7 +19,7 @@ const lslLang = JSON.parse(
 export default defineConfig({
 	site: 'https://create.secondlife.com',
 	redirects: {
-		'/': '/script/',
+		'/': '/script/'
 	},
 	integrations: [
 		starlight({
@@ -56,6 +56,60 @@ export default defineConfig({
 			},
 			sidebar: [
 				{
+					label: 'Scripting',
+					items: [
+						{ label: 'Portal', slug: 'script' },
+						{
+							label: 'Getting Started',
+							collapsed: false,
+							autogenerate: { directory: 'script/getting-started' },
+						},
+						{
+							label: 'Features',
+							collapsed: true,
+							autogenerate: { directory: 'script/features'}
+						},
+						{ label: 'Guides', slug: 'script/guides' },
+						{ label: 'Recipes', slug: 'script/recipes' },
+						{
+							label: 'SLua Language',
+							collapsed: false,
+							autogenerate: { directory: 'script/slua' },
+						},
+						{
+							label: 'LSL Language',
+							collapsed: true,
+							autogenerate: { directory: 'script/lsl' },
+						},
+						{
+							label: 'Reference',
+							collapsed: false,
+							items: [
+								{ label: 'Categories', slug: 'script/reference/categories' },
+								{ label: 'Events', slug: 'script/reference/events' },
+								{ label: 'Constants', slug: 'script/reference/constants' },
+								{
+									label: 'Standard Library',
+									collapsed: false,
+									autogenerate: { directory: 'script/reference/standard-library' },
+								},
+								{
+									label: 'Luau Libraries',
+									collapsed: false,
+									autogenerate: { directory: 'script/reference/luau' },
+								},
+								{
+									label: 'LSL',
+									collapsed: true,
+									autogenerate: { directory: 'script/reference/lsl' },
+								},
+							]
+							// autogenerate: { directory: 'script/reference' },
+						},
+					],
+				}
+				
+				/*{
 					label: 'Script',
 					items: [
 						{ label: 'Getting Started', slug: 'script' },
@@ -88,7 +142,7 @@ export default defineConfig({
 							],
 						},
 					],
-				},
+				},*/
 			],
 		}),
 	],

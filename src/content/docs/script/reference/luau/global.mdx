@@ -1,0 +1,80 @@
+---
+title: Global Functions
+description: Global functions in Luau
+sidebar:
+    order: 0
+---
+
+:::caution[Stub]
+This documentation page is a stub and is currently under development.
+
+Feel free to contribute by submitting a pull request.
+:::
+
+{/* Trying to order some useful groups towards the top */}
+```luau
+function type(obj: any): string
+function tonumber(s: string, base: number?): number?
+function tostring(obj: any): string
+```
+:::tip
+Second Life also adds the following:
+```luau
+function tovector(s: string): vector3
+function toquaternion(s: string): quaternion
+function torotation(s: string): quaternion
+function touuid(s: string): uuid
+```
+:::
+
+```luau
+function print(args: ...any)
+function assert<T>(value: T, message: string?): T
+function error(obj: any, level: number?)
+
+function getmetatable(obj: any): table?
+function setmetatable(t: table, mt: table?)
+
+function pcall(f: function, args: ...any): (boolean, ...any)
+function xpcall(f: function, e: function, args: ...any): (boolean, ...any)
+
+function newproxy(mt: boolean?): userdata
+
+function rawget<K, V>(t: { [K]: V }, k: K): V?
+function rawset<K, V>(t: { [K] : V }, k: K, v: V)
+function rawlen<K, V>(t: { [K]: V } | string): number
+function rawequal(a: any, b: any): boolean
+
+function next<K, V>(t: { [K]: V }, i: K?): (K, V)?
+function select<T>(i: string, args: ...T): number
+function select<T>(i: number, args: ...T): ...T
+function ipairs(t: table): <iterator>
+function pairs(t: table): <iterator>
+```
+:::tip
+[Luau supports generalized iterators](https://luau.org/syntax#generalized-iteration) so you don't need to use the `ipairs` and `pairs` functions:
+```luau
+for index, value in ArrayTable do
+	...
+end
+
+for key, value in DictionaryTable do
+	...
+end
+```
+:::
+```luau
+function unpack<V>(a: {V}, f: number?, t: number?): ...V
+```
+Equivalent to `table.unpack`
+
+
+## Removed
+```luau
+function gcinfo(): number
+function getfenv(target: (function | number)?): table
+function setfenv(target: function | number, env: table)
+```
+:::danger
+The above functions have been removed and are not available in Second Life SLua.
+:::

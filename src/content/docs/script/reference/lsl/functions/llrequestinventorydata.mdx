@@ -1,0 +1,30 @@
+---
+title: llRequestInventoryData
+description: >-
+  Requests data for the named InventoryItem.
+
+  When data is available, the dataserver event will be raised with the key
+  returned from this function in the requested parameter.
+
+  The only request currently implemented is to request data from landmarks,
+  where the data returned is in the form "<float, float, float>" which can be
+  cast to a vector. This position is in region local coordinates.
+---
+
+import LSLFunction from '@components/LSLFunction.astro';
+
+<LSLFunction name="llRequestInventoryData" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here.
+
+## Notes
+
+Add additional notes, caveats, or tips here.
+
+## See Also
+
+- Related pages can be linked here
