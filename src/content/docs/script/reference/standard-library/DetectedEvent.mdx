@@ -12,24 +12,22 @@ Feel free to contribute by submitting a pull request.
 :::
 
 ```luau
-DetectedEvent = {
-    getOwner: function(): uuid,
-    getName: function(): string,
-    getKey: function(): uuid,
-    getTouchFace: function(): vector,
-    getLinkNumber: function(): number,
-    getGrab: function(): vector,
-    getGroup: function(): boolean,
-    getPos: function(): vector,
-    getRot: function(): quaternion,
-    getTouchBinormal: function(): vector,
-    getTouchNormal: function(): vector,
-    getTouchPos: function(): vector,
-    getTouchST: function(): vector,
-    getTouchUV: function(): vector,
-    getType: function(): number,
-    getVel: function(): vector,
-    getRezzer: function(): uuid,
-    getDamage: function(): {number, number, number} -- {damage, type, original}
-}
+function DetectedEvent.getOwner(): uuid
+function DetectedEvent.getName(): string
+function DetectedEvent.getKey(): uuid
+function DetectedEvent.getTouchFace(): vector
+function DetectedEvent.getLinkNumber(): number
+function DetectedEvent.getGrab(): vector
+function DetectedEvent.getGroup(): boolean
+function DetectedEvent.getPos(): vector
+function DetectedEvent.getRot(): quaternion
+function DetectedEvent.getTouchBinormal(): vector
+function DetectedEvent.getTouchNormal(): vector
+function DetectedEvent.getTouchPos(): vector
+function DetectedEvent.getTouchST(): vector
+function DetectedEvent.getTouchUV(): vector
+function DetectedEvent.getType(): number
+function DetectedEvent.getVel(): vector
+function DetectedEvent.getRezzer(): uuid
+function DetectedEvent.getDamage(): {number, number, number} -- {damage, type, original}
 ```
