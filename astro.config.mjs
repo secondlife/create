@@ -24,7 +24,7 @@ export default defineConfig({
 	site: 'https://create.secondlife.com',
 	integrations: [
 		starlight({
-			title: 'Second Life Content Creation',
+			title: 'Second Life Create',
 			favicon: '/favicon.svg',
 			defaultLocale: 'root',
 			locales: {
