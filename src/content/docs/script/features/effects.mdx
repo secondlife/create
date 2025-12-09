@@ -1,5 +1,5 @@
 ---
-title: Dialog
+title: Effects
 description: Creating and managing Dialogs in Second Life scripting
 ---
 
@@ -10,3 +10,28 @@ Feel free to contribute by submitting a pull request.
 :::
 
 > Hover Text, Particle Systems, Texture Animations, … — Nexii
+
+## Hover Text
+
+
+## Particle Systems
+```luau
+ll.ParticleSystem({
+	…
+})
+```
+
+You'll need to use the bitwise OR operator method from the [`bit32` library](../reference/luau/bit32.mdx) to combine flags:
+```luau
+	PSYS_PART_FLAGS, bit32.bor(
+		PSYS_PART_EMISSIVE_MASK,
+		PSYS_PART_INTERP_COLOR_MASK,
+		PSYS_PART_INTERP_SCALE_MASK,
+		PSYS_PART_FOLLOW_VELOCITY_MASK
+	)
+```
+
+
+
+## Texture Animations
+
