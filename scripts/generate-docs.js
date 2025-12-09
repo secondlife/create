@@ -43,7 +43,7 @@ async function generateFor(name, tooltip, component, outputDir) {
 ${frontmatterYaml}
 ---
 
-import ${component} from '@components/${component}.astro';
+import ${component} from '@components/scripting/${component}.astro';
 
 <${component} name="${name}" />
 

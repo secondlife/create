@@ -5,7 +5,7 @@ description: |2-
                      Starts an asychronous transaction the request the used and total amount of data allocated for the Experience. The dataserver callback will be executed with the key returned from this call and a string describing the result. The result is commma-delimited list. The first item is an integer specifying if the transaction succeeded (1) or not (0). In the failure case, the second item will be an integer corresponding to one of the XP_ERROR_... constants. In the success case the second item will be the the amount in use and the third item will be the total available.
 ---
 
-import LSLFunction from '@components/LSLFunction.astro';
+import LSLFunction from '@components/scripting/LSLFunction.astro';
 
 <LSLFunction name="llDataSizeKeyValue" />
 

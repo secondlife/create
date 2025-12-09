@@ -1,35 +1,40 @@
 ---
 /**
- * EventReference component - Shared base for event documentation
+ * FunctionReference component - Shared base for function documentation
  *
- * This component provides the core rendering logic for event reference pages.
- * Language-specific components (LSLEvent, LuaEvent) use this as their base.
+ * This component provides the core rendering logic for function reference pages.
+ * Language-specific components (LSLFunction, LuaFunction) use this as their base.
  */
 
 import { Code } from '@astrojs/starlight/components';
-import type { EventDefinition, Argument } from '../utils/lsl-definitions';
-import '../styles/function-reference.css';
+import type { FunctionDefinition, Argument } from '~/utils/lsl-definitions';
+import '~/styles/function-reference.css';
 
-export interface EventReferences extends EventDefinition {
+export interface FunctionReference extends FunctionDefinition {
   /** The programming language for syntax highlighting */
   language: 'lsl' | 'lua';
-  /** The formatted event signature */
+  /** The formatted function signature */
   signature: string;
   /** CSS class name for the root element */
   className?: string;
 }
 
-export interface Props extends EventReferences {}
+
+export interface Props extends FunctionReference {}
 
 const {
   tooltip,
+  returnType,
+  energy,
+  sleep,
   deprecated,
   experience,
+  lindenExperience,
   godMode,
-  arguments: args = [],
+  arguments: args = {},
   language,
   signature,
-  className = 'event-reference'
+  className = 'function-reference'
 } = Astro.props;
 
 // Split tooltip into paragraphs by newlines
@@ -43,6 +48,9 @@ const tooltipParagraphs = tooltip ? tooltip.split('\n').filter((p: string) => p.
     )}
     {experience && (
       <div class="badge badge-info">Requires Experience</div>
+    )}
+    {lindenExperience && (
+      <div class="badge badge-info">Linden Experience Only</div>
     )}
     {godMode && (
       <div class="badge badge-danger">God Mode Only</div>
@@ -79,4 +87,19 @@ const tooltipParagraphs = tooltip ? tooltip.split('\n').filter((p: string) => p.
       </div>
     </details>
   )}
+
+  <details class="function-metadata-details">
+    <summary>Technical Details</summary>
+    <div class="function-metadata">
+      <ul>
+        <li><strong>Return Type:</strong> <code>{returnType}</code></li>
+        {energy !== undefined && (
+          <li><strong>Energy:</strong> {energy}</li>
+        )}
+        {sleep !== undefined && sleep > 0 && (
+          <li><strong>Sleep:</strong> {sleep}s</li>
+        )}
+      </ul>
+    </div>
+  </details>
 </div>
