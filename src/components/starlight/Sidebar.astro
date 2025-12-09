@@ -2,6 +2,7 @@
 import SidebarPersister from '@astrojs/starlight/components/SidebarPersister.astro';
 import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
+import type { StarlightRouteData } from '@astrojs/starlight/route-data';
 import { stripLeadingAndTrailingSlashes, stripLangFromSlug } from '~/utils/path';
 import { isSubPage } from '~/utils/isSubPage';
 import { allPages } from './content';
@@ -13,7 +14,8 @@ import TabPanel from './TabPanel.astro';
 
 const { sidebar, id } = Astro.locals.starlightRoute
 
-function markEntries(item) {
+type SidebarEntry = StarlightRouteData['sidebar'][number];
+function markEntries(item: SidebarEntry) {
 	if(item.type === 'group') item.entries.forEach(markEntries);
 	else if(item.type === 'link')
 	{
@@ -28,17 +30,17 @@ sidebar.forEach(markEntries);
 
 const makeId = (label: string) => '__tab-' + label.toLowerCase().replaceAll(/\s+/g, '-');
 
-const isCurrent = (sidebar) => sidebar
-	.map(entry => entry.type === 'link'? entry.isCurrent : isCurrent(entry.entries))
+const isCurrent = (sidebar: SidebarEntry[]): boolean => sidebar
+	.map((entry: SidebarEntry) => entry.type === 'link'? entry.isCurrent : isCurrent(entry.entries))
 	.some(entry => entry === true);
 
 // Drop down from portal to tabbed; sidebar structure is Portals -> Tabbed -> Groups/Links, 
-const tabbed = sidebar[0]?.entries || [];
+const tabbed = ((sidebar[0]?.type === 'group' && sidebar[0].entries) || []).filter(entry => entry.type === 'group');
 ---
 <SidebarPersister>
 	<TabbedContent class="tabbed-sidebar">
 		<Fragment slot="tab-list">
-			{tabbed.map(({ label, entries }, index) => (
+			{tabbed.map(({ label, entries }) => (
 				<TabListItem id={makeId(label)} initial={isCurrent(entries)} class="tab-item">
 					{label}
 				</TabListItem>
