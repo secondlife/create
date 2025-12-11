@@ -19,10 +19,10 @@ Built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.
 pnpm install
 
 # Start dev server at http://localhost:4321
-pnpm dev
+pnpm run dev
 
 # Build for production
-pnpm build
+pnpm run build
 ```
 
 ## Contributing
