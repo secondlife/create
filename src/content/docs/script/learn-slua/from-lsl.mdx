@@ -57,7 +57,7 @@ float damage = 25.5;
 string name = "Alice";
 vector pos = <10, 20, 30>;
 rotation rot = <0, 0, 0, 1>;
-key uuid = "...";
+key k = "...";
 list items = [1, 2, 3];
 ```
 </Fragment>
@@ -68,8 +68,8 @@ local health: number = 100
 local damage: number = 25.5
 local name: string = "Alice"
 local pos: vector = vector(10, 20, 30)
-local rot: quaternion = quaternion(0, 0, 0, 1) -- also local rot: rotation = rotation(0, 0, 0, 1)
-local uuid: string = "..."  -- keys are strings
+local rot: quaternion = quaternion(0, 0, 0, 1)
+local k: uuid = uuid("...")
 local items: {number} = {1, 2, 3}  -- tables, not lists
 ```
 </Fragment>
@@ -95,12 +95,12 @@ In many cases, luau does typecasting automatically. Here's how to do it explicit
 </Fragment>
 <Fragment slot="slua">
 ```luau
-(math.modf("-4.4")) -- extra parentheses are necessary to discard the second return value
+(math.modf("-4.4")) -- extra parentheses are necessary
 tonumber("25.5")
 tostring(99.9)
 tovector("<10, 20, 30>")
-torotation("<0, 0, 0, 1>") -- also toquaternion("<0, 0, 0, 1>")
-"700843d3-0d15-c427-81ab-e9c8a0dcdb1e"  -- keys are strings
+toquaternion("<0, 0, 0, 1>")
+uuid("700843d3-0d15-c427-81ab-e9c8a0dcdb1e")
 {"hello"}  -- table, not list
 ```
 </Fragment>
