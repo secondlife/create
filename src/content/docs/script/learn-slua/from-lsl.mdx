@@ -93,6 +93,12 @@ local items: {number} = {1, 2, 3}  -- tables, not lists
 | Power | `llPow(2, 3)` | `2 ^ 3` | Native operator |
 | Integer division | `7 / 4` → `1` | `7 // 4` → `1` | Use `//` not `/` |
 | String length | `llStringLength(s)` | `#s` | Native operator |
+| Bitwise AND | `llGetAgentInfo(id) & AGENT_TYPING` | `bit32.band(ll.GetAgentInfo(id), AGENT_TYPING)` | No `&` operator |
+| Bitwise OR | `PASSIVE | SCRIPTED` | `bit32.bor(PASSIVE | SCRIPTED)` | No `|` operator |
+| Bitwise NOT | `~0` | `bit32.bnot(0)` | No `~` operator |
+| Bitwise eXclusive OR | `6 ^ 3` | `bit32.bxor(6, 3)` | `^` means Power instead |
+| Bitwise Shift Left | `1 << 2` | `bit32.arshift(1, 2)` | No `<<` operator |
+| Bitwise Shift Right | `0x80000000 >> 2` | `bit32.arshift(0x80000000, 2)` | No `>>` operator |
 
 ### Control Flow
 
