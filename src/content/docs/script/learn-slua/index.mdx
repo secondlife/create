@@ -46,7 +46,7 @@ If you're already familiar with LSL, SLua will feel familiar but more powerful. 
   ```luau
   local isRed: boolean = true
 
-  function LLEvents.touch_start(detected: {DetectedEvent})
+  function LLEvents.touch_start(detected: {LLDetectedEvent})
       ll.Say(0, "Changing color!")
 
       if isRed then
@@ -101,7 +101,7 @@ Let's write your first SLua script. This simple script makes an object say "Hell
 
 ```luau
 -- Listen for touch events
-function LLEvents.touch_start(detected: {DetectedEvent})
+function LLEvents.touch_start(detected: {LLDetectedEvent})
   -- Say hello in local chat
   ll.Say(0, "Hello, Avatar!")
 end

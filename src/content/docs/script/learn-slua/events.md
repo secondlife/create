@@ -15,7 +15,7 @@ The primary way to register an event handler is with `LLEvents:on()`:
 
 ```luau
 -- Register a touch_start event handler
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, `Touched by {detected[1]:getName()}`)
 end)
 ```
@@ -29,7 +29,7 @@ The `on()` method takes two parameters:
 Event registration methods return a handler reference that you can use later to remove the handler:
 
 ```luau
-local handler = LLEvents:on("touch_start", function(detected: {DetectedEvent})
+local handler = LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, "Touched!")
 end)
 
@@ -45,7 +45,7 @@ Use `LLEvents:once()` to register a handler that automatically removes itself af
 
 ```luau
 -- This will only respond to the first touch
-LLEvents:once("touch_start", function(detected: {DetectedEvent})
+LLEvents:once("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, "First touch detected!")
 end)
 ```
@@ -71,8 +71,8 @@ end)
 Events like `touch_start`, `touch`, and `touch_end` receive a table of detected objects:
 
 ```luau
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
-    -- detected is a table (array) of DetectedEvent objects
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
+    -- detected is a table (array) of LLDetectedEvent objects
     for i = 1, #detected do
         if detected[i].valid then
             ll.Say(0, `Touched by: {detected[i]:getName()}`)
@@ -132,7 +132,7 @@ When the event fires, the callable table receives `self` as its first parameter,
 Errors in event handlers are fatal and will terminate the script:
 
 ```luau
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     error("Something went wrong!")  -- This will crash the script
 end)
 ```
@@ -140,7 +140,7 @@ end)
 To handle potential errors gracefully, use `pcall()`:
 
 ```luau
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     local success, err = pcall(function()
         -- Code that might error
         if math.random() > 0.5 then
@@ -164,7 +164,7 @@ You can add or remove handlers while an event is being processed:
 - This prevents infinite loops
 
 ```luau
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     -- Add another handler during event processing
     LLEvents:on("touch_start", function(det)
         ll.Say(0, "New handler - won't run until next touch")
@@ -179,12 +179,12 @@ end)
 ```luau
 local handler2
 
-local handler1 = LLEvents:on("touch_start", function(detected: {DetectedEvent})
+local handler1 = LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, "Handler 1 - removing handler 2")
     LLEvents:off("touch_start", handler2)
 end)
 
-handler2 = LLEvents:on("touch_start", function(detected: {DetectedEvent})
+handler2 = LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, "Handler 2 - might not run if handler 1 removes me")
 end)
 ```
@@ -195,17 +195,17 @@ You can register multiple handlers for the same event. They execute in the order
 
 ```luau
 -- First handler
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, "Handler 1")
 end)
 
 -- Second handler
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, "Handler 2")
 end)
 
 -- Third handler
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, "Handler 3")
 end)
 
@@ -220,15 +220,15 @@ end)
 ### Touch Events
 
 ```luau
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, `Touch started by {detected[1]:getName()}`)
 end)
 
-LLEvents:on("touch", function(detected: {DetectedEvent})
+LLEvents:on("touch", function(detected: {LLDetectedEvent})
     ll.Say(0, "Touching...")
 end)
 
-LLEvents:on("touch_end", function(detected: {DetectedEvent})
+LLEvents:on("touch_end", function(detected: {LLDetectedEvent})
     ll.Say(0, "Touch ended")
 end)
 ```
@@ -248,15 +248,15 @@ end)
 ### Collision Events
 
 ```luau
-LLEvents:on("collision_start", function(detected: {DetectedEvent})
+LLEvents:on("collision_start", function(detected: {LLDetectedEvent})
     ll.Say(0, `Collision with {detected[1]:getName()}`)
 end)
 
-LLEvents:on("collision", function(detected: {DetectedEvent})
+LLEvents:on("collision", function(detected: {LLDetectedEvent})
     ll.Say(0, "Colliding...")
 end)
 
-LLEvents:on("collision_end", function(detected: {DetectedEvent})
+LLEvents:on("collision_end", function(detected: {LLDetectedEvent})
     ll.Say(0, "Collision ended")
 end)
 ```
@@ -268,13 +268,13 @@ end)
 You can simulate states by swapping handler functions:
 
 ```luau
-local function idleHandler(detected: {DetectedEvent})
+local function idleHandler(detected: {LLDetectedEvent})
     ll.Say(0, "Switching to active state")
     LLEvents:off("touch_start", idleHandler)
     LLEvents:on("touch_start", activeHandler)
 end
 
-local function activeHandler(detected: {DetectedEvent})
+local function activeHandler(detected: {LLDetectedEvent})
     ll.Say(0, "Switching to idle state")
     LLEvents:off("touch_start", activeHandler)
     LLEvents:on("touch_start", idleHandler)
@@ -289,7 +289,7 @@ LLEvents:on("touch_start", idleHandler)
 ```luau
 local enabled = true
 
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     if not enabled then
         return
     end
@@ -307,7 +307,7 @@ enabled = false
 local handlers = {}
 
 -- Register multiple handlers and keep track of them
-handlers.touch = LLEvents:on("touch_start", function(detected: {DetectedEvent})
+handlers.touch = LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     ll.Say(0, "Touched!")
 end)
 
@@ -360,7 +360,7 @@ end)
 Remove handlers you no longer need:
 ```luau
 -- ✗ Creating new handlers repeatedly without cleanup
-LLEvents:on("touch_start", function(detected: {DetectedEvent})
+LLEvents:on("touch_start", function(detected: {LLDetectedEvent})
     -- This creates a new listen handler on each touch!
     LLEvents:on("listen", function(channel, name, id, msg)
         ll.Say(0, `Heard: {msg}`)
