@@ -363,7 +363,7 @@ local clickCount: number = 0
 
 ll.Say(0, "Ready!")
 
-LLEvents:on("touch_start", function(num_detected: number)
+LLEvents:on("touch_start", function(events: {LLDetectedEvent})
     clickCount += 1
     ll.Say(0, `Clicked {clickCount} times`)
 
@@ -379,18 +379,18 @@ end)
 
 **Basic event handler:**
 ```luau
-LLEvents:on("touch_start", function(num_detected: number)
-    ll.Say(0, `Touched by {ll.DetectedName(1)}`)
+LLEvents:on("touch_start", function(events: {LLDetectedEvent})
+    ll.Say(0, `Touched by {events[1]:getName()}`)
 end)
 ```
 
 **Multiple events (run simultaneously):**
 ```luau
-LLEvents:on("touch_start", function(num_detected: number)
+LLEvents:on("touch_start", function(events: {LLDetectedEvent})
     ll.Say(0, "Touched!")
 end)
 
-LLEvents:on("collision_start", function(num_detected: number)
+LLEvents:on("collision_start", function(events: {LLDetectedEvent})
     ll.Say(0, "Collision!")
 end)
 ```
@@ -406,10 +406,10 @@ end)
 
 **Accessing detected data:**
 ```luau
-LLEvents:on("touch_start", function(num_detected: number)
-    for i = 1, num_detected do
-        local name: string = ll.DetectedName(i)
-        local key: string = ll.DetectedKey(i)
+LLEvents:on("touch_start", function(events: {LLDetectedEvent})
+    for i: number, event: LLDetectedEvent in events do
+        local name: string = event:getName()
+        local key: uuid = event:getKey()
         ll.Say(0, `{name} touched me!`)
     end
 end)
@@ -479,7 +479,7 @@ local isOpen: boolean = false
 local closedPos: vector = ll.GetPos()
 local openPos: vector = closedPos + vector(0, 0, 2)
 
-LLEvents:on("touch_start", function(num_detected: number)
+LLEvents:on("touch_start", function(events: {LLDetectedEvent})
     if isOpen then
         ll.SetPos(closedPos)
         isOpen = false
