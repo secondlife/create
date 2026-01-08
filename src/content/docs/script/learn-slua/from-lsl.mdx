@@ -97,7 +97,7 @@ local items: {number} = {1, 2, 3}  -- tables, not lists
 | Bitwise OR | `PASSIVE | SCRIPTED` | `bit32.bor(PASSIVE | SCRIPTED)` | No `|` operator |
 | Bitwise NOT | `~0` | `bit32.bnot(0)` | No `~` operator |
 | Bitwise eXclusive OR | `6 ^ 3` | `bit32.bxor(6, 3)` | `^` means Power instead |
-| Bitwise Shift Left | `1 << 2` | `bit32.arshift(1, 2)` | No `<<` operator |
+| Bitwise Shift Left | `1 << 2` | `bit32.lshift(1, 2)` | No `<<` operator |
 | Bitwise Shift Right | `0x80000000 >> 2` | `bit32.arshift(0x80000000, 2)` | No `>>` operator |
 
 ### Control Flow
