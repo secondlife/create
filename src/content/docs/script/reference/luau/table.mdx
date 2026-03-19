@@ -1,0 +1,47 @@
+---
+title: table
+description: Math library in Luau
+sidebar:
+    order: 2
+---
+
+:::caution[Stub]
+This documentation page is a stub and is currently under development.
+
+Feel free to contribute by submitting a pull request.
+:::
+
+{/* Note: sorted and grouped based on related functionality */}
+```luau
+function table.create<V>(n: number, v: V?): {V}
+function table.insert<V>(t: {V}, v: V)
+function table.insert<V>(t: {V}, i: number, v: V)
+function table.remove<V>(t: {V}, i: number?): V?
+function table.move<V>(a: {V}, f: number, t: number, d: number, tt: {V}?)
+function table.clear(t: table)
+
+function table.pack<V>(args: ...V): { [number]: V, n: number }
+function table.unpack<V>(a: {V}, f: number?, t: number?): ...V
+
+function table.concat(a: {string}, sep: string?, f: number?, t: number?): string
+
+function table.find<V>(t: {V}, v: V, init: number?): number?
+function table.sort<V>(t: {V}, f: ((V, V) -> boolean)?)
+
+function table.maxn<V>(t: {V}): number
+
+function table.freeze(t: table): table
+function table.isfrozen(t: table): boolean
+function table.clone(t: table): table
+```
+
+
+## Deprecated
+```luau
+function table.foreach<K, V, R>(t: { [K]: V }, f: (K, V) -> R?): R?
+function table.foreachi<V, R>(t: {V}, f: (number, V) -> R?): R?
+function table.getn<V>(t: {V}): number
+```
+:::danger
+The above functions are deprecated and should not be used
+:::

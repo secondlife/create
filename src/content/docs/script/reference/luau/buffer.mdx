@@ -1,0 +1,46 @@
+---
+title: buffer
+description: Buffer library in Luau
+sidebar:
+    order: 9
+---
+
+:::caution[Stub]
+This documentation page is a stub and is currently under development.
+
+Feel free to contribute by submitting a pull request.
+:::
+
+{/* Note: sorted and grouped based on related functionality */}
+```luau
+function buffer.create(size: number): buffer
+function buffer.len(b: buffer): number
+function buffer.copy(target: buffer, targetOffset: number, source: buffer, sourceOffset: number?, count: number?): ()
+function buffer.fill(b: buffer, offset: number, value: number, count: number?): ()
+
+function buffer.fromstring(str: string): buffer
+function buffer.tostring(b: buffer): string
+function buffer.readstring(b: buffer, offset: number, count: number): string
+function buffer.writestring(b: buffer, offset: number, value: string, count: number?): ()
+
+function buffer.readbits(b: buffer, bitOffset: number, bitCount: number): number
+function buffer.writebits(b: buffer, bitOffset: number, bitCount: number, value: number): ()
+
+function buffer.readi8(b: buffer, offset: number): number
+function buffer.readu8(b: buffer, offset: number): number
+function buffer.readi16(b: buffer, offset: number): number
+function buffer.readu16(b: buffer, offset: number): number
+function buffer.readi32(b: buffer, offset: number): number
+function buffer.readu32(b: buffer, offset: number): number
+function buffer.readf32(b: buffer, offset: number): number
+function buffer.readf64(b: buffer, offset: number): number
+
+function buffer.writei8(b: buffer, offset: number, value: number): ()
+function buffer.writeu8(b: buffer, offset: number, value: number): ()
+function buffer.writei16(b: buffer, offset: number, value: number): ()
+function buffer.writeu16(b: buffer, offset: number, value: number): ()
+function buffer.writei32(b: buffer, offset: number, value: number): ()
+function buffer.writeu32(b: buffer, offset: number, value: number): ()
+function buffer.writef32(b: buffer, offset: number, value: number): ()
+function buffer.writef64(b: buffer, offset: number, value: number): ()
+```

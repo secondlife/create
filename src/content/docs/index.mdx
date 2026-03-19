@@ -1,10 +1,40 @@
 ---
-title: Second Life Creation
+title: Second Life Create
 description: Documentation for building, scripting, and creating in Second Life
+template: splash
+editUrl: false
+lastUpdated: false
+hero:
+    title: Second Life Create
+    tagline: Documentation for building, scripting, and creating in Second Life
+    image:
+        file: '@assets/sl-logo.svg'
 ---
 
-<script>
-  window.location.href = '/script/';
-</script>
+import { CardGrid, Card, LinkButton } from '@astrojs/starlight/components';
 
-Redirecting to [Getting Started with Scripting](/script/)...
+Welcome to Second Life Create, your documentation on content creation! Here you'll find resources and guides to help you build, script, and create amazing experiences in Second Life.
+
+<CardGrid stagger>
+	<Card title="Build" image="@assets/portal-build.jpg">
+		Build stunning 3D environments and objects using Second Life's powerful in-world building tools
+		
+		<LinkButton href="/build/">Get Building</LinkButton>
+	</Card>
+	<Card title="Script" image="@assets/portal-script.jpg">
+		Learn how to create scripts using LSL and SLua to bring interactivity to your creations
+		
+		<LinkButton href="/script/getting-started/introduction/">Get Started</LinkButton>
+		<LinkButton href="/script/reference/" variant="secondary">Reference</LinkButton>
+	</Card>
+	<Card title="Mesh" image="@assets/portal-mesh.jpg">
+		Create and import custom mesh objects to enhance your Second Life creations
+		
+		<LinkButton href="/mesh/">Create Mesh</LinkButton>
+	</Card>
+	<Card title="PBR" image="@assets/portal-pbr.jpg">
+		Understand Physically Based Rendering (PBR) lighting and materials in Second Life
+		
+		<LinkButton href="/pbr/">Learn PBR</LinkButton>
+	</Card>
+</CardGrid>

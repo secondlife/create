@@ -1,0 +1,33 @@
+---
+title: vector
+description: Vector library in Luau
+sidebar:
+    order: 5
+---
+
+:::caution[Stub]
+This documentation page is a stub and is currently under development.
+
+Feel free to contribute by submitting a pull request.
+:::
+
+{/* Note: sorted and grouped based on related functionality */}
+```luau
+vector.zero: vector -- vector(0, 0, 0)
+vector.one: vector -- vector(1, 1, 1)
+
+function vector.create(x: number, y: number, z: number): vector
+function vector.magnitude(vec: vector): number
+function vector.normalize(vec: vector): vector
+function vector.cross(vec1: vector, vec2: vector): vector
+function vector.dot(vec1: vector, vec2: vector): number
+function vector.angle(vec1: vector, vec2: vector, axis: vector?): number
+
+function vector.abs(vec: vector): vector
+function vector.floor(vec: vector): vector
+function vector.ceil(vec: vector): vector
+function vector.sign(vec: vector): vector
+function vector.min(...: vector): vector
+function vector.max(...: vector): vector
+function vector.clamp(vec: vector, min: vector, max: vector): vector
+```

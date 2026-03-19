@@ -1,0 +1,32 @@
+---
+title: llLoopSoundMaster
+description: >-
+  Plays attached Sound, looping at volume (0.0 - 1.0), and declares it a sync
+  master.
+
+  Behaviour is identical to llLoopSound, with the addition of marking the source
+  as a "Sync Master", causing "Slave" sounds to sync to it. If there are
+  multiple masters within a viewers interest area, the most audible one (a
+  function of both distance and volume) will win out as the master.
+
+  The use of multiple masters within a small area is unlikely to produce the
+  desired effect.
+---
+
+import LSLFunction from '@components/scripting/LSLFunction.astro';
+
+<LSLFunction name="llLoopSoundMaster" />
+
+{/* DO NOT EDIT ABOVE THIS LINE */}
+
+## Examples
+
+Add example usage here.
+
+## Notes
+
+Add additional notes, caveats, or tips here.
+
+## See Also
+
+- Related pages can be linked here

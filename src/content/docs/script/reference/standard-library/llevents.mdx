@@ -1,0 +1,25 @@
+---
+title: LLEvents
+description: LLEvents reference
+sidebar:
+    order: 1
+---
+
+:::caution[Stub]
+This documentation page is a stub and is currently under development.
+
+Feel free to contribute by submitting a pull request.
+:::
+
+```luau
+function LLEvents:on(eventName: string, callback: function): function
+function LLEvents:once(eventName: string, callback: function): function
+function LLEvents:off(eventName: string, callback: function): boolean
+function LLEvents:eventNames(): {string}
+function LLEvents:listeners(eventName: string): {[string]: {function}}
+```
+
+```luau
+function LLEvents.listen(channel: number, name: string, id: uuid, message: string)
+function LLEvents.touch_start(events: {DetectedEvent})
+```

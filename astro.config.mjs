@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import fs from 'node:fs';
 import { fetchDefinitions, OUTPUT_PATH } from './scripts/fetch-definitions.js';
+import { sidebar } from './astro.sidebar.js';
+
 
 // Ensure LSL definitions are available
 if (!fs.existsSync(OUTPUT_PATH)) {
@@ -10,86 +12,48 @@ if (!fs.existsSync(OUTPUT_PATH)) {
 	await fetchDefinitions();
 }
 
+
 // Load textmate grammar for LSL 
 const lslLang = JSON.parse(
 	fs.readFileSync(new URL('./src/definitions/lsl.tmLanguage.json', import.meta.url), 'utf-8')
 )
 
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://create.secondlife.com',
-	redirects: {
-		'/': '/script/',
-	},
 	integrations: [
 		starlight({
-			title: 'Second Life Creation',
+			title: 'Second Life Create',
 			favicon: '/favicon.svg',
-			editLink: {
-				baseUrl: 'https://github.com/secondlife/create/edit/main/',
+			defaultLocale: 'root',
+			locales: {
+				root: { label: 'English', lang: 'en' },
 			},
 			social: [
 				{ icon: 'discord', label: 'Discord', href: 'https://discord.gg/secondlifeofficial' },
-				{
-					icon: 'github',
-					label: 'GitHub',
-					href: 'https://github.com/secondlife/create',
-				},
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/secondlife/create' },
 			],
-			logo: {
-				src: './src/assets/sl-logo.svg',
+			logo: { src: './src/assets/sl-logo.svg' },
+			
+			tableOfContents: false,
+			sidebar,
+			components: {
+				Sidebar: './src/components/starlight/Sidebar.astro',
 			},
+			customCss: [
+				'./src/styles/custom.css',
+			],
+			editLink: {
+				baseUrl: 'https://github.com/secondlife/create/edit/main/',
+			},
+			
+			routeMiddleware: './config/middleware.js',
 			expressiveCode: {
 				shiki: {
 					langs: [lslLang],
 				},
 			},
-			customCss: [
-				'./src/styles/custom.css',
-			],
-			defaultLocale: 'root',
-			locales: {
-				root: {
-					label: 'English',
-					lang: 'en',
-				},
-			},
-			sidebar: [
-				{
-					label: 'Script',
-					items: [
-						{ label: 'Getting Started', slug: 'script' },
-						// {
-						// 	label: 'Guides',
-						// 	autogenerate: { directory: 'script/guides' },
-						// },
-						// {
-						// 	label: 'Recipes',
-						// 	autogenerate: { directory: 'script/recipes' },
-						// },
-						{
-							label: 'Learn SLua',
-							collapsed: true,
-							autogenerate: { directory: 'script/learn-slua' },
-						},
-						{
-							label: 'Reference',
-							items: [
-								{
-									label: 'LSL',
-									collapsed: true,
-									autogenerate: { directory: 'script/lsl-reference' },
-								},
-								{
-									label: 'SLua',
-									collapsed: true,
-									autogenerate: { directory: 'script/slua-reference' },
-								},
-							],
-						},
-					],
-				},
-			],
 		}),
 	],
 });
