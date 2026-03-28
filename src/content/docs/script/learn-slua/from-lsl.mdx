@@ -57,7 +57,7 @@ float damage = 25.5;
 string name = "Alice";
 vector pos = <10, 20, 30>;
 rotation rot = <0, 0, 0, 1>;
-key uuid = "...";
+key k = "...";
 list items = [1, 2, 3];
 ```
 </Fragment>
@@ -69,7 +69,7 @@ local damage: number = 25.5
 local name: string = "Alice"
 local pos: vector = vector(10, 20, 30)
 local rot: quaternion = quaternion(0, 0, 0, 1)
-local uuid: string = "..."  -- keys are strings
+local k: uuid = uuid("...")
 local items: {number} = {1, 2, 3}  -- tables, not lists
 ```
 </Fragment>
@@ -78,6 +78,34 @@ local items: {number} = {1, 2, 3}  -- tables, not lists
 <Aside type="caution">
   **Type annotations recommended!** While optional, they catch errors before runtime and make code self-documenting.
 </Aside>
+
+#### Typecasting
+In many cases, luau does typecasting automatically. Here's how to do it explicitly:
+<CodeComparison>
+<Fragment slot="lsl">
+```lsl
+(integer)"-4.4";
+(float)"25.5";
+(string)99.9;
+(vector)"<10, 20, 30>";
+(rotation)"<0, 0, 0, 1>";
+(key)"700843d3-0d15-c427-81ab-e9c8a0dcdb1e";
+(list)"hello"; // equivilant to ["hello"]
+```
+</Fragment>
+<Fragment slot="slua">
+```luau
+(math.modf(tonumber("-4.4") or 0)) -- extra parentheses sometimes necessary
+tonumber("25.5") or 0
+tostring(99.9)
+tovector("<10, 20, 30>") or ZERO_VECTOR
+toquaternion("<0, 0, 0, 1>") or ZERO_ROTATION
+uuid("700843d3-0d15-c427-81ab-e9c8a0dcdb1e") or NULL_KEY
+{"hello"}  -- table, not list
+```
+</Fragment>
+</CodeComparison>
+LSL and Lua typecasts return different results on invalid input: LSL returns "zero"; lua returns `nil`. The Lua examples include an `or` expressions that converts `nil` to what LSL typecast would have returned
 
 ### Operators
 
