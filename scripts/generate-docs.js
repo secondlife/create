@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Generates documentation pages for LSL/SLua functions, events, and constants
+// Generates documentation pages for LSL/Lua functions, events, and constants
 // based on the lsl_definitions.yaml file located in src/definitions.
 
 import { readFile } from 'fs/promises';
@@ -81,7 +81,7 @@ async function generateDocs() {
   const events = Object.keys(lslDefs.events);
   const constants = Object.keys(lslDefs.constants);
 
-  // Events that are LSL-specific and should not be included in SLua documentation
+  // Events that are LSL-specific and should not be included in Lua documentation
   const lslOnlyEvents = ['state_entry', 'state_exit'];
 
   for (const funcName of functions) {
@@ -90,25 +90,25 @@ async function generateDocs() {
       continue;
     }
     generateFor(funcName, lslDefs.functions[funcName]?.tooltip, 'LSLFunction', '../src/content/docs/script/lsl-reference/functions');
-    generateFor(funcName, lslDefs.functions[funcName]?.tooltip, 'SLuaFunction', '../src/content/docs/script/slua-reference/functions');
+    generateFor(funcName, lslDefs.functions[funcName]?.tooltip, 'SLuaFunction', '../src/content/docs/script/lua-reference/functions');
   }
   console.log(`✅ Generated ${Object.keys(lslDefs.functions).length*2} doc pages for ${Object.keys(lslDefs.functions).length} functions.`);
 
   let sluaEventCount = 0;
   for (const eventName of events) {
     generateFor(eventName, lslDefs.events[eventName]?.tooltip, 'LSLEvent', '../src/content/docs/script/lsl-reference/events');
-    // Skip LSL-only events when generating SLua documentation
+    // Skip LSL-only events when generating Lua documentation
     if (!lslOnlyEvents.includes(eventName)) {
-      generateFor(eventName, lslDefs.events[eventName]?.tooltip, 'SLuaEvent', '../src/content/docs/script/slua-reference/events');
+      generateFor(eventName, lslDefs.events[eventName]?.tooltip, 'SLuaEvent', '../src/content/docs/script/lua-reference/events');
       sluaEventCount++;
     }
   }
   const totalEvents = events.length;
-  console.log(`✅ Generated ${totalEvents} LSL event pages and ${sluaEventCount} SLua event pages for ${totalEvents} events.`);
+  console.log(`✅ Generated ${totalEvents} LSL event pages and ${sluaEventCount} Lua event pages for ${totalEvents} events.`);
 
   for (const constantName of constants) {
     generateFor(constantName, lslDefs.constants[constantName]?.tooltip, 'LSLConstant', '../src/content/docs/script/lsl-reference/constants');
-    generateFor(constantName, lslDefs.constants[constantName]?.tooltip, 'SLuaConstant', '../src/content/docs/script/slua-reference/constants');
+    generateFor(constantName, lslDefs.constants[constantName]?.tooltip, 'SLuaConstant', '../src/content/docs/script/lua-reference/constants');
   }
   console.log(`✅ Generated ${Object.keys(lslDefs.constants).length*2} doc pages for ${Object.keys(lslDefs.constants).length} constants.`);
 }
