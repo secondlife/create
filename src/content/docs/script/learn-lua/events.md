@@ -1,11 +1,11 @@
 ---
 title: Events
-description: Event handling in SLua with LLEvents
+description: Event handling in Lua with LLEvents
 ---
 
 ## Introduction
 
-SLua uses the `LLEvents` system to handle events from the Second Life simulator. Unlike traditional event handler declarations, SLua allows you to register event handlers dynamically using callback functions, giving you more flexibility in how you structure your code.
+Lua uses the `LLEvents` system to handle events from the Second Life simulator. Unlike traditional event handler declarations, Lua allows you to register event handlers dynamically using callback functions, giving you more flexibility in how you structure your code.
 
 ## Basic Event Registration
 
@@ -373,4 +373,4 @@ local listenHandler = LLEvents:on("listen", function(channel, name, id, msg)
 end)
 ```
 
-*This guide covers the LLEvents system for event handling in SLua. For timer management, see the [Timers](./timers/) documentation.*
+*This guide covers the LLEvents system for event handling in Lua. For timer management, see the [Timers](./timers/) documentation.*
