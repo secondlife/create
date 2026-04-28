@@ -1,6 +1,6 @@
 ---
-title: From LSL to SLua
-description: Essential guide for LSL scripters transitioning to SLua
+title: From LSL to Lua
+description: Essential guide for LSL scripters transitioning to Lua
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -8,13 +8,13 @@ import CodeComparison from '@components/CodeComparison.astro';
 
 ## For LSL Scripters
 
-You already know how Second Life scripting works—events, permissions, object communication, inventory management. All of that knowledge transfers directly to SLua. This page focuses on the syntax and pattern differences you need to know.
+You already know how Second Life scripting works—events, permissions, object communication, inventory management. All of that knowledge transfers directly to Lua. This page focuses on the syntax and pattern differences you need to know.
 
 <Aside type="tip">
-  **LSL still works!** Your existing scripts continue to run, and LSL is fully supported. SLua is an option, not a requirement.
+  **LSL still works!** Your existing scripts continue to run, and LSL is fully supported. Lua is an option, not a requirement.
 </Aside>
 
-## Why Consider SLua?
+## Why Consider Lua?
 
 - **Faster execution** and **~50% less memory** than LSL/Mono
 - **Modern features**: coroutines, gradual typing, multiple return values
@@ -35,7 +35,7 @@ You already know how Second Life scripting works—events, permissions, object c
 integer x = 5;  // Semicolons required
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 -- Single line comment
 --[[ Multi-line
@@ -61,7 +61,7 @@ key uuid = "...";
 list items = [1, 2, 3];
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 -- Dynamic typing with optional annotations
 local health: number = 100
@@ -81,7 +81,7 @@ local items: {number} = {1, 2, 3}  -- tables, not lists
 
 ### Operators
 
-| Operation | LSL | SLua | Notes |
+| Operation | LSL | Lua | Notes |
 |-----------|-----|------|-------|
 | Not equal | `!=` | `~=` | Different operator |
 | Logical AND | `&&` | `and` | Word, not symbol |
@@ -130,7 +130,7 @@ do {
 } while (count < 10);
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 -- if, then, else
 if x > 5 then
@@ -172,7 +172,7 @@ float calculateDamage(float base, float mult) {
 float result = calculateDamage(10.0, 1.5);
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 -- Always use type annotations
 function calculateDamage(base: number, mult: number): number
@@ -191,7 +191,7 @@ local health: number, mana: number, status: string = getStats()
 
 ### Lists vs Tables
 
-Tables are SLua's most powerful data structure. Unlike LSL's separate `list` type, tables serve **two purposes**: they work as both arrays (like LSL lists) and dictionaries/maps (which LSL doesn't have).
+Tables are Lua's most powerful data structure. Unlike LSL's separate `list` type, tables serve **two purposes**: they work as both arrays (like LSL lists) and dictionaries/maps (which LSL doesn't have).
 
 #### Tables as Arrays (LSL list replacement)
 
@@ -209,7 +209,7 @@ items += [50];  // Append
 integer len = llListLength(items);
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 local items: {number} = {10, 20, 30, 40}
 
@@ -230,7 +230,7 @@ local len: number = #items
 
 #### Tables as Dictionaries/Maps
 
-LSL doesn't have a dictionary/map type—you had to use two parallel lists for key-value pairs. SLua tables can store key-value pairs natively:
+LSL doesn't have a dictionary/map type—you had to use two parallel lists for key-value pairs. Lua tables can store key-value pairs natively:
 
 ```luau
 -- Dictionary/map
@@ -303,7 +303,7 @@ integer len = llStringLength(msg);
 string sub = llGetSubString(msg, 0, 4);  // "Hello"
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 local msg: string = `Hello World`
 local name: string = "Alice"
@@ -326,7 +326,7 @@ llSetRot(<0, 0, 0, 1>);
 llGiveInventory(avatar, "Object");
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 ll.Say(0, "Hello")
 ll.SetPos(vector(10, 20, 30))
@@ -340,7 +340,7 @@ ll.GiveInventory(avatar, "Object")
 
 ## Event Handling: The Big Change
 
-This is the most significant difference between LSL and SLua. Instead of state-based event handlers, SLua uses **event callbacks** with `LLEvents:on()`.
+This is the most significant difference between LSL and Lua. Instead of state-based event handlers, Lua uses **event callbacks** with `LLEvents:on()`.
 
 <CodeComparison>
 <Fragment slot="lsl">
@@ -363,7 +363,7 @@ default {
 }
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 local clickCount: number = 0
 
@@ -381,7 +381,7 @@ end)
 </Fragment>
 </CodeComparison>
 
-### SLua Event Patterns
+### Lua Event Patterns
 
 **Basic event handler:**
 ```luau
@@ -435,7 +435,7 @@ myFunction() {
 }
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 -- Script-level variables (no 'local') are global
 health = 100
@@ -479,7 +479,7 @@ default {
 }
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 local isOpen: boolean = false
 local closedPos: vector = ll.GetPos()
@@ -517,7 +517,7 @@ default {
 }
 ```
 </Fragment>
-<Fragment slot="slua">
+<Fragment slot="Lua">
 ```luau
 local counter: number = 0
 
@@ -570,7 +570,7 @@ end
 
 ## Standard Libraries
 
-SLua includes Lua standard libraries you can use alongside ll* functions. See the full [Luau library reference](https://luau.org/library) for more details.
+Lua includes Lua standard libraries you can use alongside ll* functions. See the full [Luau library reference](https://luau.org/library) for more details.
 
 ```luau
 -- String library
@@ -592,7 +592,7 @@ math.abs(-5)  -- 5
 
 ## Next Steps
 
-- **[SLua Basics](/script/learn/slua/basics/)** - Deep dive into the language
-- **[SLua Events](/script/learn/slua/events/)** - Master event handling patterns
-- **[SLua Reference](/script/reference/slua/functions/)** - All ll* functions
-- **[SLua FAQ](https://wiki.secondlife.com/wiki/SLua_FAQ)** - Common questions
+- **[Lua Basics](/script/learn/Lua/basics/)** - Deep dive into the language
+- **[Lua Events](/script/learn/Lua/events/)** - Master event handling patterns
+- **[Lua Reference](/script/reference/Lua/functions/)** - All ll* functions
+- **[Lua FAQ](https://wiki.secondlife.com/wiki/Lua_FAQ)** - Common questions

@@ -3,7 +3,7 @@
 **Site:** create.secondlife.io
 **Base Path:** `/script/`
 
-This document defines the information architecture for the scripting section of Second Life's creation documentation site. The structure supports both LSL (Linden Scripting Language) and SLua (Lua for Second Life).
+This document defines the information architecture for the scripting section of Second Life's creation documentation site. The structure supports both LSL (Linden Scripting Language) and Lua (Lua for Second Life).
 
 ---
 
@@ -15,9 +15,9 @@ This document defines the information architecture for the scripting section of 
    - All users reference "recipes" for quick solutions
    - "reference" is comprehensive API documentation
 
-2. **Language-Agnostic Structure**: Most top-level sections work for both LSL and SLua
+2. **Language-Agnostic Structure**: Most top-level sections work for both LSL and Lua
    - Only "learn" section splits by language since fundamentals differ
-   - Functions/events/constants are shared (with SLua-specific additions)
+   - Functions/events/constants are shared (with Lua-specific additions)
    - Guides and recipes can include code examples in both languages using tabs
 
 3. **Flat, Discoverable Hierarchy**: Maximum 3 levels deep
@@ -32,7 +32,7 @@ This document defines the information architecture for the scripting section of 
    - **Recipes**: Task-focused solutions (door, chair, teleporter)
    - **Reference**: Comprehensive API docs
 
-5. **Migration-Friendly**: SLua includes "from-lsl" subsection to help LSL scripters transition
+5. **Migration-Friendly**: Lua includes "from-lsl" subsection to help LSL scripters transition
 
 ---
 
@@ -46,7 +46,7 @@ script/
 │   ├── index.md                      # Quick intro for beginners
 │   ├── your-first-script.md          # Tutorial: Hello World
 │   ├── editor-setup.md               # VS Code extension setup
-│   └── lsl-vs-slua.md               # Choosing your language
+│   └── lsl-vs-lua.md                 # Choosing your language
 │
 ├── learn/
 │   ├── lsl/                          # LSL Language Tutorial
@@ -57,8 +57,8 @@ script/
 │   │   ├── states-events.md          # State machines & events
 │   │   └── lists-strings.md          # Working with lists & strings
 │   │
-│   └── slua/                         # SLua Language Tutorial
-│       ├── index.md                  # SLua overview & why Lua
+│   └── lua/                          # Lua Language Tutorial
+│       ├── index.md                  # Lua overview & why Lua
 │       ├── basics.md                 # Variables, types, operators
 │       ├── control-flow.md           # if, while, for, repeat
 │       ├── functions.md              # Function definitions
@@ -115,12 +115,12 @@ script/
     │       ├── permissions.md        # PERMISSION_* constants
     │       └── ...                   # Grouped by prefix/category
     │
-    └── slua/
-        ├── index.md                  # SLua reference overview
+    └── lua/
+        ├── index.md                  # Lua reference overview
         ├── functions/                # ll* functions (same as LSL)
         ├── events/                   # Event handling reference
         ├── constants/                # Constants reference
-        └── libraries/                # SLua-specific libraries
+        └── libraries/                # Lua-specific libraries
             ├── index.md
             ├── ll-events.md          # LLEvents API
             ├── ll-timers.md          # LLTimers API
@@ -143,13 +143,13 @@ Onboarding content for absolute beginners:
 - No prior scripting knowledge assumed
 - Step-by-step first script tutorial
 - Editor setup instructions
-- Guidance on choosing LSL vs SLua
+- Guidance on choosing LSL vs Lua
 
 ### Learn (`/script/learn/`)
 Systematic language tutorials teaching fundamentals:
 - **LSL section**: State-based scripting, LSL-specific patterns
-- **SLua section**: Lua fundamentals, modern scripting concepts
-- **SLua from-lsl**: Migration guides leveraging existing LSL knowledge
+- **Lua section**: Lua fundamentals, modern scripting concepts
+- **Lua from-lsl**: Migration guides leveraging existing LSL knowledge
 - Progressive difficulty within each section
 - Hands-on examples and exercises
 
@@ -158,7 +158,7 @@ Long-form, topic-focused articles explaining complex concepts:
 - Deep dives into specific domains (vehicles, HTTP, pathfinding)
 - Multiple approaches and best practices
 - Advanced techniques and optimizations
-- Both LSL and SLua examples (using tabs)
+- Both LSL and Lua examples (using tabs)
 - Example: "Scripting Vehicles" covers Physical Linden Vehicles, raycast vehicles, custom physics, non-physical movement, wearable vehicles
 
 ### Recipes (`/script/recipes/`)
@@ -166,7 +166,7 @@ Short, task-focused how-tos with working examples:
 - Single, specific task (e.g., "How to script a door")
 - Copy-paste-ready code with explanations
 - Beginner-friendly
-- Both LSL and SLua versions
+- Both LSL and Lua versions
 - Quick solutions for common needs
 
 ### Reference (`/script/reference/`)
@@ -174,7 +174,7 @@ Comprehensive API documentation:
 - **Functions**: Auto-generated from `lsl_definitions.yaml` with custom examples
 - **Events**: Complete event reference with parameters and usage
 - **Constants**: Searchable/filterable constant reference, grouped by category
-- **SLua Libraries**: Documentation for LLEvents, LLTimers, Luau standard library
+- **Lua Libraries**: Documentation for LLEvents, LLTimers, Luau standard library
 - Searchable and filterable overview pages
 - Consistent formatting across all entries
 
@@ -189,7 +189,7 @@ Comprehensive API documentation:
 - Related content links at bottom of pages
 
 ### Code Examples
-- Use Starlight's `<Tabs>` and `<TabItem>` components for LSL/SLua side-by-side
+- Use Starlight's `<Tabs>` and `<TabItem>` components for LSL/Lua side-by-side
 - Syntax highlighting for both languages
 - Copy buttons on all code blocks
 - Link to relevant reference pages from examples
@@ -228,9 +228,9 @@ This taxonomy is designed to scale:
 - Update examples and best practices
 - Distribute to appropriate sections (guides, recipes, learn)
 
-### From context/slua-guide/
-- **language1.md, language2.md** → `/learn/slua/` tutorial pages
-- **moving-*.md** → `/learn/slua/from-lsl/` migration guides
+### From context/lua-guide/
+- **language1.md, language2.md** → `/learn-lua/` tutorial pages
+- **moving-*.md** → `/learn-lua/from-lsl/` migration guides
 - **scripts-*.md** → `/recipes/` or `/guides/` depending on complexity
 - Modernize formatting and integrate with site design
 
@@ -249,4 +249,4 @@ A successful taxonomy enables users to:
 2. **Learn progressively**: Natural path from beginner to advanced
 3. **Solve problems**: Recipes for quick solutions, guides for deep understanding
 4. **Reference easily**: Fast lookup of functions, events, constants
-5. **Transition smoothly**: LSL scripters can migrate to SLua with clear guidance
+5. **Transition smoothly**: LSL scripters can migrate to Lua with clear guidance

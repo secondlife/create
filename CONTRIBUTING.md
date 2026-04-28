@@ -44,10 +44,10 @@ Visit http://localhost:4321 to see your changes.
 The project auto-generates function and event reference pages from LSL definitions:
 
 ```bash
-# Fetch latest LSL/SLua definitions from GitHub
+# Fetch latest LSL/Lua definitions from GitHub
 pnpm fetch:definitions
 
-# Generate all documentation (LSL + SLua functions and events)
+# Generate all documentation (LSL + Lua functions and events)
 pnpm generate:docs
 ```
 
@@ -58,7 +58,7 @@ pnpm generate:docs
 All documentation lives in `src/content/docs/` as Markdown (`.md`) or MDX (`.mdx`) files:
 
 - `script/lsl-reference/` - LSL language reference
-- `script/slua-reference/` - SLua language reference
+- `script/lua-reference/` - Lua language reference
 - `script/guides/` - Scripting tutorials and guides
 - `build/` - Building and construction documentation
 
@@ -73,7 +73,7 @@ Use a **balanced, pragmatic tone**:
 - Avoid marketing language or excessive enthusiasm
 
 **Example:**
-> "Tables are SLua's most powerful data structure. Unlike LSL's separate `list` type, tables serve two purposes: they work as both arrays (like LSL lists) and dictionaries/maps (which LSL doesn't have)."
+> "Tables are Lua's most powerful data structure. Unlike LSL's separate `list` type, tables serve two purposes: they work as both arrays (like LSL lists) and dictionaries/maps (which LSL doesn't have)."
 
 ### Adding New Pages
 
@@ -123,7 +123,7 @@ default {
 ```
 ````
 
-### SLua Code Blocks
+### Lua Code Blocks
 
 Use `luau` (not `lua`) and **always include type annotations**:
 
@@ -135,7 +135,7 @@ end)
 ```
 ````
 
-See [SLUA_REFERENCE.md](SLUA_REFERENCE.md) for detailed SLua documentation guidelines.
+See [LUA_REFERENCE.md](src/content/docs/script/lua-reference/index.mdx) for detailed Lua documentation guidelines.
 
 ## Internationalization
 
@@ -156,7 +156,7 @@ The site supports additional languages. To add translated content:
 │   ├── components/    # Astro components
 │   ├── content/
 │   │   └── docs/      # Documentation content (Markdown/MDX)
-│   ├── definitions/   # LSL/SLua language definitions (YAML)
+│   ├── definitions/   # LSL/Lua language definitions (YAML)
 │   └── styles/        # Custom CSS
 ├── astro.config.mjs   # Astro configuration
 └── CLAUDE.md          # Detailed project guidance
@@ -173,7 +173,7 @@ This repository uses different licenses for different types of content:
 - **Legacy wiki content** (pages with `<WikiAttribution>` component) remains under [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 
 **Code Examples:**
-- **All code examples** (LSL, SLua, JavaScript, etc.) must be contributed under [CC0 1.0 (Public Domain)](https://creativecommons.org/publicdomain/zero/1.0/)
+- **All code examples** (LSL, Lua, JavaScript, etc.) must be contributed under [CC0 1.0 (Public Domain)](https://creativecommons.org/publicdomain/zero/1.0/)
 - This means anyone can use your code examples freely without attribution requirements
 
 ### What This Means for Contributors

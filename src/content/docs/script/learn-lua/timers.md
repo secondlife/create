@@ -1,11 +1,11 @@
 ---
 title: Timers
-description: Timer management in SLua with LLTimers
+description: Timer management in Lua with LLTimers
 ---
 
 ## Introduction
 
-SLua provides the `LLTimers` system for managing timers in your scripts. Unlike LSL's single global timer, `LLTimers` allows you to create multiple independent timers with different intervals and callbacks, giving you precise control over scheduled execution.
+Lua provides the `LLTimers` system for managing timers in your scripts. Unlike LSL's single global timer, `LLTimers` allows you to create multiple independent timers with different intervals and callbacks, giving you precise control over scheduled execution.
 
 ## Creating Timers
 
@@ -500,7 +500,7 @@ Unlike LSL's single global timer:
 - **No state changes needed**: Timers work without state machinery
 
 ```lua
--- In SLua, these all run independently
+-- In Lua, these all run independently
 LLTimers:every(1.0, function() ll.Say(0, "Timer 1") end)
 LLTimers:every(2.0, function() ll.Say(0, "Timer 2") end)
 LLTimers:every(5.0, function() ll.Say(0, "Timer 3") end)
@@ -508,7 +508,7 @@ LLTimers:every(5.0, function() ll.Say(0, "Timer 3") end)
 
 ## Summary
 
-The `LLTimers` system provides flexible timer management in SLua:
+The `LLTimers` system provides flexible timer management in Lua:
 
 - Use `LLTimers:every()` for recurring timers
 - Use `LLTimers:once()` for one-time delayed execution
@@ -522,4 +522,4 @@ This system gives you precise control over scheduled execution without the limit
 
 ---
 
-*This guide covers the LLTimers system for timer management in SLua. For event handling, see the [Events](./events/) documentation.*
+*This guide covers the LLTimers system for timer management in Lua. For event handling, see the [Events](./events/) documentation.*

@@ -1,11 +1,11 @@
 ---
 title: JSON
-description: JSON encoding and decoding in SLua with LLJSON
+description: JSON encoding and decoding in Lua with LLJSON
 ---
 
 ## Introduction
 
-SLua provides the `lljson` library for encoding Lua values to JSON strings and decoding JSON strings back to Lua values. This is essential for data serialization, HTTP requests, and communicating with external services.
+Lua provides the `lljson` library for encoding Lua values to JSON strings and decoding JSON strings back to Lua values. This is essential for data serialization, HTTP requests, and communicating with external services.
 
 ## Basic Usage
 
@@ -600,7 +600,7 @@ end
 
 ## Summary
 
-The `lljson` library provides robust JSON handling in SLua:
+The `lljson` library provides robust JSON handling in Lua:
 
 - Use `lljson.encode()` to convert Lua values to JSON
 - Use `lljson.decode()` to parse JSON strings
@@ -615,4 +615,4 @@ JSON is the standard format for data exchange, making `lljson` essential for HTT
 
 ---
 
-*This guide covers the LLJSON library for JSON encoding and decoding in SLua.*
+*This guide covers the LLJSON library for JSON encoding and decoding in Lua.*
