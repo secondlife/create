@@ -68,9 +68,9 @@ export default defineConfig({
 						// 	autogenerate: { directory: 'script/recipes' },
 						// },
 						{
-							label: 'Learn SLua',
+							label: 'Learn Lua',
 							collapsed: true,
-							autogenerate: { directory: 'script/learn-slua' },
+							autogenerate: { directory: 'script/learn-lua' },
 						},
 						{
 							label: 'Reference',
@@ -81,9 +81,9 @@ export default defineConfig({
 									autogenerate: { directory: 'script/lsl-reference' },
 								},
 								{
-									label: 'SLua',
+									label: 'Lua',
 									collapsed: true,
-									autogenerate: { directory: 'script/slua-reference' },
+									autogenerate: { directory: 'script/lua-reference' },
 								},
 							],
 						},
