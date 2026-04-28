@@ -5,7 +5,7 @@ description: Practical examples and common patterns for Second Life scripting
 
 import { Card, CardGrid, Tabs, TabItem } from '@astrojs/starlight/components';
 
-Looking for working code examples? This collection of recipes shows you how to accomplish common scripting tasks in Second Life. Each recipe includes examples in both LSL and SLua.
+Looking for working code examples? This collection of recipes shows you how to accomplish common scripting tasks in Second Life. Each recipe includes examples in both LSL and Lua.
 
 ## How to Use These Recipes
 
@@ -14,7 +14,7 @@ Each recipe demonstrates a complete, working solution to a specific problem. You
 - Copy and paste the code directly into your scripts
 - Modify the examples to fit your specific needs
 - Learn patterns and techniques to apply elsewhere
-- Compare LSL and SLua approaches side-by-side
+- Compare LSL and Lua approaches side-by-side
 
 ## Recipe Categories
 
@@ -67,7 +67,7 @@ The simplest script - say hello when touched.
   }
   ```
   </TabItem>
-  <TabItem label="SLua">
+  <TabItem label="Lua">
   ```luau
   LLEvents:on("touch_start", function(event: TouchEvent)
       print("Hello, Avatar!")
@@ -100,7 +100,7 @@ Change an object's color when touched, cycling through the rainbow.
   }
   ```
   </TabItem>
-  <TabItem label="SLua">
+  <TabItem label="Lua">
   ```luau
   local colorIndex: number = 1
   local colors: {vector} = {
@@ -137,7 +137,7 @@ Do something every 5 seconds.
   }
   ```
   </TabItem>
-  <TabItem label="SLua">
+  <TabItem label="Lua">
   ```luau
   LLTimers:every(5, function()
       print("5 seconds have passed!")

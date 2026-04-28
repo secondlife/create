@@ -7,7 +7,7 @@ Official documentation for building and scripting in Second Life at **[create.se
 This site provides comprehensive documentation for Second Life creators, covering:
 
 - **LSL (Linden Scripting Language)** - Complete language reference, guides, and examples
-- **SLua (Second Life Lua)** - Modern scripting with Luau, including migration guides from LSL
+- **Lua (Second Life Lua)** - Modern scripting with Luau, including migration guides from LSL
 - **Building & Construction** - Tutorials and reference materials for creating in Second Life
 
 Built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build).
@@ -40,10 +40,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 ```
 src/
 ├── content/docs/          # Documentation (Markdown/MDX)
-│   ├── script/           # LSL & SLua documentation
+│   ├── script/           # LSL & Lua documentation
 │   └── build/            # Building documentation
 ├── components/           # Astro components
-├── definitions/          # LSL/SLua language definitions (YAML)
+├── definitions/          # LSL/Lua language definitions (YAML)
 └── assets/              # Images and media
 ```
 

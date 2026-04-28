@@ -15,7 +15,7 @@ All commands use pnpm:
 - `pnpm build` - Build production site to ./dist/
 - `pnpm preview` - Preview production build locally
 - `pnpm astro check` - Run TypeScript type checking
-- `pnpm generate:docs` - Generate all reference pages (functions, events, and constants) for both LSL and SLua from src/definitions/lsl_definitions.yaml
+- `pnpm generate:docs` - Generate all reference pages (functions, events, and constants) for both LSL and Lua from src/definitions/lsl_definitions.yaml
 
 ## Architecture
 
@@ -30,8 +30,8 @@ Documentation lives in `src/content/docs/` with two main areas:
 **script/** - Scripting documentation (primary focus: LSL portal)
 - `script/guides/` - Scripting guides
 - `script/lsl-reference/` - LSL language reference
-- `script/slua-reference/` - SLua reference
-- `script/learn-slua/` - SLua learning materials
+- `script/lua-reference/` - Lua reference
+- `script/learn-lua/` - Lua learning materials
 
 Files are `.md` or `.mdx` format. Routes auto-generate from file paths (e.g., `docs/script/lsl-reference/example.md` → `/script/lsl-reference/example/`).
 
@@ -71,13 +71,13 @@ All documentation should use a balanced and pragmatic tone that:
 - Use "you" to address the reader directly
 - Be clear and precise without being overly formal
 - Explain the "why" behind concepts, not just the "what"
-- Anticipate common confusion points (especially for LSL-to-SLua migration)
+- Anticipate common confusion points (especially for LSL-to-Lua migration)
 - Use code examples to illustrate concepts
 - Avoid excessive enthusiasm or marketing language
 - Don't oversimplify or condescend to the reader
 
 **Example of preferred tone:**
-> "Tables are SLua's most powerful data structure. Unlike LSL's separate `list` type, tables serve two purposes: they work as both arrays (like LSL lists) and dictionaries/maps (which LSL doesn't have)."
+> "Tables are Lua's most powerful data structure. Unlike LSL's separate `list` type, tables serve two purposes: they work as both arrays (like LSL lists) and dictionaries/maps (which LSL doesn't have)."
 
 ## Adding Documentation
 
@@ -104,7 +104,7 @@ All documentation should use a balanced and pragmatic tone that:
 
 The repository includes reference materials in the `context/` directory (gitignored):
 
-**context/lsl_definitions.yaml** - Comprehensive language definitions for both LSL and SLua, including:
+**context/lsl_definitions.yaml** - Comprehensive language definitions for both LSL and Lua, including:
 - Constants with types, values, and tooltips
 - Functions with signatures, parameters, return types, and descriptions
 - Events and their parameters
@@ -117,8 +117,8 @@ The repository includes reference materials in the `context/` directory (gitigno
 - `flow-control/` - Control flow documentation
 - `lsl-portal/` - General LSL portal pages, tutorials, protocols, examples
 
-**context/slua-guide/** - Suzanna's SLua Guide (https://suzanna-linn.github.io/slua/):
-- Comprehensive educational resource for the SLua language
+**context/lua-guide/** - Suzanna's SLua Guide (https://suzanna-linn.github.io/slua/):
+- Comprehensive educational resource for the Lua language
 - Jekyll-based documentation with markdown files in `docs/` directory
 - Content includes:
   - Language fundamentals: `language1.md`, `language2.md`
@@ -126,13 +126,13 @@ The repository includes reference materials in the `context/` directory (gitigno
   - Practical examples: `scripts-*.md` files with working examples (coroutines, enums, floating texts, sets, web integration)
   - Reference materials: `classes.md`, `transpiler.md`, `beta.md`, `future.md`, `history.md`
 - Licensed under Creative Commons Attribution 4.0 (text) and MIT License (code examples)
-- Use as reference for SLua language documentation and migration patterns
+- Use as reference for Lua language documentation and migration patterns
 
 **context/taxonomy.md** - Proposed site architecture and content taxonomy:
 - Scripting portal structure with sections for Getting Started, Features, Guides, and Recipes
-- Planned organization for SLua/LSL language documentation
+- Planned organization for Lua/LSL language documentation
 - Standard library/reference organization patterns
-- Site-wide SLua/LSL toggle considerations
+- Site-wide Lua/LSL toggle considerations
 
 These files are reference materials for building the new documentation. They should be transformed into clean, modern Markdown/MDX format in `src/content/docs/`.
 
@@ -153,20 +153,20 @@ When building documentation, use `context/lsl_definitions.yaml` as the authorita
 
 ## Reference Page Generation
 
-The project includes an automated generator for creating LSL and SLua reference pages for functions, events, and constants:
+The project includes an automated generator for creating LSL and Lua reference pages for functions, events, and constants:
 
 **Generator Script:** `scripts/generate-docs.js`
 - Parses `src/definitions/lsl_definitions.yaml` to extract definitions
-- Supports both LSL and SLua/Luau generation
-- Creates MDX pages with appropriate components (LSLFunction/SLuaFunction, LSLEvent/SLuaEvent, LSLConstant/SLuaConstant)
+- Supports both LSL and Lua/Luau generation
+- Creates MDX pages with appropriate components (LSLFunction/LuaFunction, LSLEvent/LuaEvent, LSLConstant/LuaConstant)
 - Run with: `pnpm generate:docs`
 - Generates pages in:
   - LSL functions: `src/content/docs/script/lsl-reference/functions/`
-  - SLua functions: `src/content/docs/script/slua-reference/functions/`
+  - Lua functions: `src/content/docs/script/lua-reference/functions/`
   - LSL events: `src/content/docs/script/lsl-reference/events/`
-  - SLua events: `src/content/docs/script/slua-reference/events/`
+  - Lua events: `src/content/docs/script/lua-reference/events/`
   - LSL constants: `src/content/docs/script/lsl-reference/constants/`
-  - SLua constants: `src/content/docs/script/slua-reference/constants/`
+  - Lua constants: `src/content/docs/script/lua-reference/constants/`
 
 **Custom Content Preservation:**
 Generated pages support custom content that persists across regenerations. Any content after the component tag (e.g., `<LSLFunction />`, `<LSLEvent />`, `<LSLConstant />`) and before the optional attribution footer will be preserved when re-running the generator. This allows you to:
@@ -178,7 +178,7 @@ Generated pages support custom content that persists across regenerations. Any c
 **Generated Page Structure:**
 1. Frontmatter with title and description
 2. Component import statements
-3. Reference component tag (LSLFunction/SLuaFunction, LSLEvent/SLuaEvent, or LSLConstant/SLuaConstant)
+3. Reference component tag (LSLFunction/LuaFunction, LSLEvent/LuaEvent, or LSLConstant/LuaConstant)
 4. Custom content marker comment: `{/* DO NOT EDIT ABOVE THIS LINE */}`
 5. Custom content section for examples, notes, and related links
 6. Optional WikiAttribution footer (for LSL pages)
@@ -188,17 +188,17 @@ Generated pages support custom content that persists across regenerations. Any c
 Functions:
 - `src/components/FunctionReference.astro` - Base function reference component
 - `src/components/LSLFunction.astro` - LSL function wrapper
-- `src/components/SLuaFunction.astro` - SLua function wrapper
+- `src/components/SLuaFunction.astro` - Lua function wrapper
 
 Events:
 - `src/components/EventReference.astro` - Base event reference component
 - `src/components/LSLEvent.astro` - LSL event wrapper
-- `src/components/SLuaEvent.astro` - SLua event wrapper
+- `src/components/SLuaEvent.astro` - Lua event wrapper
 
 Constants:
 - `src/components/ConstantReference.astro` - Base constant reference component
 - `src/components/LSLConstant.astro` - LSL constant wrapper
-- `src/components/SLuaConstant.astro` - SLua constant wrapper
+- `src/components/SLuaConstant.astro` - Lua constant wrapper
 
 These components dynamically load data from `src/definitions/lsl_definitions.yaml` at build time, requiring only the name as a prop. All metadata (signatures, parameters, types, values, energy costs, sleep times, badges) is loaded from the YAML file.
 
