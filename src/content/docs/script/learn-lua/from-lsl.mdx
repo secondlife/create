@@ -26,7 +26,7 @@ You already know how Second Life scripting works—events, permissions, object c
 ### Comments & Structure
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 // Single line comment
 /* Multi-line
@@ -49,7 +49,7 @@ local x: number = 5  -- Semicolons optional (rarely used)
 ### Variables & Types
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 // Type declarations required
 integer health = 100;
@@ -57,7 +57,7 @@ float damage = 25.5;
 string name = "Alice";
 vector pos = <10, 20, 30>;
 rotation rot = <0, 0, 0, 1>;
-key uuid = "...";
+key k = "...";
 list items = [1, 2, 3];
 ```
 </Fragment>
@@ -69,7 +69,7 @@ local damage: number = 25.5
 local name: string = "Alice"
 local pos: vector = vector(10, 20, 30)
 local rot: quaternion = quaternion(0, 0, 0, 1)
-local uuid: string = "..."  -- keys are strings
+local k: uuid = uuid("...")
 local items: {number} = {1, 2, 3}  -- tables, not lists
 ```
 </Fragment>
@@ -78,6 +78,34 @@ local items: {number} = {1, 2, 3}  -- tables, not lists
 <Aside type="caution">
   **Type annotations recommended!** While optional, they catch errors before runtime and make code self-documenting.
 </Aside>
+
+#### Typecasting
+In many cases, Luau does typecasting automatically. Here's how to do it explicitly:
+<CodeComparison>
+<Fragment slot="LSL">
+```lsl
+(integer)"-4.4";
+(float)"25.5";
+(string)99.9;
+(vector)"<10, 20, 30>";
+(rotation)"<0, 0, 0, 1>";
+(key)"700843d3-0d15-c427-81ab-e9c8a0dcdb1e";
+(list)"hello"; // equivilant to ["hello"]
+```
+</Fragment>
+<Fragment slot="Lua">
+```luau
+(math.modf(tonumber("-4.4") or 0)) -- extra parentheses sometimes necessary
+tonumber("25.5") or 0
+tostring(99.9)
+tovector("<10, 20, 30>") or ZERO_VECTOR
+toquaternion("<0, 0, 0, 1>") or ZERO_ROTATION
+uuid("700843d3-0d15-c427-81ab-e9c8a0dcdb1e") or NULL_KEY
+{"hello"}  -- table, not list
+```
+</Fragment>
+</CodeComparison>
+LSL and Lua typecasts return different results on invalid input: LSL returns "zero"; Lua returns `nil`. The Lua examples include an `or` expressions that converts `nil` to what LSL typecast would have returned
 
 ### Operators
 
@@ -97,7 +125,7 @@ local items: {number} = {1, 2, 3}  -- tables, not lists
 ### Control Flow
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 // if, then, else
 if (x > 5) {
@@ -156,7 +184,7 @@ until count >= 10
 ### Functions
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 float calculateDamage(float base, float mult) {
     return base * mult;
@@ -190,7 +218,7 @@ Tables are Lua's most powerful data structure. Unlike LSL's separate `list` type
 #### Tables as Arrays (LSL list replacement)
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 list items = [10, 20, 30, 40];
 
@@ -287,7 +315,7 @@ ll.Say(0, `Name: {data.name}`)  -- "Alice"
 ### String Operations
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 string msg = "Hello" + " " + "World";
 string name = "Alice";
@@ -312,7 +340,7 @@ local sub: string = string.sub(msg, 1, 5)  -- "Hello" (1-based!)
 ### ll* Functions
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 llSay(0, "Hello");
 llSetPos(<10, 20, 30>);
@@ -337,7 +365,7 @@ ll.GiveInventory(avatar, "Object")
 This is the most significant difference between LSL and Lua. Instead of state-based event handlers, Lua uses **event callbacks** with `LLEvents:on()`.
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 integer clickCount = 0;
 
@@ -418,7 +446,7 @@ end)
 ## Global Variables
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 // All script-level variables are global
 integer health = 100;
@@ -449,7 +477,7 @@ end
 ### Door Script
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 integer isOpen = FALSE;
 vector closedPos;
@@ -495,7 +523,7 @@ end)
 ### Timer Events
 
 <CodeComparison>
-<Fragment slot="lsl">
+<Fragment slot="LSL">
 ```lsl
 integer counter = 0;
 
