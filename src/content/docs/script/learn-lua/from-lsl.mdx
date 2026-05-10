@@ -101,7 +101,7 @@ local items: {number} = {1, 2, 3}  -- tables, not lists
 | Bitwise Shift Right | `0x80000000 >> 2` | `bit32.arshift(0x80000000, 2)` | No `>>` operator [(2)](#s32) |
 
 Notes:
-1. <a name="band"/>`bit32.btest` returns a boolean; `bit32.band` returns an integer.
+1. <a name="band"/>`bit32.btest` returns a boolean; `bit32.band` returns an integer. Both match the behavior of LSL `&`.
     Integers (`bit32.band`) don't work inside `if` statements, unlike LSL. Use whichever is most appropriate.
 2. <a name="s32"/>Hexadecimal numbers `0x8000000` and above are positive in Lua, but negative in LSL,
     due to different number formats (signed 32-bit int vs 64-bit float). Use `bit32.s32` to wrap large numbers 
