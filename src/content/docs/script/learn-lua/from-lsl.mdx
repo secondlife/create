@@ -407,7 +407,7 @@ end)
 **Accessing detected data:**
 ```luau
 LLEvents:on("touch_start", function(events: {DetectedEvent})
-    for i: number, event: DetectedEvent in events do
+    for i, event in events do
         local name: string = event:getName()
         local key: uuid = event:getKey()
         ll.Say(0, `{name} touched me!`)
