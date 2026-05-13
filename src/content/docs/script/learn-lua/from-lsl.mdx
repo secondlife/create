@@ -111,7 +111,7 @@ LSL and Lua typecasts return different results on invalid input: LSL returns "ze
 
 | Operation | LSL | Lua | Notes |
 |-----------|-----|------|-------|
-| Not equal | `!=` | `~=` | Different operator |
+| Not equal | `!=` | `~=` | **Different operator** |
 | Logical AND | `&&` | `and` | Word, not symbol |
 | Logical OR | `\|\|` | `or` | Word, not symbol |
 | Logical NOT | `!` | `not` | Word, not symbol |
@@ -121,6 +121,19 @@ LSL and Lua typecasts return different results on invalid input: LSL returns "ze
 | Power | `llPow(2, 3)` | `2 ^ 3` | Native operator |
 | Integer division | `7 / 4` → `1` | `7 // 4` → `1` | Use `//` not `/` |
 | String length | `llStringLength(s)` | `#s` | Native operator |
+| Bitwise AND | `llGetAgentInfo(id) & AGENT_TYPING` | `bit32.btest(ll.GetAgentInfo(id), AGENT_TYPING)` | No `&` operator [(1)](#band) |
+| Bitwise OR | `PASSIVE \| SCRIPTED` | `bit32.bor(PASSIVE, SCRIPTED)` | No `\|` operator |
+| Bitwise NOT | `~0` | `bit32.bnot(0)` | No `~` operator [(2)](#s32) |
+| Bitwise eXclusive OR | `6 ^ 3` | `bit32.bxor(6, 3)` | `^` means Power instead [(2)](#s32) |
+| Bitwise Shift Left | `1 << 2` | `bit32.lshift(1, 2)` | No `<<` operator [(2)](#s32) |
+| Bitwise Shift Right | `0x80000000 >> 2` | `bit32.arshift(0x80000000, 2)` | No `>>` operator [(2)](#s32) |
+
+Notes:
+1. <a name="band"/>`bit32.btest` returns a boolean; `bit32.band` returns an integer. Both match the behavior of LSL `&`.
+    Integers (`bit32.band`) don't work inside `if` statements, unlike LSL. Use whichever is most appropriate.
+2. <a name="s32"/>Hexadecimal numbers `0x8000000` and above are positive in Lua, but negative in LSL,
+    due to different number formats (signed 32-bit int vs 64-bit float). Use `bit32.s32` to wrap large numbers 
+    down to the 32-bit signed integer range for LSL compatability.
 
 ### Control Flow
 
