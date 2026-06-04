@@ -12,11 +12,11 @@
     "generate:docs": "node scripts/generate-docs.js"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.36.2",
-    "astro": "^5.16.0",
+    "@astrojs/starlight": "^0.39.3",
+    "astro": "^6.1.10",
     "js-yaml": "^4.1.1",
     "sharp": "^0.34.5",
-    "yaml": "^2.8.1"
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.5",

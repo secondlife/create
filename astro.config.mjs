@@ -70,7 +70,7 @@ export default defineConfig({
 						{
 							label: 'Learn Lua',
 							collapsed: true,
-							autogenerate: { directory: 'script/learn-lua' },
+							items: [{ autogenerate: { directory: 'script/learn-lua', collapsed: true } }],
 						},
 						{
 							label: 'Reference',
@@ -78,12 +78,12 @@ export default defineConfig({
 								{
 									label: 'LSL',
 									collapsed: true,
-									autogenerate: { directory: 'script/lsl-reference' },
+									items: [{ autogenerate: { directory: 'script/lsl-reference', collapsed: true } }],
 								},
 								{
 									label: 'Lua',
 									collapsed: true,
-									autogenerate: { directory: 'script/lua-reference' },
+									items: [{ autogenerate: { directory: 'script/lua-reference', collapsed: true } }],
 								},
 							],
 						},
