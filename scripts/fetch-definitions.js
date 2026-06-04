@@ -25,7 +25,6 @@ export async function fetchDefinitions(url = DEFAULT_URL) {
     await mkdir(dirname(OUTPUT_PATH), { recursive: true });
 
     // OUTPUT_PATH is hardcoded via import.meta.url; HTTP response cannot influence the write location.
-    // lgtm[js/http-to-file-access]
     await writeFile(OUTPUT_PATH, content, 'utf8');
 
     console.log(`Successfully saved LSL definitions to: ${OUTPUT_PATH}`);
