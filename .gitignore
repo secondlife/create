@@ -9,3 +9,7 @@ node_modules/
 *.log
 *.zip
 .DS_Store
+
+# local-only
+.env*
+scratch/
