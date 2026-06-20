@@ -1,23 +1,67 @@
+# Dependabot configuration.
+# Docs: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Strategy:
+#   - Batch minor/patch bumps into a small number of grouped PRs to reduce review noise.
+#   - Let major bumps arrive as individual PRs so breaking changes can be reviewed in isolation.
+#   - Bundle all security advisories into a single PR (security PRs are otherwise always individual).
 version: 2
 updates:
+  # ---------------------------------------------------------------------------
+  # npm / pnpm packages (package.json + pnpm-lock.yaml)
+  # ---------------------------------------------------------------------------
   - package-ecosystem: npm
     directory: "/"
     schedule:
       interval: weekly
+    # Cap concurrent non-grouped PRs (e.g. major bumps). Grouped PRs don't count.
     open-pull-requests-limit: 10
     assignees:
       - mcgroarty
     groups:
+      # Astro + first-party plugins move together; keep them in their own PR
+      # so an Astro upgrade isn't buried in unrelated dependency churn.
+      # Listed first so these packages land here instead of in production-dependencies.
       astro:
         patterns:
           - "astro"
           - "@astrojs/*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Everything else in `dependencies` (runtime).
+      production-dependencies:
+        dependency-type: production
+        update-types:
+          - "minor"
+          - "patch"
+      # Everything in `devDependencies` (tooling, types, etc.).
       dev-dependencies:
         dependency-type: development
+        update-types:
+          - "minor"
+          - "patch"
+      # Security advisories. `applies-to: security-updates` is required because
+      # security PRs are individual by default, even when they match a version-update group.
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
 
+  # ---------------------------------------------------------------------------
+  # GitHub Actions used in .github/workflows/
+  # ---------------------------------------------------------------------------
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
     assignees:
       - mcgroarty
+    groups:
+      actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
