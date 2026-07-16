@@ -22,11 +22,19 @@ updates:
       # Astro + first-party plugins move together; keep them in their own PR
       # so an Astro upgrade isn't buried in unrelated dependency churn.
       # Listed first so these packages land here instead of in production-dependencies.
+      #
+      # Includes "major" (unlike other groups) because Astro's ecosystem
+      # packages have tightly coupled peer-dependency requirements: a
+      # Starlight minor bump can require an Astro major bump. Grouping majors
+      # here keeps the ecosystem in sync in a single PR. Note: 0.x → 0.y
+      # bumps for @astrojs/* packages are classified as "minor" by SemVer
+      # but frequently contain breaking changes, so review carefully.
       astro:
         patterns:
           - "astro"
           - "@astrojs/*"
         update-types:
+          - "major"
           - "minor"
           - "patch"
       # Everything else in `dependencies` (runtime).
