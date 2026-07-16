@@ -1,4 +1,4 @@
-import yaml from 'js-yaml';
+import { load } from 'js-yaml';
 import lslDefinitionsRaw from '../definitions/lsl_definitions.yaml?raw';
 
 interface HasTooltip {
@@ -50,7 +50,7 @@ let cachedDefinitions: LSLDefinitions | null = null;
 export function getLSLDefinitions(): LSLDefinitions {
     // Lazy load and cache definitions
     if (cachedDefinitions === null) {
-        cachedDefinitions = convertLSLDefinitions(yaml.load(lslDefinitionsRaw));
+        cachedDefinitions = convertLSLDefinitions(load(lslDefinitionsRaw));
     }
     return cachedDefinitions;
 }
