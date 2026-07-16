@@ -18,6 +18,20 @@ updates:
     open-pull-requests-limit: 10
     assignees:
       - mcgroarty
+    ignore:
+      # js-yaml v5 dropped its CommonJS default export. Astro and
+      # @astrojs/starlight consume js-yaml via `import yaml from 'js-yaml'`,
+      # which fails at build time with:
+      #   "The requested module 'js-yaml' does not provide an export named 'default'"
+      # Hold at v4 until upstream Astro/Starlight switch to named imports,
+      # then remove this ignore.
+      #
+      # Note: `ignore` blocks routine version updates only. Security-driven
+      # updates from the GitHub Advisory Database are unaffected and will
+      # still open PRs if a CVE lands against js-yaml 4.x.
+      - dependency-name: "js-yaml"
+        update-types:
+          - "version-update:semver-major"
     groups:
       # Astro + first-party plugins move together; keep them in their own PR
       # so an Astro upgrade isn't buried in unrelated dependency churn.
