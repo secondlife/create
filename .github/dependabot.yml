@@ -52,14 +52,22 @@ updates:
           - "minor"
           - "patch"
       # Everything else in `dependencies` (runtime).
+      # Explicitly exclude the astro group's packages; group order alone
+      # didn't keep them out (see create#80 and create#81).
       production-dependencies:
         dependency-type: production
+        exclude-patterns:
+          - "astro"
+          - "@astrojs/*"
         update-types:
           - "minor"
           - "patch"
       # Everything in `devDependencies` (tooling, types, etc.).
       dev-dependencies:
         dependency-type: development
+        exclude-patterns:
+          - "astro"
+          - "@astrojs/*"
         update-types:
           - "minor"
           - "patch"
@@ -86,4 +94,3 @@ updates:
         update-types:
           - "minor"
           - "patch"
-
